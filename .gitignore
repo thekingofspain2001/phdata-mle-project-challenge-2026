@@ -1,0 +1,30 @@
+# Local env — never commit secrets or local overrides
+.env
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Test / coverage artifacts
+.pytest_cache/
+.coverage
+htmlcov/
+test-results/
+
+# IDE
+.vscode/
+.idea/
+
+# Local convenience symlinks to src/data and src/model
+/data
+/model
+
+# OS
+.DS_Store
+Thumbs.db
