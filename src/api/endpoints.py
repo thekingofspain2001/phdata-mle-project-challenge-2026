@@ -3,6 +3,7 @@ from pydantic import BaseModel
 import json
 import pathlib
 import pickle
+import pandas as pd
 
 router = APIRouter()
 
