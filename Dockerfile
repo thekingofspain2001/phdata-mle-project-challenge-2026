@@ -1,4 +1,5 @@
-FROM ghcr.io/astral-sh/uv:python3.14-trixie-slim AS builder
+ARG PYTHON_VERSION=3.14
+FROM ghcr.io/astral-sh/uv:python${PYTHON_VERSION}-trixie-slim AS builder
 
 WORKDIR /app
 
@@ -10,7 +11,8 @@ COPY src ./src
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --locked --no-dev --no-install-project
 
-FROM python:3.14-slim
+ARG PYTHON_VERSION=3.14
+FROM python:${PYTHON_VERSION}-slim
 
 WORKDIR /app
 
