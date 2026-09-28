@@ -3,7 +3,7 @@ import pytest
 
 @pytest.mark.integration
 def test_predict_endpoint_integration(http_client, sample_home_features):
-    """Test the /predict endpoint via HTTP using httpx client."""
+    """Test the /predict endpoint via HTTP using httpx2 client."""
     response = http_client.post("/predict", json=sample_home_features)
     assert response.status_code == 200
     response_data = response.json()
@@ -14,7 +14,7 @@ def test_predict_endpoint_integration(http_client, sample_home_features):
 
 @pytest.mark.integration
 def test_health_endpoint_integration(http_client):
-    """Test the /health endpoint via HTTP using httpx client."""
+    """Test the /health endpoint via HTTP using httpx2 client."""
     response = http_client.get("/health")
     assert response.status_code == 200
     response_data = response.json()

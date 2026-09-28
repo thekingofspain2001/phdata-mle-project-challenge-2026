@@ -1,6 +1,6 @@
 import pytest
 from fastapi.testclient import TestClient
-import httpx
+import httpx2
 import os
 
 
@@ -19,8 +19,8 @@ def api_base_url():
 
 @pytest.fixture
 def http_client(api_base_url):
-    """Fixture for integration tests using httpx."""
-    return httpx.Client(base_url=api_base_url, timeout=10.0)
+    """Fixture for integration tests using httpx2."""
+    return httpx2.Client(base_url=api_base_url, timeout=10.0)
 
 
 @pytest.fixture
