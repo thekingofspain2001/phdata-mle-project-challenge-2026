@@ -1,13 +1,28 @@
-from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
+"""API endpoints for home price prediction."""
+
 import json
+import logging
+import pathlib
 import pickle
+
 import pandas as pd
+from fastapi import APIRouter
+from pydantic import BaseModel
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
+# ponytail: anchored to package file, CWD-independent; no symlinks needed
+_SRC = pathlib.Path(__file__).resolve().parents[1]
+MODEL_PATH = _SRC / "model" / "model.pkl"
+FEATURES_PATH = _SRC / "model" / "model_features.json"
+DEMOGRAPHICS_PATH = _SRC / "data" / "zipcode_demographics.csv"
+
 
 class HomeFeatures(BaseModel):
+    """Input features for home price prediction."""
+
     bedrooms: int
     bathrooms: float
     sqft_living: float
@@ -19,34 +34,37 @@ class HomeFeatures(BaseModel):
 
 
 @router.get("/health")
-async def health_check():
-    """
-    Health check endpoint for container orchestration.
-    Returns 200 if API is ready to accept requests.
+def health_check() -> dict[str, str]:
+    """Check API readiness.
+
+    Return 200 with a healthy status when ready to accept requests.
     """
     return {"status": "healthy"}
 
 
 @router.post("/predict")
-async def predict(home_features: HomeFeatures):
+def predict(home_features: HomeFeatures) -> dict[str, float]:
+    """Predict a home sale price from listing and demographic features."""
     # Load the model and features
-    with open("model/model.pkl", "rb") as model_file:
+    with MODEL_PATH.open("rb") as model_file:
         model = pickle.load(model_file)
 
-    with open("model/model_features.json") as features_file:
-        model_features = json.load(features_file)
-        
-    input_data = pd.DataFrame([home_features.model_dump()])
+    with FEATURES_PATH.open() as features_file:
+        model_features: list[str] = json.load(features_file)
+
+    input_data: pd.DataFrame = pd.DataFrame([home_features.model_dump()])
 
     # Load demographic data
-    demographics = pd.read_csv("data/zipcode_demographics.csv", dtype={"zipcode": str})
-    demographic_info = demographics[
-        demographics["zipcode"] == home_features.zipcode
-    ].drop(columns="zipcode").reset_index(drop=True)
+    demographics = pd.read_csv(DEMOGRAPHICS_PATH, dtype={"zipcode": str})
+    demographic_info = (
+        demographics[demographics["zipcode"] == home_features.zipcode]
+        .drop(columns="zipcode")
+        .reset_index(drop=True)
+    )
 
     # Combine input data with demographic data
     input_data = pd.concat([input_data, demographic_info], axis=1)
-    print(input_data)
+    logger.info("input_data: %s", input_data)
 
     # Ensure the input data has the correct features
     input_data = input_data[model_features]
