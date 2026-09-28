@@ -1,8 +1,11 @@
 .PHONY: test-build test-unit test-integration test-all clean help
 
+# Single source: .python-version drives every image
+PYTHON_VERSION := $(shell cat .python-version)
+
 # Build the test Docker image
 test-build:
-	docker build -f Dockerfile.test -t ml-api-test .
+	docker build --build-arg PYTHON_VERSION=$(PYTHON_VERSION) -f Dockerfile.test -t ml-api-test .
 
 # Run unit tests only (fast, no Docker Compose)
 test-unit: test-build
@@ -12,12 +15,12 @@ test-unit: test-build
 
 # Run integration tests with Docker Compose
 test-integration:
-	docker-compose -f docker-compose.test.yml up --build --abort-on-container-exit --exit-code-from test
+	PYTHON_VERSION=$(PYTHON_VERSION) docker compose -f docker-compose.test.yml up --build --abort-on-container-exit --exit-code-from test
 
 # Run all tests (unit + integration)
 test-all: test-build
 	@echo "Running integration tests..."
-	docker-compose -f docker-compose.test.yml up --build --abort-on-container-exit --exit-code-from test
+	PYTHON_VERSION=$(PYTHON_VERSION) docker compose -f docker-compose.test.yml up --build --abort-on-container-exit --exit-code-from test
 	@echo "Running unit tests..."
 	docker run --rm \
 		-v $(PWD)/test-results:/app/test-results \
@@ -25,7 +28,7 @@ test-all: test-build
 
 # Clean up containers and test artifacts
 clean:
-	docker-compose -f docker-compose.test.yml down -v
+	docker compose -f docker-compose.test.yml down -v
 	rm -rf test-results/*
 
 # Display help information

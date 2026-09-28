@@ -1,14 +1,25 @@
-FROM python:3.10-slim
+ARG PYTHON_VERSION=3.14
+FROM ghcr.io/astral-sh/uv:python${PYTHON_VERSION}-trixie-slim AS builder
 
 WORKDIR /app
 
-# Copy requirements from project root
-COPY requirements.txt .
+ENV UV_LINK_MODE=copy
 
-# Copy the create_model script and data
-COPY create_model.py .
+COPY pyproject.toml uv.lock .python-version ./
 COPY src/data ./data
 
-RUN pip install --no-cache-dir -r requirements.txt
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --locked --no-dev --no-install-project
+
+ARG PYTHON_VERSION=3.14
+FROM python:${PYTHON_VERSION}-slim
+
+WORKDIR /app
+
+COPY --from=builder /app/.venv /app/.venv
+COPY src/model/create_model.py ./
+COPY src/data ./data
+
+ENV PATH="/app/.venv/bin:$PATH"
 
 CMD ["python", "create_model.py"]
