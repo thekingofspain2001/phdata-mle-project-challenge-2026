@@ -10,7 +10,7 @@ jobs:
   unit:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: astral-sh/setup-uv@v5
         with:
           python-version-file: .python-version
@@ -21,7 +21,7 @@ jobs:
   images:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - run: docker build --build-arg PYTHON_VERSION=$(cat .python-version) -f Dockerfile -t ml-api:ci .
       - run: docker build --build-arg PYTHON_VERSION=$(cat .python-version) -f Dockerfile.test -t ml-api-test:ci .
       - run: docker run --rm ml-api-test:ci pytest test/unit -q -p no:cacheprovider --no-cov
