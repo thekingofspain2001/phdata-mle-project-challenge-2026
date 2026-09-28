@@ -21,9 +21,6 @@ test-results/
 .vscode/
 .idea/
 
-# Local convenience symlinks to src/data and src/model
-/data
-/model
 
 # OS
 .DS_Store

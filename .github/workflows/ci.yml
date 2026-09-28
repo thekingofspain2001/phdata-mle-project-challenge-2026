@@ -13,7 +13,6 @@ jobs:
       - uses: actions/checkout@v5
       - uses: astral-sh/setup-uv@v7
       - run: uv sync --locked --group test
-      - run: ln -sf src/model model && ln -sf src/data data
       - run: uv run --group test pytest test/unit -q -p no:cacheprovider --no-cov
 
   images:

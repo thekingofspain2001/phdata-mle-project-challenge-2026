@@ -24,8 +24,6 @@ COPY src ./src
 COPY test ./test
 COPY pyproject.toml ./
 
-RUN ln -s /app/src/model /app/model && \
-    ln -s /app/src/data /app/data
 
 ENV PATH="/app/.venv/bin:$PATH"
 
