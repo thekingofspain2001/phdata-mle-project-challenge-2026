@@ -1,0 +1,27 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          python-version-file: .python-version
+      - run: uv sync --locked --group test
+      - run: ln -sf src/model model && ln -sf src/data data
+      - run: uv run --group test pytest test/unit -q -p no:cacheprovider --no-cov
+
+  images:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build --build-arg PYTHON_VERSION=$(cat .python-version) -f Dockerfile -t ml-api:ci .
+      - run: docker build --build-arg PYTHON_VERSION=$(cat .python-version) -f Dockerfile.test -t ml-api-test:ci .
+      - run: docker run --rm ml-api-test:ci pytest test/unit -q -p no:cacheprovider --no-cov
