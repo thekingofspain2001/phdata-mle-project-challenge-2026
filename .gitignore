@@ -17,8 +17,13 @@ __pycache__/
 htmlcov/
 test-results/
 
-# IDE
-.vscode/
+# Notebook outputs (regenerated on execute)
+notebooks/imputation_comparison_results.csv
+
+# IDE (share settings + recommended extensions, ignore machine-local state)
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
 .idea/
 
 

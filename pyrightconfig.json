@@ -1,0 +1,10 @@
+{
+    "typeCheckingMode": "strict",
+    "executionEnvironments": [
+        {
+            "root": "notebooks",
+            "reportUnknownMemberType": "none",
+            "reportUnknownVariableType": "none"
+        }
+    ]
+}
