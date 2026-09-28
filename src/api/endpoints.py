@@ -36,7 +36,7 @@ async def predict(home_features: HomeFeatures):
     with open("model/model_features.json") as features_file:
         model_features = json.load(features_file)
         
-    input_data = pd.DataFrame([home_features.dict()])
+    input_data = pd.DataFrame([home_features.model_dump()])
 
     # Load demographic data
     demographics = pd.read_csv("data/zipcode_demographics.csv", dtype={"zipcode": str})
