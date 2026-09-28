@@ -1,26 +1,30 @@
-FROM python:3.10-slim
+FROM ghcr.io/astral-sh/uv:python3.14-trixie-slim AS builder
 
 WORKDIR /app
 
-# Set PYTHONPATH to allow imports from src and within src
-ENV PYTHONPATH=/app:/app/src
+ENV UV_LINK_MODE=copy
 
-# Copy and install production dependencies
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Copy and install test dependencies
-COPY requirements-test.txt .
-RUN pip install --no-cache-dir -r requirements-test.txt
-
-# Copy application code
+COPY pyproject.toml uv.lock .python-version ./
 COPY src ./src
 COPY test ./test
-COPY pytest.ini .
 
-# Create symlinks for model and data directories to match expected paths
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --locked --group test --no-install-project
+
+FROM python:3.14-slim
+
+WORKDIR /app
+
+ENV PYTHONPATH=/app:/app/src
+
+COPY --from=builder /app/.venv /app/.venv
+COPY src ./src
+COPY test ./test
+COPY pyproject.toml ./
+
 RUN ln -s /app/src/model /app/model && \
     ln -s /app/src/data /app/data
 
-# Default command runs all tests with coverage
+ENV PATH="/app/.venv/bin:$PATH"
+
 CMD ["pytest"]

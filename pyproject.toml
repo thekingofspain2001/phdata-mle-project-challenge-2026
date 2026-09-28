@@ -1,0 +1,36 @@
+[project]
+name = "phdata-mle-project"
+version = "0.1.0"
+requires-python = ">=3.14"
+dependencies = [
+    "fastapi",
+    "uvicorn",
+    "pandas",
+    "scikit-learn",
+    "pydantic",
+    "numpy",
+    "matplotlib",
+    "nbclient",
+    "seaborn",
+]
+
+[dependency-groups]
+test = [
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+    "httpx>=0.24.0",
+    "hypothesis>=6.82.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["test"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v --strict-markers --tb=short"
+pythonpath = [".", "src"]
+markers = [
+    "unit: Unit tests using TestClient",
+    "integration: Integration tests requiring running API",
+    "slow: Tests that take significant time",
+]
