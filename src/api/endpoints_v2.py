@@ -9,6 +9,18 @@ from api.shared import REQUEST_COLUMNS, Artifacts, predict_price, require_artifa
 router_v2 = APIRouter(tags=["v2"])
 
 
+class PredictionResponse(BaseModel):
+    """Predicted home sale price."""
+
+    predicted_price: float = Field(examples=[394708.0])
+
+
+class ErrorDetail(BaseModel):
+    """String-detail error body returned by v2 routes."""
+
+    detail: str = Field(examples=["Unknown zipcode: 00000"])
+
+
 class HomeFeaturesV2(BaseModel):
     """Input features for home price prediction v2; non-zipcode fields nullable."""
 
@@ -22,15 +34,19 @@ class HomeFeaturesV2(BaseModel):
     zipcode: str = Field(pattern=r"^\d{5}$", examples=["98125"])
 
 
-@router_v2.get("/health/v2")
+@router_v2.get("/health/v2", responses={503: {"model": ErrorDetail}})
 def health_check_v2(request: Request) -> dict[str, str]:
     """Check v2 API readiness (lifespan artifacts incl. imputer)."""
     require_artifacts(request)
     return {"status": "healthy"}
 
 
-@router_v2.post("/predict/v2")
-def predict_v2(home_features: HomeFeaturesV2, request: Request) -> dict[str, float]:
+@router_v2.post(
+    "/predict/v2",
+    response_model=PredictionResponse,
+    responses={404: {"model": ErrorDetail}, 500: {"model": ErrorDetail}},
+)
+def predict_v2(home_features: HomeFeaturesV2, request: Request) -> PredictionResponse:
     """Predict a home sale price, imputing null fields via KNN (k=5)."""
     try:
         artifacts: Artifacts = require_artifacts(request)
@@ -46,4 +62,4 @@ def predict_v2(home_features: HomeFeaturesV2, request: Request) -> dict[str, flo
         )
         row[REQUEST_COLUMNS] = filled
         payload |= {c: float(row.iloc[0][c]) for c in REQUEST_COLUMNS}
-    return predict_price(payload, artifacts)
+    return PredictionResponse(**predict_price(payload, artifacts))
