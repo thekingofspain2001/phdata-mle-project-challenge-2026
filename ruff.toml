@@ -6,5 +6,5 @@ select = ["ALL"]
 ignore = ["CPY001"] # no copyright headers anywhere in repo; rule contradicts convention
 
 [lint.per-file-ignores]
-"test/**/*.py" = ["S101"]
+"test/**/*.py" = ["S101", "TC002"] # TC002: test typing imports are runtime-loaded
 
