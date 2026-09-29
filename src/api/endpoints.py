@@ -6,7 +6,7 @@ import pathlib
 import pickle
 
 import pandas as pd
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
 logger = logging.getLogger(__name__)
@@ -61,6 +61,8 @@ def predict(home_features: HomeFeatures) -> dict[str, float]:
         .drop(columns="zipcode")
         .reset_index(drop=True)
     )
+    if demographic_info.empty:
+        raise HTTPException(status_code=404, detail=f"Unknown zipcode: {home_features.zipcode}")
 
     # Combine input data with demographic data
     input_data = pd.concat([input_data, demographic_info], axis=1)
