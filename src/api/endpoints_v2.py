@@ -15,6 +15,12 @@ class PredictionResponse(BaseModel):
     predicted_price: float = Field(examples=[394708.0])
 
 
+class HealthResponse(BaseModel):
+    """Service health status."""
+
+    status: str = Field(examples=["healthy"])
+
+
 class ErrorDetail(BaseModel):
     """String-detail error body returned by v2 routes."""
 
@@ -34,11 +40,11 @@ class HomeFeaturesV2(BaseModel):
     zipcode: str = Field(pattern=r"^\d{5}$", examples=["98125"])
 
 
-@router_v2.get("/health/v2", responses={503: {"model": ErrorDetail}})
-def health_check_v2(request: Request) -> dict[str, str]:
+@router_v2.get("/health/v2", response_model=HealthResponse, responses={503: {"model": ErrorDetail}})
+def health_check_v2(request: Request) -> HealthResponse:
     """Check v2 API readiness (lifespan artifacts incl. imputer)."""
     require_artifacts(request)
-    return {"status": "healthy"}
+    return HealthResponse(status="healthy")
 
 
 @router_v2.post(
