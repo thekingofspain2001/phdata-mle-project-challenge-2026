@@ -3,6 +3,7 @@
 from fastapi.testclient import TestClient
 
 HTTP_STATUS_OK = 200
+HTTP_STATUS_NOT_FOUND = 404
 
 
 def test_health_endpoint(test_client: TestClient) -> None:
@@ -24,3 +25,12 @@ def test_predict_endpoint_valid_input(
     response_data = response.json()
     assert "predicted_price" in response_data
     assert isinstance(response_data["predicted_price"], float)
+
+def test_predict_endpoint_unknown_zipcode_returns_not_found(
+    test_client: TestClient,
+    sample_home_features: dict[str, int | float | str],
+) -> None:
+    """Test the /predict endpoint returns 404 for a zipcode with no demographics."""
+    sample_home_features["zipcode"] = "00000"
+    response = test_client.post("/predict", json=sample_home_features)
+    assert response.status_code == HTTP_STATUS_NOT_FOUND
