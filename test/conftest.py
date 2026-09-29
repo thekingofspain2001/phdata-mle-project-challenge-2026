@@ -1,6 +1,7 @@
 """Shared pytest fixtures for API tests."""
 
 import os
+from typing import TYPE_CHECKING
 
 import httpx2
 import pytest
@@ -8,11 +9,15 @@ from fastapi.testclient import TestClient
 
 from src.main import app
 
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+
 
 @pytest.fixture
-def test_client() -> TestClient:
+def test_client() -> Iterator[TestClient]:
     """Fixture for unit tests using FastAPI TestClient."""
-    return TestClient(app)
+    with TestClient(app) as client:
+        yield client
 
 
 @pytest.fixture
