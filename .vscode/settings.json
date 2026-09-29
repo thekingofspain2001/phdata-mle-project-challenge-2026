@@ -10,9 +10,18 @@
     "python.testing.unittestEnabled": false,
     "[python]": {
         "editor.defaultFormatter": "charliermarsh.ruff",
-        "editor.formatOnSave": true
+        "editor.formatOnSave": true,
+        "editor.formatOnSaveMode": "file",
+        "editor.formatOnType": false,
+        "editor.codeActionsOnSave": {
+            "source.fixAll": "explicit",
+            "source.organizeImports": "explicit"
+        },
     },
+    "notebook.formatOnSave.enabled": true,
     "files.associations": {
         ".dockerignore": "ignore"
-    }
+    },
+
+    "ruff.nativeServer": "on",
 }

@@ -1,10 +1,20 @@
+target-version = "py314"
+line-length = 160
+extend-exclude = [".vscode", ".idea", "__pycache__", ".python-version", ".ruff.toml", "ruff.toml", "setup.cfg", "pyproject.toml"]
 # Single source of truth for `ruff check` in the terminal AND the VSCode Ruff
 # extension (which discovers this file automatically). Strictest ruleset
 # (`ALL`); ruff built-in defaults are left unset everywhere.
+
 [lint]
 select = ["ALL"]
 ignore = ["CPY001"] # no copyright headers anywhere in repo; rule contradicts convention
 
+[lint.pydocstyle]
+convention = "pep257"
+
+[lint.mccabe]
+max-complexity = 10
 [lint.per-file-ignores]
-"test/**/*.py" = ["S101"]
+"test/**/*.py" = ["S101", "TC002"] # TC002: test typing imports are runtime-loaded
+"**/*.ipynb" = ["T201"] # notebooks legitimately print() cell output
 
