@@ -30,3 +30,6 @@ notebooks/imputation_comparison_results.csv
 # OS
 .DS_Store
 Thumbs.db
+
+# Playwright CLI session snapshots (local verification artifacts)
+.playwright-cli/
