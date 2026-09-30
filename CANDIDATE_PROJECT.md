@@ -77,6 +77,7 @@ Implement the imputation logic researched in the Jupyter notebook (`notebooks/im
 - Document the imputation approach in your presentation
 
 **Example request with missing data:**
+
 ```json
 {
   "bedrooms": 3,
@@ -160,14 +161,14 @@ We will evaluate your submission based on:
 - **Communication**: Can you explain your solution to both technical and non-technical audiences?
 - **Production Readiness**: How close is this to something you'd deploy in production?
 
-## AI Usage Expectations 
+## AI Usage Expectations
 
 We expect that you will use some form of AI coding assistant or agent to solve this problem, as it is now a reality of software engineering work.
-As you discuss your solution with our team, you should be prepared to: 
+As you discuss your solution with our team, you should be prepared to:
 
 1. Describe how you used AI to solve the problem
 2. Share any challenges you faced and techniques you used in managing context and generated code
-3. Nerd out on how your favorite AI tools work best for you 
+3. Nerd out on how your favorite AI tools work best for you
 
 ## Getting Started
 
