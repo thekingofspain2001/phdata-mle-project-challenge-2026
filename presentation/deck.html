@@ -1,0 +1,891 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:,">
+<title>Sound Realty — Valuation API Production Hardening</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4/dist/reveal.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap">
+<style>
+/* Single change point: every value below is a token. No raw sizes outside :root. */
+:root {
+  --ph-navy: #111f3a;
+  --ph-mint: #a5feca;
+  --ph-sage: #b1d9c5;
+  --ph-mist: #bcccd4;
+  --ph-card-border: rgba(165, 254, 202, 0.5);
+  --ph-card-bg: #0c142e;
+  --ph-why-h: #ffffff;
+  --ph-why-body: rgba(255, 255, 255, 0.75);
+  --ph-cap-bg: #f0f1f5;
+  --ph-cap-h: #232a43;
+  --ph-brand-font: "Aspekta", "Inter", system-ui, sans-serif;
+  --ph-client-font: "Inter", system-ui, sans-serif;
+  --ph-font: "Aspekta", "Inter", system-ui, sans-serif;
+
+  /* Approach colors: one per fill-in method, reused in S4 detail + S5. */
+  --av: #bcccd4;
+  --md: #b1d9c5;
+  --knn: #a5feca;
+
+  /* Type scale (viewport-based stepped tokens). */
+  --fs-brand: 1.7vh;
+  --fs-h1: 5.4vh;
+  --fs-h2: 3vh;
+  --fs-h3: 2.2vh;
+  --fs-lead: 2.3vh;
+  --fs-body: 1.9vh;
+  --fs-caption: 1.5vh;
+
+  /* Spacing scale. */
+  --sp-xs: 0.8vh;
+  --sp-sm: 1.6vh;
+  --sp-md: 2.4vh;
+  --gap-sm: 1vw;
+  --gap-md: 2vw;
+  --ph-header-h: 7vh;
+
+  /* Shape + line tokens. */
+  --rad-card: 1.2vh;
+  --rad-cell: 1vh;
+  --line-sm: 0.15vw;
+  --line-md: 0.2vw;
+  --logo-size: 2.4vh;
+
+  /* Motif at 50% size, pinned bottom-right. */
+  --ph-motif-size: 50% auto;
+
+  --ph-pattern: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='783' height='642' viewBox='0 0 783 642' fill='none'%3E%3Cg opacity='0.22'%3E%3Cg opacity='0.25'%3E%3Cpath d='M382.852 169.936H315.956V173.702H382.852V169.936Z' fill='%23BCCCD4'/%3E%3Cpath d='M402.188 85.625H398.418V152.476H402.188V85.625Z' fill='%23BCCCD4'/%3E%3C/g%3E%3Cpath d='M202.685 185.314H198.916V252.165H202.685V185.314Z' fill='%23B1D9C5'/%3E%3Cpath d='M284.86 269.625H217.965V273.392H284.86V269.625Z' fill='%23B1D9C5'/%3E%3Cpath d='M304.196 185.314H300.427V252.165H304.196V185.314Z' fill='%23B1D9C5'/%3E%3Cg opacity='0.25'%3E%3Cpath d='M382.852 269.625H315.956V273.392H382.852V269.625Z' fill='%23BCCCD4'/%3E%3Cpath d='M402.188 185.314H398.418V252.165H402.188V185.314Z' fill='%23BCCCD4'/%3E%3C/g%3E%3Cpath d='M183.349 365.795H116.453V369.562H183.349V365.795Z' fill='%23B1D9C5'/%3E%3Cpath d='M202.685 281.479H198.916V348.329H202.685V281.479Z' fill='%23B1D9C5'/%3E%3Cpath d='M284.86 365.795H217.965V369.562H284.86V365.795Z' fill='%23B1D9C5'/%3E%3Cpath d='M304.196 281.479H300.427V348.329H304.196V281.479Z' fill='%23B1D9C5'/%3E%3Cpath d='M382.852 365.795H315.956V369.562H382.852V365.795Z' fill='%23B1D9C5'/%3E%3Cpath d='M402.188 281.479H398.418V348.329H402.188V281.479Z' fill='%23B1D9C5'/%3E%3Cpath d='M3.76919 486.121H0V552.972H3.76919V486.121Z' fill='%23B1D9C5'/%3E%3Cpath opacity='0.25' d='M84.1811 468.115H17.2855V471.881H84.1811V468.115Z' fill='%23B1D9C5'/%3E%3Cpath d='M103.525 383.802H99.7554V450.653H103.525V383.802Z' fill='%23BCCCD4'/%3E%3Cpath d='M103.525 486.121H99.7554V552.972H103.525V486.121Z' fill='%23B1D9C5'/%3E%3Cg opacity='0.25'%3E%3Cpath d='M183.349 468.115H116.453V471.881H183.349V468.115Z' fill='%23BCCCD4'/%3E%3Cpath d='M202.685 383.802H198.915V450.653H202.685V383.802Z' fill='%23BCCCD4'/%3E%3C/g%3E%3Cg opacity='0.25'%3E%3Cpath d='M202.685 486.121H198.916V552.972H202.685V486.121Z' fill='%23BCCCD4'/%3E%3Cpath d='M202.685 575.025H198.916V641.876H202.685V575.025Z' fill='%23BCCCD4'/%3E%3C/g%3E%3Cpath d='M284.861 468.115H217.965V471.881H284.861V468.115Z' fill='%23B1D9C5'/%3E%3Cpath d='M304.197 383.802H300.427V450.653H304.197V383.802Z' fill='%23B1D9C5'/%3E%3Cpath d='M304.196 486.121H300.427V552.972H304.196V486.121Z' fill='%23B1D9C5'/%3E%3Cpath opacity='0.25' d='M304.196 575.025H300.427V641.876H304.196V575.025Z' fill='%23BCCCD4'/%3E%3Cg opacity='0.25'%3E%3Cpath d='M382.852 468.115H315.956V471.881H382.852V468.115Z' fill='%23BCCCD4'/%3E%3Cpath d='M402.188 383.802H398.419V450.653H402.188V383.802Z' fill='%23BCCCD4'/%3E%3C/g%3E%3Cg opacity='0.25'%3E%3Cpath d='M484.122 169.936H417.227V173.702H484.122V169.936Z' fill='%23BCCCD4'/%3E%3Cpath d='M503.458 85.625H499.689V152.476H503.458V85.625Z' fill='%23BCCCD4'/%3E%3C/g%3E%3Cg opacity='0.25'%3E%3Cpath d='M583.289 169.936H516.393V173.702H583.289V169.936Z' fill='%23BCCCD4'/%3E%3Cpath d='M583.289 73.2891H516.393V77.0557H583.289V73.2891Z' fill='%23BCCCD4'/%3E%3Cpath d='M602.625 85.625H598.856V152.476H602.625V85.625Z' fill='%23BCCCD4'/%3E%3Cpath d='M602.625 0H598.856V66.8509H602.625V0Z' fill='%23BCCCD4'/%3E%3C/g%3E%3Cg opacity='0.25'%3E%3Cpath d='M684.801 169.936H617.906V173.702H684.801V169.936Z' fill='%23BCCCD4'/%3E%3Cpath d='M704.137 85.625H700.368V152.476H704.137V85.625Z' fill='%23BCCCD4'/%3E%3C/g%3E%3Cpath d='M782.793 169.936H715.897V173.702H782.793V169.936Z' fill='%23B1D9C5'/%3E%3Cpath d='M484.122 269.625H417.227V273.392H484.122V269.625Z' fill='%23B1D9C5'/%3E%3Cpath d='M503.458 185.314H499.689V252.165H503.458V185.314Z' fill='%23B1D9C5'/%3E%3Cpath d='M583.289 269.625H516.394V273.392H583.289V269.625Z' fill='%23BCCCD4'/%3E%3Cpath d='M602.626 185.314H598.856V252.165H602.626V185.314Z' fill='%23B1D9C5'/%3E%3Cpath d='M684.801 269.625H617.906V273.392H684.801V269.625Z' fill='%23BCCCD4'/%3E%3Cpath d='M704.137 185.314H700.368V252.165H704.137V185.314Z' fill='%23B1D9C5'/%3E%3Cpath d='M782.793 269.625H715.897V273.392H782.793V269.625Z' fill='%23BCCCD4'/%3E%3Cpath d='M484.122 365.795H417.227V369.562H484.122V365.795Z' fill='%23B1D9C5'/%3E%3Cpath d='M503.458 281.479H499.689V348.329H503.458V281.479Z' fill='%23B1D9C5'/%3E%3Cpath d='M583.289 365.795H516.394V369.562H583.289V365.795Z' fill='%23BCCCD4'/%3E%3Cpath d='M602.626 281.479H598.856V348.329H602.626V281.479Z' fill='%23BCCCD4'/%3E%3Cpath d='M684.801 365.795H617.906V369.562H684.801V365.795Z' fill='%23BCCCD4'/%3E%3Cpath d='M704.137 281.479H700.368V348.329H704.137V281.479Z' fill='%23B1D9C5'/%3E%3Cg opacity='0.25'%3E%3Cpath d='M782.793 365.795H715.897V369.562H782.793V365.795Z' fill='%23BCCCD4'/%3E%3C/g%3E%3Cg opacity='0.25'%3E%3Cpath d='M484.123 468.115H417.227V471.881H484.123V468.115Z' fill='%23BCCCD4'/%3E%3Cpath d='M503.459 383.802H499.689V450.653H503.459V383.802Z' fill='%23BCCCD4'/%3E%3C/g%3E%3Cg opacity='0.25'%3E%3Cpath d='M503.458 486.121H499.689V552.972H503.458V486.121Z' fill='%23BCCCD4'/%3E%3C/g%3E%3Cg opacity='0.25'%3E%3Cpath d='M583.289 468.115H516.393V471.881H583.289V468.115Z' fill='%23BCCCD4'/%3E%3Cpath d='M602.625 383.802H598.856V450.653H602.625V383.802Z' fill='%23BCCCD4'/%3E%3C/g%3E%3Cg opacity='0.25'%3E%3Cpath d='M602.627 486.121H598.857V552.972H602.627V486.121Z' fill='%23BCCCD4'/%3E%3C/g%3E%3Cg opacity='0.25'%3E%3Cpath d='M684.801 468.115H617.906V471.881H684.801V468.115Z' fill='%23BCCCD4'/%3E%3Cpath d='M704.137 383.802H700.368V450.653H704.137V383.802Z' fill='%23BCCCD4'/%3E%3C/g%3E%3Cg opacity='0.25'%3E%3Cpath d='M704.137 486.121H700.368V552.972H704.137V486.121Z' fill='%23BCCCD4'/%3E%3C/g%3E%3Cg opacity='0.25'%3E%3Cpath d='M782.793 468.115H715.897V471.881H782.793V468.115Z' fill='%23BCCCD4'/%3E%3C/g%3E%3C/g%3E%3Cpath d='M382.852 365.795H315.956V369.562H382.852V365.795Z' fill='%23A5FECA'/%3E%3Cpath d='M402.188 281.479H398.418V348.329H402.188V281.479Z' fill='%23A5FECA'/%3E%3Cpath d='M402.188 383.802H398.419V450.653H402.188V383.802Z' fill='%23A5FECA'/%3E%3Cpath d='M484.122 365.795H417.227V369.562H484.122V365.795Z' fill='%23A5FECA'/%3E%3Cpath d='M583.29 269.625H516.395V273.392H583.29V269.625Z' fill='%23A5FECA'/%3E%3Cpath d='M684.801 269.625H617.905V273.392H684.801V269.625Z' fill='%23A5FECA'/%3E%3Cpath d='M602.626 281.479H598.856V348.329H602.626V281.479Z' fill='%23111F3A'/%3E%3Cpath d='M602.626 185.314H598.856V252.165H602.626V185.314Z' fill='%23A5FECA'/%3E%3C/svg%3E");
+}
+
+/* Page shell. Reveal.js owns geometry below .reveal. */
+html,
+body {
+  height: 100vh;
+  margin: 0;
+  overflow: hidden;
+  background-color: var(--ph-navy);
+}
+
+/* Fixed viewport background: solid navy + motif pinned bottom-right.
+   Lives on .reveal so it never moves during slide transitions. */
+.reveal {
+  font-family: var(--ph-font);
+  color: #ffffff;
+  background-color: #111F3A;
+  background-image: var(--ph-pattern);
+  background-size: var(--ph-motif-size);
+  background-repeat: no-repeat;
+  background-position: 100% 100%;
+}
+
+/* Slides are transparent: only content transitions, background stays put. */
+.reveal .slides section {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: transparent;
+  text-align: left;
+  box-sizing: border-box;
+}
+
+/* Persistent chrome: brand | client left, slide title right, one row.
+   Fixed above the slides; only the title text fades between slides. */
+.ph-global-top {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 30;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gap-md);
+  padding: var(--sp-sm) var(--gap-md) 0;
+  pointer-events: none;
+}
+.ph-brandline {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--gap-sm);
+  margin: 0;
+  font-size: var(--fs-brand);
+  white-space: nowrap;
+}
+.ph-logo {
+  height: var(--logo-size);
+  width: auto;
+}
+.ph-word {
+  font-family: var(--ph-brand-font);
+  color: var(--ph-mint);
+  text-transform: none;
+  letter-spacing: 0.08em;
+}
+.ph-brandline .ph-sep {
+  color: var(--ph-why-body);
+}
+.ph-brandline .ph-client {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--gap-sm);
+  font-family: var(--ph-client-font);
+  color: var(--ph-why-h);
+  text-transform: none;
+  letter-spacing: normal;
+}
+.ph-client-logo {
+  width: 2.2vh;
+  height: 2.2vh;
+  border-radius: 50%;
+  background-color: var(--ph-mint);
+  flex: 0 0 auto;
+}
+#ph-global-title {
+  margin: 0;
+  text-align: right;
+  font-family: var(--ph-font);
+  font-weight: 400;
+  font-size: var(--fs-h2);
+  color: var(--ph-mint);
+  opacity: 1;
+  transition: opacity 0.25s ease;
+}
+#ph-global-title.is-fading {
+  opacity: 0;
+}
+
+/* Body fills remaining viewport height below the fixed chrome. */
+.ph-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--sp-sm);
+  padding: var(--ph-header-h) var(--gap-md) var(--sp-md);
+}
+
+.reveal h1 {
+  font-family: var(--ph-font);
+  font-weight: 400;
+  text-transform: none;
+  color: var(--ph-why-h);
+  font-size: var(--fs-h1);
+}
+.reveal h2 {
+  font-family: var(--ph-font);
+  font-weight: 400;
+  text-transform: none;
+  color: var(--ph-mint);
+}
+.reveal h3 {
+  font-family: var(--ph-font);
+  font-weight: 400;
+  text-transform: none;
+  color: var(--ph-why-h);
+  font-size: var(--fs-h3);
+}
+.reveal p {
+  color: #ffffff;
+  font-size: var(--fs-body);
+}
+.reveal li {
+  color: #ffffff;
+}
+
+/* Cover body centers customer + engagement. */
+.ph-cover .ph-body {
+  align-items: center;
+  text-align: center;
+}
+.ph-cover h1 {
+  margin: 0;
+}
+.ph-customer {
+  color: var(--ph-why-h);
+  font-size: var(--fs-h2);
+  margin: 0;
+}
+
+/* Summary lead + SCR list. Solid fills on bordered items. */
+.ph-action {
+  color: var(--ph-why-h);
+  font-size: var(--fs-lead);
+  margin: 0;
+}
+.ph-scr {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: var(--sp-sm) var(--gap-md);
+}
+.ph-scr li {
+  flex: 1 1 28vw;
+  background-color: var(--ph-card-bg);
+  border-left: var(--line-md) solid var(--ph-card-border);
+  padding-left: var(--gap-sm);
+}
+.ph-scr h3 {
+  margin: 0 0 var(--sp-xs);
+}
+.ph-scr p {
+  color: var(--ph-why-body);
+  margin: 0;
+}
+
+/* Three-column click-reveal. Solid fills on bordered items. */
+.ph-cols {
+  display: flex;
+  flex-direction: row;
+  gap: var(--gap-md);
+}
+.ph-cols article {
+  flex: 1 1 0;
+  min-width: 0;
+  background-color: var(--ph-card-bg);
+  border: var(--line-sm) solid var(--ph-card-border);
+  border-radius: var(--rad-card);
+  padding: var(--sp-sm) var(--gap-sm);
+}
+.ph-cols h3 {
+  color: var(--ph-mint);
+  margin: 0 0 var(--sp-xs);
+}
+.ph-cols p {
+  color: var(--ph-why-body);
+  margin: 0;
+}
+.ph-panel[hidden] {
+  display: none;
+}
+/* S4 houses scene: top row 50vh when staged, bottom detail 50%. */
+#s4 .ph-houses {
+  justify-content: flex-start;
+}
+.ph-houses-top {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+#s4[data-stage="1"] .ph-houses-top,
+#s4[data-stage="2"] .ph-houses-top,
+#s4[data-stage="3"] .ph-houses-top {
+  flex: 0 0 50%;
+  justify-content: flex-end;
+}
+#houses-svg {
+  width: 100%;
+  max-height: 44vh;
+}
+#s4[data-stage="0"] #houses-svg {
+  max-height: 60vh;
+}
+.ph-stage-hint {
+  color: var(--ph-why-body);
+  font-size: var(--fs-caption);
+  margin: var(--sp-xs) 0 0;
+}
+#s4[data-stage="1"] .ph-stage-hint,
+#s4[data-stage="2"] .ph-stage-hint,
+#s4[data-stage="3"] .ph-stage-hint {
+  display: none;
+}
+.houses-svg .h {
+  transition: opacity 0.3s;
+}
+.houses-svg .mk {
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+#s4[data-stage="1"] .houses-svg .h {
+  stroke: var(--av);
+}
+#s4[data-stage="2"] .houses-svg .h {
+  stroke: var(--md);
+}
+#s4[data-stage="3"] .houses-svg .h {
+  stroke: var(--ph-mist);
+  opacity: 0.35;
+}
+#s4[data-stage="3"] .houses-svg .h-nn {
+  stroke: var(--knn);
+  opacity: 1;
+}
+#s4[data-stage="1"] #mk-avg {
+  opacity: 1;
+}
+#s4[data-stage="2"] #mk-med {
+  opacity: 1;
+}
+#s4[data-stage="3"] #mk-knn {
+  opacity: 1;
+}
+.ph-stage-bottom {
+  flex: 0 0 auto;
+  min-height: 0;
+}
+#s4[data-stage="0"] .ph-stage-bottom .ph-panels {
+  display: none;
+}
+#s4[data-stage="1"] .ph-stage-bottom,
+#s4[data-stage="2"] .ph-stage-bottom,
+#s4[data-stage="3"] .ph-stage-bottom {
+  flex: 0 0 50%;
+  overflow: hidden;
+}
+.ph-panels {
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  gap: var(--gap-md);
+}
+.ph-panel {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: row;
+  gap: var(--gap-md);
+  background-color: var(--ph-card-bg);
+  border: var(--line-sm) solid var(--ph-card-border);
+  border-radius: var(--rad-card);
+  padding: var(--sp-sm) var(--gap-sm);
+  overflow: hidden;
+}
+.ph-panel-words {
+  flex: 1 1 50%;
+  min-width: 0;
+}
+.ph-panel-words h3 {
+  margin: 0 0 var(--sp-xs);
+}
+.ph-panel-words p {
+  color: var(--ph-why-body);
+  margin: 0;
+}
+.ph-panel-pick {
+  flex: 1 1 50%;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ph-panel-pick svg {
+  width: 100%;
+  max-height: 30vh;
+}
+.ph-panel[data-panel="1"] {
+  border-color: var(--av);
+}
+.ph-panel[data-panel="1"] h3 {
+  color: var(--av);
+}
+.ph-panel[data-panel="2"] {
+  border-color: var(--md);
+}
+.ph-panel[data-panel="2"] h3 {
+  color: var(--md);
+}
+.ph-panel[data-panel="3"] {
+  border-color: var(--knn);
+}
+.ph-panel[data-panel="3"] h3 {
+  color: var(--knn);
+}
+.s4-drivers {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+/* Diagrams. */
+.ph-diagram {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-xs);
+}
+.ph-viz {
+  color: var(--ph-mint);
+}
+.ph-viz svg {
+  width: 100%;
+  max-height: 22vh;
+  display: block;
+}
+.ph-diagram figcaption {
+  color: var(--ph-why-body);
+  font-size: var(--fs-caption);
+}
+
+/* Winner bars. */
+.ph-bars {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-xs);
+}
+.ph-bars li {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-xs) var(--gap-sm);
+  color: var(--ph-why-body);
+}
+.ph-bars li:nth-child(1) span {
+  color: var(--av);
+}
+.ph-bars li:nth-child(2) span {
+  color: var(--md);
+}
+.ph-bars li:nth-child(n+3) span {
+  color: var(--knn);
+}
+.ph-bars meter {
+  flex: 1 1 100%;
+  width: 100%;
+  accent-color: var(--ph-mint);
+}
+
+/* Footnote. */
+.ph-foot {
+  color: var(--ph-why-body);
+  font-size: var(--fs-caption);
+  opacity: 80%;
+  margin: 0;
+}
+
+/* Template A: Why thirds. Solid fills on bordered items. */
+.ph-why-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: row;
+  gap: var(--gap-md);
+}
+.ph-why-grid li {
+  flex: 1 1 0;
+  background-color: var(--ph-card-bg);
+  border: var(--line-sm) solid var(--ph-card-border);
+  border-radius: var(--rad-card);
+  padding: var(--sp-sm) var(--gap-sm);
+}
+.ph-num {
+  color: var(--ph-mint);
+  font-size: var(--fs-h3);
+  margin: 0;
+}
+.ph-why-grid h3 {
+  margin: var(--sp-xs) 0;
+}
+.ph-why-grid p:last-child {
+  color: var(--ph-why-body);
+  margin: 0;
+}
+.ph-handoff {
+  color: var(--ph-why-h);
+  font-size: var(--fs-lead);
+  margin: 0;
+}
+
+/* Template B: Capabilities six-cell grid. */
+.ph-caps-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: var(--gap-md);
+}
+.ph-caps-grid li {
+  flex: 1 1 26vw;
+  background-color: var(--ph-cap-bg);
+  border-radius: var(--rad-cell);
+  padding: var(--sp-sm) var(--gap-sm);
+}
+.ph-caps-grid h3 {
+  color: var(--ph-cap-h);
+  margin: 0 0 var(--sp-xs);
+}
+.ph-caps-grid p {
+  color: var(--ph-cap-h);
+  margin: 0;
+  opacity: 80%;
+}
+</style>
+</head>
+<body>
+<div class="reveal">
+<header class="ph-global-top">
+<p class="ph-brandline"><img class="ph-logo" src="https://www.phdata.io/wp-content/uploads/2023/09/phData_white_rgb.png" alt="phData logo"><span class="ph-word">phData</span><span class="ph-sep" aria-hidden="true">|</span><span class="ph-client"><span class="ph-client-logo" role="img" aria-label="Sound Realty logo"></span>Sound Realty</span></p>
+<h2 id="ph-global-title">Valuation API</h2>
+</header>
+<div class="slides">
+
+<!-- S1 Cover. -->
+<section class="ph-cover" aria-label="Cover" data-title="Valuation API">
+<div class="ph-body">
+<h1>Sound Realty</h1>
+<p class="ph-customer">Valuation API Production Hardening</p>
+</div>
+</section>
+
+<!-- S2 Executive summary. -->
+<section aria-label="Executive summary" data-title="Executive summary">
+<div class="ph-body">
+<p class="ph-action">The valuation API now prices incomplete listings, answers faster, and fails clearly.</p>
+<ul class="ph-scr">
+<li class="fragment">
+<h3>Listings arrive with blanks.</h3>
+<p>Up to <span data-metric="nnr.recovered">10–20%</span> of requests arrive with missing fields and used to be rejected.</p>
+</li>
+<li class="fragment">
+<h3>Every request reloads the model.</h3>
+<p>Typical wait <span data-metric="perf.v1p50">56 ms</span>, slow tail <span data-metric="perf.v1p95">79 ms</span>.</p>
+</li>
+<li class="fragment">
+<h3>Bad postcodes crash; the base is ageing.</h3>
+<p>Confusing failures on unknown areas; runtime and docs behind.</p>
+</li>
+<li class="fragment">
+<h3>Blanks filled from <span data-metric="knn.k">5</span> similar homes.</h3>
+<p>Price-moving fields <span data-metric="knn.range">14–17% closer</span> than averages.</p>
+</li>
+<li class="fragment">
+<h3>Model loaded once, reused.</h3>
+<p>Typical wait <span data-metric="perf.v2p50">9 ms</span>, slow tail <span data-metric="perf.v2p95">13 ms</span>.</p>
+</li>
+<li class="fragment">
+<h3>Unknown areas named in plain words; base modernised.</h3>
+<p>One supported runtime, typed contracts, docs match reality.</p>
+</li>
+</ul>
+</div>
+</section>
+
+<!-- S3 Core problem. -->
+<section aria-label="Core problem" data-title="Listings with blanks get turned away">
+<div class="ph-body">
+<div class="ph-cols">
+<article class="fragment">
+<h3>Problem</h3>
+<p>A seller's listing is missing the bathroom count or the plot size. The API rejects the whole request. No price comes back.</p>
+</article>
+<article class="fragment">
+<h3>Impact</h3>
+<p>Up to <span data-metric="nnr.recovered">10–20%</span> of live requests stall. The agent phones back, the seller waits, the valuation queue stops.</p>
+</article>
+<article class="fragment">
+<h3>Cost</h3>
+<p>Every rejected listing is a conversation restarted and a deal delayed. Coverage, not accuracy, is what leaks.</p>
+</article>
+</div>
+</div>
+</section>
+
+<!-- S4 Three options: 12 houses, staged detail. -->
+<section id="s4" data-stage="0" aria-label="Three ways to fill a blank" data-title="Three ways to fill a blank">
+<div class="ph-body ph-houses">
+<div class="ph-houses-top">
+<svg id="houses-svg" class="houses-svg" viewBox="0 0 1200 260" fill="none" role="img" aria-label="Twelve houses in four groups of three, sorted smallest to largest">
+<defs>
+<g id="hs">
+<rect x="-20" y="-30" width="40" height="30" stroke-width="3"/>
+<path d="M-25 -30 L0 -48 L25 -30 Z" stroke-width="3"/>
+<rect x="-6" y="-16" width="12" height="16" stroke-width="2"/>
+</g>
+</defs>
+<!-- Group A: base 40 -->
+<g class="h" stroke="#BCCCD4" transform="translate(80,210) scale(0.95)"><use href="#hs"/></g>
+<g class="h" stroke="#BCCCD4" transform="translate(175,210) scale(1.0)"><use href="#hs"/></g>
+<g class="h" stroke="#BCCCD4" transform="translate(270,210) scale(1.05)"><use href="#hs"/></g>
+<!-- Group B: 25% bigger, base 50 -->
+<g class="h" stroke="#BCCCD4" transform="translate(375,210) scale(1.1875)"><use href="#hs"/></g>
+<g class="h" stroke="#BCCCD4" transform="translate(475,210) scale(1.25)"><use href="#hs"/></g>
+<g class="h" stroke="#BCCCD4" transform="translate(575,210) scale(1.3125)"><use href="#hs"/></g>
+<!-- Group C: base 62.5 -->
+<g class="h h-nn" stroke="#BCCCD4" transform="translate(675,210) scale(1.484)"><use href="#hs"/></g>
+<g class="h h-nn" stroke="#BCCCD4" transform="translate(775,210) scale(1.5625)"><use href="#hs"/></g>
+<g class="h h-nn" stroke="#BCCCD4" transform="translate(875,210) scale(1.6406)"><use href="#hs"/></g>
+<!-- Group D: base 78.1 -->
+<g class="h h-nn" stroke="#BCCCD4" transform="translate(975,210) scale(1.855)"><use href="#hs"/></g>
+<g class="h h-nn" stroke="#BCCCD4" transform="translate(1075,210) scale(1.953)"><use href="#hs"/></g>
+<g class="h" stroke="#BCCCD4" transform="translate(1160,210) scale(2.05)"><use href="#hs"/></g>
+<!-- Sorted-size baseline -->
+<line x1="40" y1="214" x2="1190" y2="214" stroke="#BCCCD4" stroke-width="1" opacity="0.4"/>
+<!-- Average marker above sorted position -->
+<g id="mk-avg" class="mk" stroke="#BCCCD4">
+<line x1="625" y1="120" x2="625" y2="200" stroke-width="2" stroke-dasharray="6 4"/>
+<g transform="translate(625,90) scale(1.44)"><use href="#hs"/></g>
+<text x="625" y="30" text-anchor="middle" font-size="20" fill="#BCCCD4" stroke="none">AVG</text>
+</g>
+<!-- Median marker -->
+<g id="mk-med" class="mk" stroke="#B1D9C5">
+<line x1="600" y1="120" x2="600" y2="200" stroke-width="2" stroke-dasharray="6 4"/>
+<g transform="translate(600,90) scale(1.4)"><use href="#hs"/></g>
+<text x="600" y="30" text-anchor="middle" font-size="20" fill="#B1D9C5" stroke="none">MED</text>
+</g>
+<!-- KNN marker cluster -->
+<g id="mk-knn" class="mk" stroke="#A5FECA">
+<line x1="775" y1="120" x2="775" y2="170" stroke-width="2" stroke-dasharray="6 4"/>
+<g transform="translate(775,90) scale(1.5)"><use href="#hs"/></g>
+<text x="775" y="30" text-anchor="middle" font-size="20" fill="#A5FECA" stroke="none">5-NN</text>
+</g>
+</svg>
+<p class="ph-stage-hint">Twelve homes, four groups of three. Each group runs 25% bigger than the last; inside a group two homes vary by ±5%. Click for each approach.</p>
+</div>
+<div class="ph-stage-bottom">
+<div class="ph-panels">
+<article class="ph-panel" data-panel="1" hidden>
+<div class="ph-panel-words">
+<h3>Average</h3>
+<p>Add all twelve sizes, divide by twelve. One city-wide number fills every blank. Simple; ignores the house.</p>
+</div>
+<div class="ph-panel-pick">
+<svg viewBox="0 0 200 120" fill="none" stroke="#BCCCD4" stroke-width="3" role="img" aria-label="Single average-size house">
+<use href="#hs" transform="translate(100,95) scale(1.44)"/>
+<text x="100" y="20" text-anchor="middle" font-size="14" fill="#BCCCD4" stroke="none">AVG</text>
+</svg>
+</div>
+</article>
+<article class="ph-panel" data-panel="2" hidden>
+<div class="ph-panel-words">
+<h3>Middle value</h3>
+<p>Sort the row, take the middle. Mansions stop skewing the answer. Still one number for all blanks.</p>
+</div>
+<div class="ph-panel-pick">
+<svg viewBox="0 0 200 120" fill="none" stroke="#B1D9C5" stroke-width="3" role="img" aria-label="Single middle-size house">
+<use href="#hs" transform="translate(100,95) scale(1.4)"/>
+<text x="100" y="20" text-anchor="middle" font-size="14" fill="#B1D9C5" stroke="none">MED</text>
+</svg>
+</div>
+</article>
+<article class="ph-panel" data-panel="3" hidden>
+<div class="ph-panel-words">
+<h3>Similar homes</h3>
+<p>Take the 5 nearest sizes; closer homes count more. Each blank gets its own answer from its own street.</p>
+</div>
+<div class="ph-panel-pick">
+<svg viewBox="0 0 260 120" fill="none" stroke="#A5FECA" stroke-width="3" role="img" aria-label="Five similar houses and the blank">
+<g transform="translate(40,95) scale(1.1)"><use href="#hs"/></g>
+<g transform="translate(90,95) scale(1.3)"><use href="#hs"/></g>
+<g transform="translate(140,95) scale(1.5)"><use href="#hs"/></g>
+<g transform="translate(190,95) scale(1.2)"><use href="#hs"/></g>
+<g transform="translate(235,95) scale(1.4)"><use href="#hs"/></g>
+<text x="140" y="20" text-anchor="middle" font-size="14" fill="#A5FECA" stroke="none">5-NN → ?</text>
+</svg>
+</div>
+</article>
+</div>
+</div>
+<div class="s4-drivers" aria-hidden="true">
+<span class="fragment" data-s4="1"></span>
+<span class="fragment" data-s4="2"></span>
+<span class="fragment" data-s4="3"></span>
+</div>
+</div>
+</section>
+
+<!-- S5 Winner. -->
+<section aria-label="Why similar homes won" data-title="Why similar homes won">
+<div class="ph-body">
+<div class="ph-cols">
+<article class="fragment">
+<h3>Problem</h3>
+<p>Averages ignore the house in front of us. A flat and a family home get the same guess.</p>
+</article>
+<article class="fragment">
+<h3>Impact</h3>
+<p>Similar homes track the features that move price: size, grade, age, bathrooms.</p>
+</article>
+<article class="fragment">
+<h3>Savings</h3>
+<ul class="ph-bars">
+<li>Upper floor area <span data-metric="knn.sqftAbove">17% closer</span><meter min="0" max="20" value="17">17 of 20</meter></li>
+<li>Bathrooms <span data-metric="knn.bathrooms">16% closer</span><meter min="0" max="20" value="16">16 of 20</meter></li>
+<li>Floors <span data-metric="knn.floors">15% closer</span><meter min="0" max="20" value="15">15 of 20</meter></li>
+<li>Grade <span data-metric="knn.grade">14% closer</span><meter min="0" max="20" value="14">14 of 20</meter></li>
+</ul>
+</article>
+</div>
+<p class="ph-foot fragment">Caveat: the headline average hides this — two plot-size fields with wild outliers swamp it.</p>
+</div>
+</section>
+
+<!-- S6 Caching. -->
+<section aria-label="Faster answers" data-title="Faster answers">
+<div class="ph-body">
+<div class="ph-cols">
+<article class="fragment">
+<h3>Problem</h3>
+<p>Every request reloads the model, the maps, and the comparables from disk. Under load, that queues up.</p>
+</article>
+<article class="fragment">
+<h3>Impact</h3>
+<p>Agents wait on every valuation. Peak traffic makes every answer slower.</p>
+</article>
+<article class="fragment">
+<h3>Savings</h3>
+<p>Load once when the service wakes, serve from memory. Typical <span data-metric="perf.v1p50">56 ms</span> down to <span data-metric="perf.v2p50">9 ms</span>. Slow tail <span data-metric="perf.v1p95">79 ms</span> down to <span data-metric="perf.v2p95">13 ms</span>.</p>
+</article>
+</div>
+<p class="ph-foot fragment">Local harness, 30 repeated calls, same machine — not a production promise.</p>
+</div>
+</section>
+
+<!-- S7 Errors. -->
+<section aria-label="Errors you can act on" data-title="Errors you can act on">
+<div class="ph-body">
+<div class="ph-cols ph-cols-2">
+<article class="fragment">
+<h3>Before</h3>
+<p>A mistyped area code blows up. The agent sees a dead end and starts over.</p>
+</article>
+<article class="fragment">
+<h3>After</h3>
+<p>A plain-words reply names the bad code. Fix the digit, move on.</p>
+</article>
+</div>
+</div>
+</section>
+
+<!-- S8 Modernised base. -->
+<section class="ph-caps" aria-label="Modernised base" data-title="Modernised base">
+<div class="ph-body">
+<ul class="ph-caps-grid">
+<li class="fragment"><h3>Missing-data handling</h3><p>Blanks filled from similar homes.</p></li>
+<li class="fragment"><h3>Load-once serving</h3><p>Model and data cached at startup.</p></li>
+<li class="fragment"><h3>Clear errors</h3><p>Unknown areas named in plain words.</p></li>
+<li class="fragment"><h3>Current runtime</h3><p>One supported version, locked installs.</p></li>
+<li class="fragment"><h3>Typed contracts</h3><p>Docs promise what the API returns.</p></li>
+<li class="fragment"><h3>Tested paths</h3><p>Blank, missing, zero, and bad-area covered.</p></li>
+</ul>
+</div>
+</section>
+
+<!-- S9 Close. -->
+<section class="ph-why" aria-label="Close" data-title="What you get">
+<div class="ph-body">
+<ol class="ph-why-grid">
+<li class="fragment"><p class="ph-num">01</p><h3>No listing left behind</h3><p>Incomplete paperwork still prices.</p></li>
+<li class="fragment"><p class="ph-num">02</p><h3>Answers in milliseconds</h3><p>Headroom for busy days.</p></li>
+<li class="fragment"><p class="ph-num">03</p><h3>Errors you can act on</h3><p>On a base we can maintain.</p></li>
+</ol>
+<p class="ph-handoff fragment">Next: live demo — a blank, a bad area code, and speed.</p>
+</div>
+</section>
+
+<!-- S10 Appendix: demo runbook, not presented. -->
+<section data-visibility="hidden" aria-label="Appendix demo runbook" data-title="Appendix">
+<div class="ph-body">
+<ol>
+<li>Blank fields score; same payload to the old endpoint fails.</li>
+<li>Bad area code returns a named plain-words reply.</li>
+<li>Load-once versus per-request; cite harness numbers, offer live rerun.</li>
+<li>Health check passes when ready, fails clearly when not.</li>
+<li>Docs show typed responses with examples.</li>
+</ol>
+</div>
+</section>
+
+</div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@4/dist/reveal.js"></script>
+<script>
+/* Single source for every number on the slides. Edit here, all renders update. */
+const DECK_METRICS = {
+  perf: { v1p50: "56 ms", v1p95: "79 ms", v2p50: "9 ms", v2p95: "13 ms" },
+  nnr: { recovered: "10–20%" },
+  knn: {
+    k: "5",
+    range: "14–17% closer",
+    sqftAbove: "17% closer",
+    bathrooms: "16% closer",
+    floors: "15% closer",
+    grade: "14% closer",
+  },
+};
+
+document.querySelectorAll("[data-metric]").forEach((el) => {
+  const value = el.dataset.metric
+    .split(".")
+    .reduce((obj, key) => (obj ? obj[key] : undefined), DECK_METRICS);
+  if (value != null) el.textContent = value;
+});
+
+/* S4 staging: fragment clicks drive top/bottom state. Bottom clears each step. */
+function setS4Stage(n) {
+  const s4 = document.getElementById("s4");
+  if (!s4) return;
+  s4.dataset.stage = String(n);
+  s4.querySelectorAll(".ph-panel").forEach((p) => {
+    p.hidden = p.dataset.panel !== String(n);
+  });
+}
+
+/* Persistent chrome: only the title text fades between slides. */
+function setGlobalTitle(title) {
+  const el = document.getElementById("ph-global-title");
+  if (!el || el.textContent === title) return;
+  el.classList.add("is-fading");
+  window.setTimeout(() => {
+    el.textContent = title;
+    el.classList.remove("is-fading");
+  }, 160);
+}
+
+Reveal.initialize({
+  width: 1270,
+  height: 961,
+  margin: 0.04,
+  minScale: 0.2,
+  maxScale: 2.0,
+  center: true,
+  hash: true,
+  slideNumber: true,
+  transition: "slide",
+  backgroundTransition: "none",
+});
+
+Reveal.on("ready", (e) => {
+  if (e.currentSlide) setGlobalTitle(e.currentSlide.dataset.title || "");
+});
+Reveal.on("fragmentshown", (e) => {
+  const n = e.fragment && e.fragment.dataset && e.fragment.dataset.s4;
+  if (n) setS4Stage(n);
+});
+Reveal.on("fragmenthidden", (e) => {
+  const n = e.fragment && e.fragment.dataset && e.fragment.dataset.s4;
+  if (n) setS4Stage(String(Number(n) - 1));
+});
+Reveal.on("slidechanged", (e) => {
+  const s4 = document.getElementById("s4");
+  if (e.currentSlide && e.currentSlide.id === "s4") {
+    /* Re-entering S4: reveal keeps prior fragments visible; hide back to stage 0. */
+    Reveal.slide(Reveal.getIndices().h, 0, -1);
+    window.setTimeout(() => setS4Stage("0"), 60);
+  } else if (s4 && s4.dataset.stage !== "0") {
+    setS4Stage("0");
+  }
+  if (e.currentSlide) setGlobalTitle(e.currentSlide.dataset.title || "");
+});
+</script>
+</body>
+</html>
