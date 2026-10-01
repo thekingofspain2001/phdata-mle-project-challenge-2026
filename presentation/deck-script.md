@@ -41,11 +41,12 @@ All `section`s transparent (`deck.html:83-90`: `display:flex`,
 6vh, `width:auto`, `margin-right:calc(var(--gap-sm)*-0.51)` (absorbs PNG side
 padding). Client `.ph-client`: Georgia serif (distinct from phData
 Aspekta/Inter), `align-items:center` with the house glyph box
-(`1.58cap`, amber `#e8b04b`, no nudges) — icon vertically centered on the
-name cap. Title `#ph-global-title`: right-aligned, `font-weight:400`,
-`font-size:var(--fs-h2)`, `color:var(--ph-mint)`; syncs from each slide's
-`data-title` via `setGlobalTitle` (direct text set + `is-empty` class hiding
-it when the title is empty — no fade, no `.style` writes).
+  (`1.58cap`, amber `#e8b04b`, no nudges) — icon vertically centered on the
+  name cap. Title `#ph-global-title`: right-aligned, `font-weight:400`,
+  `font-size:var(--fs-h2)`, `line-height:1.25` (descenders clear),
+  `setGlobalTitle(slide)` (cover `ph-cover` → empty; direct text set +
+  `is-empty` class hiding it when the title is empty — no fade, no `.style`
+  writes).
 
 (c) Footer chrome — static `height:var(--ph-footer-h)` (8vh). Arrows
 pinned `bottom:calc((var(--ph-footer-h) - 36px)/2)` (36px button centered
@@ -56,18 +57,19 @@ in-band); rest `#6f8590`, all four directions `color:inherit`,
 with `bottom:calc((var(--ph-footer-h) - 34px)/2)` left of the arrows, zero
 overlap; current slide only.
 
-- Layout rule: `.reveal .slides` is the static area
-  (`height:calc(100vh - var(--ph-header-h) - var(--ph-footer-h))`,
-  `margin-top:var(--ph-header-h)`). `.ph-body` fills it exactly
-  (`height:calc(100vh - var(--ph-header-h) - var(--ph-footer-h))`,
-  `padding:0 var(--gap-md) var(--sp-md)`), top-left origin,
-  `justify-content:flex-start`. Card rows fill the same area
-  (`flex:1 1 auto` + stretch). Cover (`T-cover`) is the exception: centered.
-- `data-title` per slide: `` (S1, header title hidden) · `Executive summary` ·
-  `Listings with blanks get turned away` · `Missing value approaches` ·
-  `Why similar homes won` · `Faster answers` · `Errors you can act on` ·
-  `Modernised base` · `What you get` · `Appendix`. `aria-label` mirrors it
-  (S1 `aria-label` stays `Cover`).
+  - Layout rule: reveal.js owns `.slides` geometry (`width:1270`,
+    `height:961`, `margin:0.04`, `center:true` — uniform scale, no CSS
+    overrides). Each `section` flex-fills its slide box (`display:flex`,
+    `flex-direction:column`, `height:100%`). `.ph-body` flex-fills that
+    (`flex:1 1 auto`, `min-height:0`) with overlay-band padding
+    (`padding:var(--ph-header-h) var(--gap-md) var(--ph-footer-h)`), so the
+    header title aligns with content at any viewport. Card rows fill the
+    same area (`flex:1 1 auto`). Cover (`T-cover`) is the exception: centered.
+  - Header title source: `aria-label` per slide — `Cover` (S1, hidden) ·
+    `Executive summary` · `Listings with blanks get turned away` ·
+    `Missing value approaches` · `Why similar homes won` · `Faster answers` ·
+    `Errors you can act on` · `Modernised base` · `What you get` ·
+    `Appendix demo runbook` (hidden). No `data-title` attributes.
 
 ## Tokens (`:root`)
 
@@ -89,9 +91,9 @@ overlap; current slide only.
 
 No wordmark tokens. `--logo-size:6vh` is the single logo size token.
 
-Equation accents (each used ONLY for its equation deck-wide): `--av:#e8b04b`
-amber = Average Value; `--md:#7fb6d9` blue = /1 Mean value;
-`--knn:#c792ea` purple = /2 Near Neighbor. Complement, never clash with,
+  Equation accents (each used ONLY for its equation deck-wide): `--av:#e8b04b`
+  amber = Average Value; `--md:#7fb6d9` blue = Mean value;
+  `--knn:#c792ea` purple = Nearest Neighbor. Complement, never clash with,
 phData mint/navy; distinct from Sound Realty house amber (header only).
 ## Metrics (single source)
 
@@ -116,45 +118,46 @@ headline average excluded — two lot-size outlier fields swamp it).
 Each reused layout defined once. Class names + flex rules + fragment order
 verbatim from `deck.html` CSS.
 
-- T-cover — used by S1. `section.ph-cover > div.ph-body`
-  (`height:100%`, `align-items:center`, `justify-content:center`,
-  `text-align:center`): the centered exception to the top-left rule.
-  Single `h1` (margin 0, `max-width:20ch`), no sub, no fragments, no metrics.
-- T-scr — used by S2. Lead `p.ph-action` (always visible;
-  `var(--ph-why-h)`, `var(--fs-lead)`, margin 0) + `ul.ph-scr`
-  (`deck.html:216-241`): wrapping row, `flex:1 1 auto`, `flex-wrap:wrap`,
-  `align-items:stretch` + `align-content:stretch`,
-  `gap:var(--sp-sm) var(--gap-md)`; cards `li` `flex:1 1 28vw`, dark fill
-  `var(--ph-card-bg)`, mint left border (`border-left:var(--line-md) solid
-  var(--ph-card-border)`), `padding-left:var(--gap-sm)`, no radius;
-  `h3` default white, body `p` dim `var(--ph-why-body)`. Fragments: 6
-  cards in DOM order (pains 1–3, fixes 4–6).
-- T-cols-3 — used by S3, S5, S6. `div.ph-cols` (`deck.html:244-267`):
-  row (`flex-direction:row`), `flex:1 1 auto`, `align-items:stretch`,
-  `gap:var(--gap-md)`; each `article` `flex:1 1 0`, dark fill
-  `var(--ph-card-bg)`, full border
-  (`var(--line-sm) solid var(--ph-card-border)`),
-  `border-radius:var(--rad-card)`, `padding:var(--sp-sm) var(--gap-sm)`;
-  `h3` mint, `p` dim. Fragments: 3 articles left-to-right, then foot
-  (S5/S6 only).
+  - T-cover — used by S1. `section.ph-cover > div.ph-body` (`align-items:center`,
+    `justify-content:center`, `text-align:center`): the centered exception.
+    Single `h1` (margin 0, `max-width:20ch`), no sub, no fragments, no metrics.
+    Cover `aria-label="Cover"` hides the header title via `is-empty`.
+  - T-scr — used by S2. Lead `p.ph-action` (always visible;
+    `var(--ph-why-h)`, `var(--fs-lead)`, margin 0) + `ul.ph-scr`
+    (wrapping, `flex:1 1 auto`, `align-content:stretch`,
+    `gap:var(--sp-sm) var(--gap-md)`); cards `li` `flex:1 1 28vw`, dark fill
+    `var(--ph-card-bg)`, mint left border (`border-left:var(--line-md) solid
+    var(--ph-card-border)`), `padding-left:var(--gap-sm)`, no radius;
+    `h3` default white, body `p` dim `var(--ph-why-body)`. Fragments: 6
+    cards in DOM order (pains 1–3, fixes 4–6).
+  - T-cols-3 — used by S3, S5, S6. `div.ph-cols` (`flex:1 1 auto`,
+    `gap:var(--gap-md)`); each `article` `flex:1 1 0`, dark fill
+    `var(--ph-card-bg)`, full border
+    (`var(--line-sm) solid var(--ph-card-border)`),
+    `border-radius:var(--rad-card)`, `padding:var(--sp-sm) var(--gap-sm)`;
+    `h3` mint, `p` dim. Fragments: 3 articles left-to-right, then foot
+    (S5/S6 only).
 - T-cols-2 — used by S7. Same `.ph-cols` rules as T-cols-3 with 2
   articles (`Before` / `After`), no foot. Fragments: 2, left-to-right.
-- T-houses-staged — used by S4 only. `div.ph-body.ph-houses`:
-  corner subtitles `div.ph-s4-subs` (row, `justify-content:flex-end`):
-  three `p.ph-s4-sub` (`var(--fs-h3)`, margin 0) tinted per equation —
-  `Average Value` amber, `/1 Mean value` blue, `/2 Near Neighbor` purple.
-  Top `.ph-houses-top` with `svg#houses-svg` (12 houses STATIC: mist stroke,
-  fixed transforms, never recolored/dimmed across stages) + price labels
-  ($105k–$859k, 98042 quantiles, y=232) + `p.ph-stage-hint` (hidden 1–4).
-  Equation markers (`.mk`, staged): floating house + stem + equation text
-  below the house + equation on the pick (`AVG $334k = Σ$4,003k/12`,
-  `MED $294k = mid($284k,$303k)`, `5-NN → $293k = w-avg(5)`).
-  Bottom `.ph-stage-bottom` (stage 0: panels hidden; stages 1–4: 50%) with
-  one visible `.ph-panel` per stage (border + `h3` in the equation accent;
-  panel 4 summary neutral mint border, `p.ph-panel-nums` value list).
-  Hidden drivers: 4 `.fragment` spans `data-s4="1|2|3|4"`; stage-0 subtitle
-  removed (empty until staged). Houses x
-  60/158/256/354/452/550/648/746/844/942/1040/1138, y=210.
+  - T-houses-staged — used by S4 only (`section#s4.is-stage-0..4`, no
+    `data-*` attrs). `div.ph-body.ph-houses`: corner subtitles
+    `div.ph-s4-subs` (`justify-content:flex-end`,
+    `min-height:calc(var(--fs-h3)*1.3)` so layout holds): three `p.ph-s4-sub`
+    (`display:none`; stage N shows only its accent class) — stage 1
+    `.ph-is-av` Average Value amber, stage 2 `.ph-is-md` Mean value blue,
+    stage 3 `.ph-is-knn` Nearest Neighbor purple; stages 0/4 show none.
+    Top `.ph-houses-top` with `svg#houses-svg` (12 houses STATIC: mist stroke,
+    fixed transforms, never recolored/dimmed across stages) + price labels
+    ($105k–$859k, 98042 quantiles, y=232) + `p.ph-stage-hint` (hidden 1–4).
+    Equation markers (`.mk`, staged): floating house + stem + equation text
+    below the house + equation on the pick (`AVG $334k = Σ$4,003k/12`,
+    `MED $294k = mid($284k,$303k)`, `5-NN → $293k = w-avg(5)`).
+    Bottom `.ph-stage-bottom` (stage 0: panels hidden; stages 1–4: 50%) with
+    one visible `.ph-panel` per stage in DOM order (border + `h3` in the
+    panel's `.ph-is-*` accent; panel 4 summary neutral, `p.ph-panel-nums`
+    value list). Hidden drivers: 4 `.fragment.ph-s4-go` spans in stage
+    order. Houses x
+    60/158/256/354/452/550/648/746/844/942/1040/1138, y=210.
 - T-bars — used inside S5's third T-cols-3 card. `ul.ph-bars`
   (`deck.html:415-444`): column, `gap:var(--sp-xs)`; each `li` row-wrap
   (`flex-wrap:wrap`, `align-items:center`), dim body text; label `span`
@@ -163,13 +166,18 @@ verbatim from `deck.html` CSS.
   values 17/16/15/14 (`min="0" max="20"`). Plus `p.ph-foot`
   (`deck.html:447-452`): dim, `var(--fs-caption)`, `opacity:80%`,
   margin 0.
-- T-caps-6 — used by S8. `section.ph-caps > div.ph-body >
-  ul.ph-caps-grid` (`deck.html:492-519`): wrapping row, `flex:1 1 auto`,
-  `align-items:stretch` + `align-content:stretch`, `gap:var(--gap-md)`;
-  cells `li` `flex:1 1 26vw`, light fill `var(--ph-cap-bg)`
-  (`#F0F1F5`), `border-radius:var(--rad-cell)`, dark text
-  `var(--ph-cap-h)` (`h3` full, `p` at `opacity:80%`). Fragments: 6
-  cells in DOM order.
+  - T-caps-6 — used by S8. `section.ph-caps > div.ph-body >
+    ul.ph-caps-grid` (wrapping, `flex:1 1 auto`, `align-content:stretch`,
+    `gap:var(--gap-md)`); cells `li` `flex:1 1 26vw`, light fill
+    `var(--ph-cap-bg)` (`#F0F1F5`), `border-radius:var(--rad-cell)`, dark text
+    `var(--ph-cap-h)` (`h3` full, `p` at `opacity:80%`). Fragments: 6
+    cells in DOM order.
+  - T-why-3 + handoff — used by S9. `section.ph-why > div.ph-body >
+    ol.ph-why-grid` (`flex:1 1 auto`, `gap:var(--gap-md)`); each `li`
+    `flex:1 1 0`, dark fill, full mint-tinted border,
+    `border-radius:var(--rad-card)`; `p.ph-num` mint, `var(--fs-h3)`;
+    `h3` white (`--ph-why-h`); body `p` dim. Then `p.ph-handoff.fragment`
+    (white, `var(--fs-lead)`). Fragments: 3 cards + handoff = 4.
 - T-why-3 + handoff — used by S9. `section.ph-why > div.ph-body >
   ol.ph-why-grid` (`deck.html:455-489`): row, `flex:1 1 auto`,
   `align-items:stretch`, `gap:var(--gap-md)`; each `li` `flex:1 1 0`,
@@ -188,12 +196,13 @@ Reveal.initialize({ width:1270, height:961, margin:0.04,
   transition:"slide", backgroundTransition:"none" });
 ```
 
-- `ready` → set title from current slide.
-- `fragmentshown/hidden` with `data-s4="N"` → `setS4Stage(N)` /
-  `setS4Stage(N-1)` (S4 staging; §S4).
-- `slidechanged` → sync title; entering `#s4` resets fragments to stage 0
-  (`Reveal.slide(h,0,-1)` + `setS4Stage("0")` after 60 ms); leaving a
-  non-zero S4 resets it to `"0"`.
+  - `ready` → `setGlobalTitle(currentSlide)`.
+  - `fragmentshown/hidden` → `s4Index(fragment)` over `.ph-s4-go` order →
+    `setS4Stage(i+1)` / `setS4Stage(i)`; `setS4Stage` swaps `is-stage-N`
+    + shows the Nth `.ph-panel` in DOM order (S4 staging; §S4).
+  - `slidechanged` → sync title; entering `#s4` resets fragments to stage 0
+    (`Reveal.slide(h,0,-1)` + `setS4Stage("0")` after 60 ms); leaving a
+    non-zero S4 resets it to `"0"`.
 - Chrome styling (appended after caps grid, verified headless 1280×800):
   arrows rest `#6f8590`, `:hover/:focus-visible/:active` → `var(--ph-mint)`.
   Slide number 26px `var(--ph-mist)` on transparent, `text-decoration:none`
@@ -204,8 +213,8 @@ Reveal.initialize({ width:1270, height:961, margin:0.04,
 
 ## S1 — Cover (header title hidden)
 
-Layout: T-cover. No fragments, no metrics. `data-title=""` so the header
-title hides via `is-empty`.
+  Layout: T-cover. No fragments, no metrics. Cover `aria-label` hides the
+  header title via `is-empty`.
 
 | Item | Content |
 |------|---------|
@@ -253,28 +262,28 @@ Layout: T-cols-3. Fragments: 3.
 
 - Say: "A missing bathroom field used to kill the whole valuation."
 
-## S4 — Missing value approaches (title same, `id="s4"`, `data-stage`)
+  ## S4 — Missing value approaches (title same, `id="s4"`, `is-stage-0..4`)
 
-Layout: T-houses-staged. Fragments: 4 (hidden drivers). Corner subtitles
-`div.ph-s4-subs` (always visible, one per equation, tinted). Houses STATIC
-(mist, fixed). Markers staged (floating house + stem + equation below +
-equation on the pick).
+Layout: T-houses-staged. Fragments: 4 (hidden drivers). Corner subtitle:
+only the staged equation shows (stages 0/4: none). Houses STATIC (mist,
+fixed). Markers staged (floating house + stem + equation below + equation
+on the pick).
 
 | Item | Content |
 |------|---------|
-| Corner sub 1 | Average Value (amber) |
-| Corner sub 2 | /1 Mean value (blue) |
-| Corner sub 3 | /2 Near Neighbor (purple) |
+  | Corner sub (stage 1 only) | Average Value (amber) |
+  | Corner sub (stage 2 only) | Mean value (blue) |
+  | Corner sub (stage 3 only) | Nearest Neighbor (purple) |
 | House prices (98042 quantiles, y=232) | $105k $201k $223k $249k $267k $284k $303k $326k $350k $387k $450k $859k |
 | Hint (`p.ph-stage-hint`, stage 0 only) | Twelve homes, four groups of three. Each group runs 25% bigger than the last; inside a group two homes vary by ±5%. Click for each approach. |
 | Marker 1 | Floating house + `Average Value` below + pick `AVG $334k = Σ/12` |
 | Panel 1 h3 | Average Value |
 | Panel 1 body | Add all twelve sizes, divide by twelve. One city-wide number fills every blank. Simple; ignores the house. |
-| Marker 2 | Floating house + `/1 Mean value` below + pick `MED $294k = mid($284k,$303k)` |
-| Panel 2 h3 | /1 Mean value |
-| Panel 2 body | Sort the row, take the middle. Mansions stop skewing the answer. Still one number for all blanks. |
-| Marker 3 | Floating house + `/2 Near Neighbor` below + pick `5-NN → $293k = w-avg(5)` |
-| Panel 3 h3 | /2 Near Neighbor |
+  | Marker 2 | Floating house + `Mean value` below + pick `MED $294k = mid($284k,$303k)` |
+  | Panel 2 h3 | Mean value |
+  | Panel 2 body | Sort the row, take the middle. Mansions stop skewing the answer. Still one number for all blanks. |
+  | Marker 3 | Floating house + `Nearest Neighbor` below + pick `5-NN → $293k = w-avg(5)` |
+  | Panel 3 h3 | Nearest Neighbor |
 | Panel 3 body | Take the 5 nearest sizes; closer homes count more. Each blank gets its own answer from its own street. |
 | Panel 4 h3 (Summary) | Summary: similar homes win |
 | Panel 4 body | Average and middle value give every blank the same city-wide guess. Similar homes adapt to the house — price-moving fields [knn.range] than averages. |
