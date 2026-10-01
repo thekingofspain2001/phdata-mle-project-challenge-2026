@@ -139,25 +139,27 @@ verbatim from `deck.html` CSS.
     (S5/S6 only).
 - T-cols-2 — used by S7. Same `.ph-cols` rules as T-cols-3 with 2
   articles (`Before` / `After`), no foot. Fragments: 2, left-to-right.
-  - T-houses-staged — used by S4 only (`section#s4.is-stage-0..4`, no
-    `data-*` attrs). `div.ph-body.ph-houses`: corner subtitles
-    `div.ph-s4-subs` (`justify-content:flex-end`,
-    `min-height:calc(var(--fs-h3)*1.3)` so layout holds): three `p.ph-s4-sub`
-    (`display:none`; stage N shows only its accent class) — stage 1
-    `.ph-is-av` Average Value amber, stage 2 `.ph-is-md` Mean value blue,
-    stage 3 `.ph-is-knn` Nearest Neighbor purple; stages 0/4 show none.
-    Top `.ph-houses-top` with `svg#houses-svg` (12 houses STATIC: mist stroke,
-    fixed transforms, never recolored/dimmed across stages) + price labels
-    ($105k–$859k, 98042 quantiles, y=232) + `p.ph-stage-hint` (hidden 1–4).
-    Equation markers (`.mk`, staged): floating house + stem + equation text
-    below the house + equation on the pick (`AVG $334k = Σ$4,003k/12`,
-    `MED $294k = mid($284k,$303k)`, `5-NN → $293k = w-avg(5)`).
-    Bottom `.ph-stage-bottom` (stage 0: panels hidden; stages 1–4: 50%) with
+  - T-houses-staged — used by S4 only (`section[data-s4].is-stage-0..4`).
+    `div.ph-body.ph-houses`: corner subtitles `div.ph-s4-subs`
+    (`justify-content:flex-end`, `min-height:calc(var(--fs-h3)*1.3)` so layout
+    holds): three `p.ph-s4-sub` (`display:none`; stage N shows only its accent
+    class) — stage 1 `.ph-is-av` Average Value amber, stage 2 `.ph-is-md` Mean
+    value blue, stage 3 `.ph-is-knn` Nearest Neighbor purple; stages 0/4 show
+    none. Top `.ph-houses-top` with `svg#houses-svg` (12 houses STATIC: mist
+    stroke, fixed transforms, never recolored/dimmed across stages) + sqft
+    labels (640–1830 living area, y=232) + `p.ph-stage-hint` (hidden 1–4).
+    Intra-group gaps clear roofs (44/56/68/82u); inter-group gaps staggered
+    1:2:3 (99/198/297u); edges pinned to baseline (35/1188). Equation markers
+    (`.mk`, staged): floating house + equation above (y=60) + sqft value below
+    the house (y=143) (`AVG 1211 = Σ14530/12`, `MED 1250 = mid(1170,1330)`,
+    `5-NN → 1740 = w-avg(5)`). Dashed input boxes (`.bx`, staged): AVG all 12,
+    MED two middle values, KNN last 5.
+    Bottom `.ph-stage-bottom` (stage 0: collapsed; stages 1–4: 50%) with
     one visible `.ph-panel` per stage in DOM order (border + `h3` in the
     panel's `.ph-is-*` accent; panel 4 summary neutral, `p.ph-panel-nums`
     value list). Hidden drivers: 4 `.fragment.ph-s4-go` spans in stage
     order. Houses x
-    60/158/256/354/452/550/648/746/844/942/1040/1138, y=210.
+    54/98/142/241/297/353/551/619/687/984/1066/1148, y=210.
 - T-bars — used inside S5's third T-cols-3 card. `ul.ph-bars`
   (`deck.html:415-444`): column, `gap:var(--sp-xs)`; each `li` row-wrap
   (`flex-wrap:wrap`, `align-items:center`), dim body text; label `span`
@@ -262,7 +264,7 @@ Layout: T-cols-3. Fragments: 3.
 
 - Say: "A missing bathroom field used to kill the whole valuation."
 
-  ## S4 — Missing value approaches (title same, `id="s4"`, `is-stage-0..4`)
+  ## S4 — Missing value approaches (title same, `data-s4`, `is-stage-0..4`)
 
 Layout: T-houses-staged. Fragments: 4 (hidden drivers). Corner subtitle:
 only the staged equation shows (stages 0/4: none). Houses STATIC (mist,
@@ -274,20 +276,20 @@ on the pick).
   | Corner sub (stage 1 only) | Average Value (amber) |
   | Corner sub (stage 2 only) | Mean value (blue) |
   | Corner sub (stage 3 only) | Nearest Neighbor (purple) |
-| House prices (98042 quantiles, y=232) | $105k $201k $223k $249k $267k $284k $303k $326k $350k $387k $450k $859k |
-| Hint (`p.ph-stage-hint`, stage 0 only) | Twelve homes, four groups of three. Each group runs 25% bigger than the last; inside a group two homes vary by ±5%. Click for each approach. |
-| Marker 1 | Floating house + `Average Value` below + pick `AVG $334k = Σ/12` |
+| House sizes (sqft living area, y=232) | 640 710 780 1060 1110 1170 1330 1390 1460 1660 1740 1830 |
+| Hint (`p.ph-stage-hint`, stage 0 only) | Twelve homes, four groups of three. Each group runs 25% bigger than the last; labels are living area in sq ft. Click for each approach. |
+| Marker 1 | Floating house + equation above + `1211 sq ft` below + pick `AVG 1211 = Σ14530/12` + dashed box all 12 |
 | Panel 1 h3 | Average Value |
 | Panel 1 body | Add all twelve sizes, divide by twelve. One city-wide number fills every blank. Simple; ignores the house. |
-  | Marker 2 | Floating house + `Mean value` below + pick `MED $294k = mid($284k,$303k)` |
+  | Marker 2 | Floating house + equation above + `1250 sq ft` below + pick `MED 1250 = mid(1170,1330)` + dashed box two middle values |
   | Panel 2 h3 | Mean value |
   | Panel 2 body | Sort the row, take the middle. Mansions stop skewing the answer. Still one number for all blanks. |
-  | Marker 3 | Floating house + `Nearest Neighbor` below + pick `5-NN → $293k = w-avg(5)` |
+  | Marker 3 | Floating house + equation above + `1740 sq ft` below + pick `5-NN → 1740 = w-avg(5)` + dashed box last 5 |
   | Panel 3 h3 | Nearest Neighbor |
 | Panel 3 body | Take the 5 nearest sizes; closer homes count more. Each blank gets its own answer from its own street. |
 | Panel 4 h3 (Summary) | Summary: similar homes win |
 | Panel 4 body | Average and middle value give every blank the same city-wide guess. Similar homes adapt to the house — price-moving fields [knn.range] than averages. |
-| Panel 4 pick | `p.ph-panel-nums`: AVG $334k · MED $294k · 5-NN → $293k |
+| Panel 4 pick | `p.ph-panel-nums`: AVG 1211 · MED 1250 · 5-NN → 1740 |
 
 - Say (per click): "City average — one number for every house." →
   "Middle value — mansions stop skewing it, still one number." →
