@@ -327,21 +327,46 @@
       section[data-s4].is-stage-0 #houses-svg {
         max-height: 68vh;
       }
+      /* Shared sub-slide title: right-aligned with the header title, one step
+         below it in the type scale, accent-colored per context. */
+      .ph-subtitle {
+        margin: 0;
+        min-height: calc(var(--fs-h3) * 1.3);
+        text-align: right;
+        font-size: var(--fs-h3);
+        font-weight: 400;
+        line-height: 1.25;
+        color: var(--ph-mint);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
       .ph-s4-subs {
         display: flex;
         justify-content: flex-end;
         gap: var(--gap-md);
-        margin: 0;
+        /* Card rhythm: h3 margin-bottom is --sp-sm, but flex gap adds the same
+           again between stacked rows; mirror the total so the subtitle sits
+           with identical air. */
         min-height: calc(var(--fs-h3) * 1.3);
+        margin: 0;
+        margin-bottom: calc(2 * var(--sp-sm));
+        /* Right edge lands on the header title's right edge (viewport minus
+           gap-md). Title lives in unscaled viewport coords, this row in scaled
+           slide coords: bridge the slide centering margin plus the body's
+           arrow keep-out, all divided by reveal's --slide-scale. */
+        margin-right: calc(-1 * ((100vw - var(--slide-width, 1270px) * var(--slide-scale, 1)) / 2 + var(--ph-arrow-x)) / var(--slide-scale, 1));
+      }
+      section[data-s4] .ph-body {
+        overflow: visible;
       }
       .ph-s4-sub {
-        font-size: var(--fs-h3);
-        margin: 0;
         display: none;
+        flex: 1 1 auto;
       }
-      section[data-s4].is-stage-1 .ph-is-av,
-      section[data-s4].is-stage-2 .ph-is-md,
-      section[data-s4].is-stage-3 .ph-is-knn {
+      section[data-s4].is-stage-1 .ph-s4-sub.ph-is-av,
+      section[data-s4].is-stage-2 .ph-s4-sub.ph-is-md,
+      section[data-s4].is-stage-3 .ph-s4-sub.ph-is-knn {
         display: block;
       }
       .ph-is-av {
@@ -733,27 +758,26 @@
         >
           <div class="ph-body ph-houses">
             <div class="ph-s4-subs" aria-hidden="false">
-              <p class="ph-s4-sub ph-is-av">Average Value</p>
-              <p class="ph-s4-sub ph-is-md">Mean value</p>
-              <p class="ph-s4-sub ph-is-knn">Nearest Neighbor</p>
+              <p class="ph-subtitle ph-s4-sub ph-is-av">Average Value</p>
+              <p class="ph-subtitle ph-s4-sub ph-is-md">Mean value</p>
+              <p class="ph-subtitle ph-s4-sub ph-is-knn">Nearest Neighbor</p>
             </div>
             <div class="ph-houses-top">
               <svg
                 id="houses-svg"
                 class="houses-svg"
-                viewBox="0 0 1200 260"
+                viewBox="15 -80 1195 340"
                 fill="none"
                 role="img"
                 aria-label="Twelve houses in four groups of three, sorted smallest to largest"
               >
                 <defs>
-                  <g id="hs">
+                  <g id="hs"  stroke="#BCCCD4" stroke-width="3">
                     <rect
                       x="-20"
                       y="-30"
                       width="40"
                       height="30"
-                      stroke-width="3"
                     />
                     <path d="M-25 -30 L0 -48 L25 -30 Z" stroke-width="3" />
                     <rect
@@ -761,28 +785,58 @@
                       y="-16"
                       width="12"
                       height="16"
-                      stroke-width="2"
                     />
                   </g>
+                  <marker
+                    id="arr-av"
+                    viewBox="0 0 10 10"
+                    refX="8"
+                    refY="5"
+                    markerWidth="7"
+                    markerHeight="7"
+                    orient="auto-start-reverse"
+                  >
+                    <path d="M0 0 L10 5 L0 10 z" fill="var(--av)" />
+                  </marker>
+                  <marker
+                    id="arr-md"
+                    viewBox="0 0 10 10"
+                    refX="8"
+                    refY="5"
+                    markerWidth="7"
+                    markerHeight="7"
+                    orient="auto-start-reverse"
+                  >
+                    <path d="M0 0 L10 5 L0 10 z" fill="var(--md)" />
+                  </marker>
+                  <marker
+                    id="arr-knn"
+                    viewBox="0 0 10 10"
+                    refX="8"
+                    refY="5"
+                    markerWidth="7"
+                    markerHeight="7"
+                    orient="auto-start-reverse"
+                  >
+                    <path d="M0 0 L10 5 L0 10 z" fill="var(--knn)" />
+                  </marker>
                 </defs>
                 <!-- Group A: intra 44u clears roofs (need 39); left edge pinned at 35 -->
                 <g
                   class="h"
-                  stroke="#BCCCD4"
+                 
                   transform="translate(54,210) scale(0.76)"
                 >
                   <use href="#hs" />
                 </g>
                 <g
                   class="h"
-                  stroke="#BCCCD4"
                   transform="translate(98,210) scale(0.8)"
                 >
                   <use href="#hs" />
                 </g>
                 <g
                   class="h"
-                  stroke="#BCCCD4"
                   transform="translate(142,210) scale(0.84)"
                 >
                   <use href="#hs" />
@@ -790,21 +844,21 @@
                 <!-- Group B: intra 56u clears roofs (need 51); gap A-B = 99u (1x) -->
                 <g
                   class="h"
-                  stroke="#BCCCD4"
+
                   transform="translate(241,210) scale(0.95)"
                 >
                   <use href="#hs" />
                 </g>
                 <g
                   class="h"
-                  stroke="#BCCCD4"
+
                   transform="translate(297,210) scale(1.0)"
                 >
                   <use href="#hs" />
                 </g>
                 <g
                   class="h"
-                  stroke="#BCCCD4"
+
                   transform="translate(353,210) scale(1.05)"
                 >
                   <use href="#hs" />
@@ -819,14 +873,14 @@
                 </g>
                 <g
                   class="h h-nn"
-                  stroke="#BCCCD4"
+
                   transform="translate(619,210) scale(1.25)"
                 >
                   <use href="#hs" />
                 </g>
                 <g
                   class="h h-nn"
-                  stroke="#BCCCD4"
+
                   transform="translate(687,210) scale(1.3125)"
                 >
                   <use href="#hs" />
@@ -834,21 +888,21 @@
                 <!-- Group D: intra 82u clears roofs (need 80); gap C-D = 297u (3x); right edge pinned at 1188 -->
                 <g
                   class="h h-nn"
-                  stroke="#BCCCD4"
+
                   transform="translate(984,210) scale(1.484)"
                 >
                   <use href="#hs" />
                 </g>
                 <g
                   class="h h-nn"
-                  stroke="#BCCCD4"
+
                   transform="translate(1066,210) scale(1.5625)"
                 >
                   <use href="#hs" />
                 </g>
                 <g
                   class="h"
-                  stroke="#BCCCD4"
+
                   transform="translate(1148,210) scale(1.6406)"
                 >
                   <use href="#hs" />
@@ -868,7 +922,7 @@
                   x="54"
                   y="232"
                   text-anchor="middle"
-                  font-size="12"
+                  font-size="14"
                   fill="#BCCCD4"
                 >
                   640
@@ -877,7 +931,7 @@
                   x="98"
                   y="232"
                   text-anchor="middle"
-                  font-size="12"
+                  font-size="14"
                   fill="#BCCCD4"
                 >
                   710
@@ -886,7 +940,7 @@
                   x="142"
                   y="232"
                   text-anchor="middle"
-                  font-size="12"
+                  font-size="14"
                   fill="#BCCCD4"
                 >
                   780
@@ -895,7 +949,7 @@
                   x="241"
                   y="232"
                   text-anchor="middle"
-                  font-size="12"
+                  font-size="14"
                   fill="#BCCCD4"
                 >
                   1060
@@ -904,7 +958,7 @@
                   x="297"
                   y="232"
                   text-anchor="middle"
-                  font-size="12"
+                  font-size="14"
                   fill="#BCCCD4"
                 >
                   1110
@@ -913,7 +967,7 @@
                   x="353"
                   y="232"
                   text-anchor="middle"
-                  font-size="12"
+                  font-size="14"
                   fill="#BCCCD4"
                 >
                   1170
@@ -922,7 +976,7 @@
                   x="551"
                   y="232"
                   text-anchor="middle"
-                  font-size="12"
+                  font-size="14"
                   fill="#BCCCD4"
                 >
                   1330
@@ -931,7 +985,7 @@
                   x="619"
                   y="232"
                   text-anchor="middle"
-                  font-size="12"
+                  font-size="14"
                   fill="#BCCCD4"
                 >
                   1390
@@ -940,7 +994,7 @@
                   x="687"
                   y="232"
                   text-anchor="middle"
-                  font-size="12"
+                  font-size="14"
                   fill="#BCCCD4"
                 >
                   1460
@@ -949,7 +1003,7 @@
                   x="984"
                   y="232"
                   text-anchor="middle"
-                  font-size="12"
+                  font-size="14"
                   fill="#BCCCD4"
                 >
                   1660
@@ -958,7 +1012,7 @@
                   x="1066"
                   y="232"
                   text-anchor="middle"
-                  font-size="12"
+                  font-size="14"
                   fill="#BCCCD4"
                 >
                   1740
@@ -967,7 +1021,7 @@
                   x="1148"
                   y="232"
                   text-anchor="middle"
-                  font-size="12"
+                  font-size="14"
                   fill="#BCCCD4"
                 >
                   1830
@@ -976,10 +1030,10 @@
                 <rect
                   id="bx-avg"
                   class="bx"
-                  x="15"
-                  y="168"
-                  width="1193"
-                  height="62"
+                  x="16"
+                  y="116"
+                  width="1190"
+                  height="132"
                   fill="none"
                   stroke="var(--av)"
                   stroke-width="2"
@@ -1009,32 +1063,24 @@
                   stroke-width="2"
                   stroke-dasharray="8 5"
                 />
-                <!-- Average marker: same pick line y=90 as all markers -->
+                <!-- Average marker: house lifted clear; equal text gaps; down arrow to box -->
                 <g id="mk-avg" class="mk" stroke="var(--av)">
-                  <line
-                    x1="380"
-                    y1="98"
-                    x2="380"
-                    y2="122"
-                    stroke-width="2"
-                    stroke-dasharray="6 4"
-                  />
-                  <g transform="translate(380,90) scale(1.44)">
+                  <g transform="translate(380,10) scale(1.44)">
                     <use href="#hs" />
                   </g>
                   <text
                     x="380"
-                    y="60"
+                    y="-66"
                     text-anchor="middle"
                     font-size="20"
                     fill="var(--av)"
                     stroke="none"
                   >
-                    AVG 1211 = Σ14530/12
+                    Avg
                   </text>
                   <text
                     x="380"
-                    y="143"
+                    y="30"
                     text-anchor="middle"
                     font-size="16"
                     fill="var(--av)"
@@ -1042,23 +1088,23 @@
                   >
                     1211 sq ft
                   </text>
+                  <line
+                    x1="380"
+                    y1="44"
+                    x2="380"
+                    y2="108"
+                    stroke-width="2"
+                    marker-end="url(#arr-av)"
+                  />
                 </g>
                 <!-- Median marker -->
                 <g id="mk-med" class="mk" stroke="var(--md)">
-                  <line
-                    x1="605"
-                    y1="98"
-                    x2="605"
-                    y2="122"
-                    stroke-width="2"
-                    stroke-dasharray="6 4"
-                  />
-                  <g transform="translate(605,90) scale(1.4)">
+                  <g transform="translate(605,10) scale(1.4)">
                     <use href="#hs" />
                   </g>
                   <text
                     x="605"
-                    y="60"
+                    y="-66"
                     text-anchor="middle"
                     font-size="20"
                     fill="var(--md)"
@@ -1068,7 +1114,7 @@
                   </text>
                   <text
                     x="605"
-                    y="143"
+                    y="30"
                     text-anchor="middle"
                     font-size="16"
                     fill="var(--md)"
@@ -1076,23 +1122,23 @@
                   >
                     1250 sq ft
                   </text>
+                  <line
+                    x1="605"
+                    y1="44"
+                    x2="605"
+                    y2="108"
+                    stroke-width="2"
+                    marker-end="url(#arr-md)"
+                  />
                 </g>
                 <!-- KNN marker cluster -->
                 <g id="mk-knn" class="mk" stroke="var(--knn)">
-                  <line
-                    x1="900"
-                    y1="98"
-                    x2="900"
-                    y2="122"
-                    stroke-width="2"
-                    stroke-dasharray="6 4"
-                  />
-                  <g transform="translate(900,90) scale(1.5)">
+                  <g transform="translate(900,10) scale(1.5)">
                     <use href="#hs" />
                   </g>
                   <text
                     x="900"
-                    y="60"
+                    y="-66"
                     text-anchor="middle"
                     font-size="20"
                     fill="var(--knn)"
@@ -1102,7 +1148,7 @@
                   </text>
                   <text
                     x="900"
-                    y="143"
+                    y="30"
                     text-anchor="middle"
                     font-size="16"
                     fill="var(--knn)"
@@ -1110,6 +1156,14 @@
                   >
                     1740 sq ft
                   </text>
+                  <line
+                    x1="900"
+                    y1="44"
+                    x2="900"
+                    y2="108"
+                    stroke-width="2"
+                    marker-end="url(#arr-knn)"
+                  />
                 </g>
               <p class="ph-stage-hint">
                 Twelve homes, four groups of three. Each group runs 25% bigger
