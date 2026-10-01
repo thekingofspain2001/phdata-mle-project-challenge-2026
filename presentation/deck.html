@@ -38,34 +38,37 @@
         --md: #7fb6d9;
         --knn: #c792ea;
 
-        /* Type scale (viewport-based stepped tokens). */
-        --fs-brand: 1.7vh;
-        --fs-h1: 5.4vh;
-        --fs-h2: 3vh;
-        --fs-h3: 2.2vh;
-        --fs-lead: 2.3vh;
-        --fs-body: 1.9vh;
-        --fs-caption: 1.5vh;
+        /* Type scale (slide px at 1270x961 design size; reveal scales uniformly). */
+        --fs-brand: 16px;
+        --fs-h1: 52px;
+        --fs-h2: 29px;
+        --fs-h3: 21px;
+        --fs-lead: 22px;
+        --fs-body: 18px;
+        --fs-caption: 14px;
 
-        /* Spacing scale. */
-        --sp-xs: 0.8vh;
-        --sp-sm: 1.6vh;
-        --sp-md: 2.4vh;
-        --gap-sm: 1vw;
-        --gap-md: 2vw;
+        /* Spacing scale (slide px at 1270x961; chrome bands stay viewport). */
+        --sp-xs: 8px;
+        --sp-sm: 15px;
+        --sp-md: 23px;
+        --gap-sm: 13px;
+        --gap-md: 25px;
         --ph-header-h: 10vh;
         --ph-footer-h: 8vh;
-        /* Approx reveal.js edge-arrow keep-out: .8em offset + 3.6em arrow @10px base. */
-        --ph-arrow-x: 48px;
+        /* Slide-coord pads: top clears chrome, sides match slide rhythm. */
+        --pad-x: 60px;
+        --pad-y: 104px;
+        --pad-foot: 72px;
+        /* ponytail: chrome bands + pads hand-tuned at 1440x900; recompute if slide size changes. */
         /* One motion language: reveal.js slide (0.8s) + fast fade (0.18s). */
         --ph-t-slide: 0.8s;
         --ph-t-fade: 0.18s;
         --ph-ease: cubic-bezier(0.26, 0.86, 0.44, 0.985);
         /* Shape + line tokens. */
-        --rad-card: 1.2vh;
-        --rad-cell: 1vh;
-        --line-sm: 0.15vw;
-        --line-md: 0.2vw;
+        --rad-card: 12px;
+        --rad-cell: 10px;
+        --line-sm: 2px;
+        --line-md: 3px;
         --logo-size: 6vh;
 
         /* Motif at 50% size, pinned bottom-right. */
@@ -96,16 +99,19 @@
         background-position: 100% 100%;
       }
 
-      /* Reveal.js sets inline display:block (beats stylesheets) and owns width/position;
-         keep height:100% so .ph-body has a box to fill, paint only otherwise. */
+      /* Section is the flex column: header fixed, body fills the rest.
+         Reveal.js sets inline display:block; !important restores flex.
+         Native element order, no sync JS. */
       .reveal .slides section.present {
-        height: 100%;
+        height: 100% !important;
+        display: flex !important;
+        flex-direction: column;
         background: transparent;
         text-align: left;
       }
 
-      /* Persistent chrome: brand | client left, slide title right, one row.
-   Fixed above the slides; only the title text fades between slides. */
+      /* Persistent chrome: brand | client left, one row. Fixed above slides. */
+      /* Titles live in-slide (.ph-head); nothing to sync here. */
       .ph-global-top {
         position: absolute;
         top: 0;
@@ -115,7 +121,7 @@
         z-index: 30;
         display: flex;
         align-items: center;
-        justify-content: space-between;
+        justify-content: flex-start;
         gap: var(--gap-md);
         padding: 0 var(--gap-md);
         box-sizing: border-box;
@@ -159,10 +165,21 @@
         width: 100%;
         height: 100%;
       }
-      #ph-global-title {
+      /* In-slide header: upper right, same row as the brandline.
+         Title baseline meets the Sound Realty baseline; sub stacks below. */
+      .ph-head {
+        flex: 0 0 auto;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 0;
+        text-align: right;
+        padding: 12px var(--pad-x) 0;
+        min-height: 81px;
+        box-sizing: border-box;
+      }
+      .ph-head h2 {
         margin: 0;
-        min-width: 0;
-        max-width: 40vw;
         text-align: right;
         font-weight: 400;
         font-size: var(--fs-h2);
@@ -171,37 +188,18 @@
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        opacity: 1;
-        transform: none;
-        transition:
-          opacity var(--ph-t-fade) var(--ph-ease),
-          transform var(--ph-t-fade) var(--ph-ease);
-      }
-      #ph-global-title.is-swap {
-        opacity: 0;
-        transform: translateY(6px);
-      }
-      #ph-global-title.is-empty {
-        visibility: hidden;
       }
 
-      /* Body inherits reveal's slide box; vertical insets clear the overlay
-         header/footer bands. Header/footer live in unscaled viewport px while
-         .ph-body lives in scaled slide coords: divide by reveal's viewport-owned
-         --slide-scale, then subtract the centered slide offset
-         ((100vh - slide-height*scale)/2) so content starts/ends exactly at the
-         chrome edges instead of overshooting by the slide top margin. */
+      /* Draw area: fills the rest; can never write over header or footer. */
       .ph-body {
-        width: inherit;
-        height: inherit;
+        flex: 1 1 auto;
+        min-height: 0;
+        width: 100%;
         overflow: hidden;
         display: flex;
         flex-direction: column;
         gap: var(--sp-sm);
-        padding-top: calc(var(--ph-header-h) / var(--slide-scale, 1) - 50vh / var(--slide-scale, 1) + var(--slide-height, 961px) / 2);
-        padding-right: calc(var(--gap-md) / var(--slide-scale, 1) + var(--ph-arrow-x) / var(--slide-scale, 1));
-        padding-bottom: calc(var(--ph-footer-h) / var(--slide-scale, 1) - 50vh / var(--slide-scale, 1) + var(--slide-height, 961px) / 2);
-        padding-left: calc(var(--gap-md) / var(--slide-scale, 1) + var(--ph-arrow-x) / var(--slide-scale, 1));
+        padding: var(--sp-sm) var(--pad-x) var(--pad-foot);
         box-sizing: border-box;
       }
 
@@ -220,7 +218,11 @@
         font-size: var(--fs-body);
       }
 
-      /* Cover: true slide center on both axes, no chrome insets. */
+      /* Cover: true slide center on both axes. Chrome hidden while cover
+         presents so viewport center == visual center. */
+      .reveal:has(.slides > section.ph-cover.present) .ph-global-top {
+        display: none;
+      }
       .ph-cover .ph-body {
         justify-content: center;
         align-items: center;
@@ -228,8 +230,10 @@
         padding: 0;
       }
       .ph-cover h1 {
-        margin: 0;
+        margin: auto;
         max-width: 20ch;
+        line-height: 1.15;
+        text-align: center;
       }
 
       /* Summary lead + SCR list. Solid fills on bordered items. */
@@ -250,7 +254,7 @@
         gap: var(--sp-sm) var(--gap-md);
       }
       .ph-scr li {
-        flex: 1 1 28vw;
+        flex: 1 1 340px;
         background-color: var(--ph-card-bg);
         -webkit-backdrop-filter: blur(2px);
         backdrop-filter: blur(2px);
@@ -300,6 +304,32 @@
         color: var(--ph-ink-muted);
         margin: 0;
       }
+      /* Version table: tabular numbers, muted from-column. */
+      .ph-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: var(--fs-body);
+        font-variant-numeric: tabular-nums;
+      }
+      .ph-table th,
+      .ph-table td {
+        padding: 2px 8px 2px 0;
+        text-align: left;
+        font-weight: 400;
+      }
+      .ph-table thead th {
+        color: var(--ph-mint);
+        font-size: var(--fs-caption);
+      }
+      .ph-table tbody th {
+        color: var(--ph-ink-on-dark);
+      }
+      .ph-table tbody td {
+        color: var(--ph-ink-muted);
+      }
+      .ph-table tbody td + td {
+        color: var(--ph-ink-on-dark);
+      }
       /* S2 stacked variant: same bordered cards, full-width rows. */
       .ph-cols.ph-is-stack {
         flex-direction: column;
@@ -313,7 +343,7 @@
         justify-content: flex-start;
         transition: flex-basis var(--ph-t-slide) var(--ph-ease);
       }
-      section[data-s4].is-stage-0 .ph-houses-top {
+      section[data-s4]:not(:has(.ph-s4-go:nth-of-type(1).visible)) .ph-houses-top {
         flex: 1 1 auto;
         justify-content: center;
       }
@@ -322,16 +352,15 @@
         height: 100%;
         flex: 1 1 auto;
         min-height: 0;
-        max-height: 48vh;
+        max-height: 380px;
       }
-      section[data-s4].is-stage-0 #houses-svg {
-        max-height: 68vh;
+      section[data-s4]:not(:has(.ph-s4-go:nth-of-type(1).visible)) #houses-svg {
+        max-height: 540px;
       }
-      /* Shared sub-slide title: right-aligned with the header title, one step
-         below it in the type scale, accent-colored per context. */
+      /* Shared sub-slide title: one step below the slide title, accent-colored
+         per context. Right-aligned under the title. */
       .ph-subtitle {
         margin: 0;
-        min-height: calc(var(--fs-h3) * 1.3);
         text-align: right;
         font-size: var(--fs-h3);
         font-weight: 400;
@@ -341,32 +370,23 @@
         overflow: hidden;
         text-overflow: ellipsis;
       }
-      .ph-s4-subs {
-        display: flex;
-        justify-content: flex-end;
-        gap: var(--gap-md);
-        /* Card rhythm: h3 margin-bottom is --sp-sm, but flex gap adds the same
-           again between stacked rows; mirror the total so the subtitle sits
-           with identical air. */
+      /* S4 staged subs: grid stack reserves one line; drivers are native
+         fragments, CSS reacts to reveal's .visible — no JS staging. */
+      .ph-subs {
+        display: grid;
+        margin-top: var(--sp-xs);
+        margin-bottom: 0;
         min-height: calc(var(--fs-h3) * 1.3);
-        margin: 0;
-        margin-bottom: calc(2 * var(--sp-sm));
-        /* Right edge lands on the header title's right edge (viewport minus
-           gap-md). Title lives in unscaled viewport coords, this row in scaled
-           slide coords: bridge the slide centering margin plus the body's
-           arrow keep-out, all divided by reveal's --slide-scale. */
-        margin-right: calc(-1 * ((100vw - var(--slide-width, 1270px) * var(--slide-scale, 1)) / 2 + var(--ph-arrow-x)) / var(--slide-scale, 1));
       }
-      section[data-s4] .ph-body {
-        overflow: visible;
+      .ph-subs > * {
+        grid-area: 1 / 1;
       }
       .ph-s4-sub {
         display: none;
-        flex: 1 1 auto;
       }
-      section[data-s4].is-stage-1 .ph-s4-sub.ph-is-av,
-      section[data-s4].is-stage-2 .ph-s4-sub.ph-is-md,
-      section[data-s4].is-stage-3 .ph-s4-sub.ph-is-knn {
+      section[data-s4]:has(.ph-s4-go:nth-of-type(1).visible):not(:has(.ph-s4-go:nth-of-type(2).visible)) .ph-s4-sub.ph-is-av,
+      section[data-s4]:has(.ph-s4-go:nth-of-type(2).visible):not(:has(.ph-s4-go:nth-of-type(3).visible)) .ph-s4-sub.ph-is-md,
+      section[data-s4]:has(.ph-s4-go:nth-of-type(3).visible):not(:has(.ph-s4-go:nth-of-type(4).visible)) .ph-s4-sub.ph-is-knn {
         display: block;
       }
       .ph-is-av {
@@ -383,10 +403,7 @@
         font-size: var(--fs-caption);
         margin: 0;
       }
-      section[data-s4].is-stage-1 .ph-stage-hint,
-      section[data-s4].is-stage-2 .ph-stage-hint,
-      section[data-s4].is-stage-3 .ph-stage-hint,
-      section[data-s4].is-stage-4 .ph-stage-hint {
+      section[data-s4]:has(.ph-s4-go:nth-of-type(1).visible) .ph-stage-hint {
         display: none;
       }
       .houses-svg .h {
@@ -402,29 +419,25 @@
           transform var(--ph-t-slide) var(--ph-ease);
       }
       /* Per-stage eq houses + input boxes; summary shows all three, winners big. */
-      section[data-s4].is-stage-1 #mk-avg,
-      section[data-s4].is-stage-2 #mk-med,
-      section[data-s4].is-stage-3 #mk-knn {
+      section[data-s4]:has(.ph-s4-go:nth-of-type(1).visible):not(:has(.ph-s4-go:nth-of-type(2).visible)) #mk-avg,
+      section[data-s4]:has(.ph-s4-go:nth-of-type(2).visible):not(:has(.ph-s4-go:nth-of-type(3).visible)) #mk-med,
+      section[data-s4]:has(.ph-s4-go:nth-of-type(3).visible):not(:has(.ph-s4-go:nth-of-type(4).visible)) #mk-knn,
+      section[data-s4]:has(.ph-s4-go:nth-of-type(4).visible) #mk-avg,
+      section[data-s4]:has(.ph-s4-go:nth-of-type(4).visible) #mk-med,
+      section[data-s4]:has(.ph-s4-go:nth-of-type(4).visible) #mk-knn {
         opacity: 1;
       }
-      section[data-s4].is-stage-1 #bx-avg,
-      section[data-s4].is-stage-2 #bx-med,
-      section[data-s4].is-stage-3 #bx-knn {
+      section[data-s4]:has(.ph-s4-go:nth-of-type(1).visible):not(:has(.ph-s4-go:nth-of-type(2).visible)) #bx-avg,
+      section[data-s4]:has(.ph-s4-go:nth-of-type(2).visible):not(:has(.ph-s4-go:nth-of-type(3).visible)) #bx-med,
+      section[data-s4]:has(.ph-s4-go:nth-of-type(3).visible):not(:has(.ph-s4-go:nth-of-type(4).visible)) #bx-knn,
+      section[data-s4]:has(.ph-s4-go:nth-of-type(4).visible) #bx-knn {
         opacity: 1;
       }
-      section[data-s4].is-stage-4 #mk-avg,
-      section[data-s4].is-stage-4 #mk-med,
-      section[data-s4].is-stage-4 #mk-knn {
-        opacity: 1;
-      }
-      section[data-s4].is-stage-4 #bx-knn {
-        opacity: 1;
-      }
-      section[data-s4].is-stage-4 #mk-avg,
-      section[data-s4].is-stage-4 #mk-med {
+      section[data-s4]:has(.ph-s4-go:nth-of-type(4).visible) #mk-avg,
+      section[data-s4]:has(.ph-s4-go:nth-of-type(4).visible) #mk-med {
         transform: scale(0.72);
       }
-      section[data-s4].is-stage-4 #mk-knn {
+      section[data-s4]:has(.ph-s4-go:nth-of-type(4).visible) #mk-knn {
         transform: scale(1.25);
       }
       .ph-stage-bottom {
@@ -432,13 +445,7 @@
         min-height: 0;
         overflow: hidden;
       }
-      section[data-s4].is-stage-0 .ph-stage-bottom .ph-panels {
-        display: none;
-      }
-      section[data-s4].is-stage-1 .ph-stage-bottom,
-      section[data-s4].is-stage-2 .ph-stage-bottom,
-      section[data-s4].is-stage-3 .ph-stage-bottom,
-      section[data-s4].is-stage-4 .ph-stage-bottom {
+      section[data-s4]:has(.ph-s4-go:nth-of-type(1).visible) .ph-stage-bottom {
         flex: 0 0 50%;
         overflow: hidden;
       }
@@ -460,8 +467,14 @@
         padding: var(--sp-sm) var(--gap-sm);
         overflow: hidden;
       }
-      .ph-panel[hidden] {
+      section[data-s4] .ph-panel {
         display: none;
+      }
+      section[data-s4]:has(.ph-s4-go:nth-of-type(1).visible):not(:has(.ph-s4-go:nth-of-type(2).visible)) .ph-panel.ph-is-av,
+      section[data-s4]:has(.ph-s4-go:nth-of-type(2).visible):not(:has(.ph-s4-go:nth-of-type(3).visible)) .ph-panel.ph-is-md,
+      section[data-s4]:has(.ph-s4-go:nth-of-type(3).visible):not(:has(.ph-s4-go:nth-of-type(4).visible)) .ph-panel.ph-is-knn,
+      section[data-s4]:has(.ph-s4-go:nth-of-type(4).visible) .ph-panel.ph-is-sum {
+        display: flex;
       }
       .ph-panel-words {
         flex: 1 1 50%;
@@ -483,7 +496,7 @@
       }
       .ph-panel-pick svg {
         width: 100%;
-        max-height: 30vh;
+        max-height: 240px;
       }
       .ph-panel.ph-is-av {
         border-color: var(--av);
@@ -599,7 +612,7 @@
         gap: var(--gap-md);
       }
       .ph-caps-grid li {
-        flex: 1 1 26vw;
+        flex: 1 1 320px;
         background-color: var(--ph-cap-bg);
         border-radius: var(--rad-cell);
         padding: var(--sp-sm) var(--gap-sm);
@@ -672,7 +685,6 @@
             >Sound Realty</span
           >
         </p>
-        <h2 id="ph-global-title" class="is-empty"></h2>
       </header>
       <div class="slides">
         <!-- S1 Cover. -->
@@ -684,6 +696,9 @@
 
         <!-- S2 Executive summary. -->
         <section aria-label="Executive summary">
+          <header class="ph-head">
+            <h2>Executive summary</h2>
+          </header>
           <div class="ph-body">
             <div class="ph-cols ph-is-stack">
               <article>
@@ -722,6 +737,9 @@
 
         <!-- S3 Core problem. -->
         <section aria-label="Listings with blanks get turned away">
+          <header class="ph-head">
+            <h2>Listings with blanks get turned away</h2>
+          </header>
           <div class="ph-body">
             <div class="ph-cols">
               <article class="fragment">
@@ -751,17 +769,16 @@
         </section>
 
         <!-- S4 Three options: 12 houses, staged detail. -->
-        <section
-          data-s4
-          class="is-stage-0"
-          aria-label="Missing value approaches"
-        >
-          <div class="ph-body ph-houses">
-            <div class="ph-s4-subs" aria-hidden="false">
+        <section data-s4 aria-label="Missing value approaches">
+          <header class="ph-head">
+            <h2>Missing value approaches</h2>
+            <div class="ph-subs" aria-live="off">
               <p class="ph-subtitle ph-s4-sub ph-is-av">Average Value</p>
               <p class="ph-subtitle ph-s4-sub ph-is-md">Mean value</p>
               <p class="ph-subtitle ph-s4-sub ph-is-knn">Nearest Neighbor</p>
             </div>
+          </header>
+          <div class="ph-body ph-houses">
             <div class="ph-houses-top">
               <svg
                 id="houses-svg"
@@ -1042,10 +1059,10 @@
                 <rect
                   id="bx-med"
                   class="bx"
-                  x="310"
-                  y="168"
-                  width="330"
-                  height="62"
+                  x="324"
+                  y="116"
+                  width="260"
+                  height="132"
                   fill="none"
                   stroke="var(--md)"
                   stroke-width="2"
@@ -1054,10 +1071,10 @@
                 <rect
                   id="bx-knn"
                   class="bx"
-                  x="940"
-                  y="168"
-                  width="250"
-                  height="62"
+                  x="584"
+                  y="116"
+                  width="611"
+                  height="132"
                   fill="none"
                   stroke="var(--knn)"
                   stroke-width="2"
@@ -1099,21 +1116,21 @@
                 </g>
                 <!-- Median marker -->
                 <g id="mk-med" class="mk" stroke="var(--md)">
-                  <g transform="translate(605,10) scale(1.4)">
+                  <g transform="translate(455,10) scale(1.44)">
                     <use href="#hs" />
                   </g>
                   <text
-                    x="605"
+                    x="455"
                     y="-66"
                     text-anchor="middle"
                     font-size="20"
                     fill="var(--md)"
                     stroke="none"
                   >
-                    MED 1250 = mid(1170,1330)
+                    Med
                   </text>
                   <text
-                    x="605"
+                    x="455"
                     y="30"
                     text-anchor="middle"
                     font-size="16"
@@ -1123,9 +1140,9 @@
                     1250 sq ft
                   </text>
                   <line
-                    x1="605"
+                    x1="455"
                     y1="44"
-                    x2="605"
+                    x2="455"
                     y2="108"
                     stroke-width="2"
                     marker-end="url(#arr-md)"
@@ -1133,7 +1150,7 @@
                 </g>
                 <!-- KNN marker cluster -->
                 <g id="mk-knn" class="mk" stroke="var(--knn)">
-                  <g transform="translate(900,10) scale(1.5)">
+                  <g transform="translate(900,10) scale(1.44)">
                     <use href="#hs" />
                   </g>
                   <text
@@ -1144,7 +1161,7 @@
                     fill="var(--knn)"
                     stroke="none"
                   >
-                    5-NN → 1740 = w-avg(5)
+                    5-NN
                   </text>
                   <text
                     x="900"
@@ -1173,7 +1190,7 @@
             </div>
             <div class="ph-stage-bottom">
               <div class="ph-panels">
-                <article class="ph-panel ph-is-av" hidden>
+                <article class="ph-panel ph-is-av">
                   <div class="ph-panel-words">
                     <h3>Average Value</h3>
                     <p>
@@ -1207,7 +1224,7 @@
                     </svg>
                   </div>
                 </article>
-                <article class="ph-panel ph-is-md" hidden>
+                <article class="ph-panel ph-is-md">
                   <div class="ph-panel-words">
                     <h3>Mean value</h3>
                     <p>
@@ -1241,7 +1258,7 @@
                     </svg>
                   </div>
                 </article>
-                <article class="ph-panel ph-is-knn" hidden>
+                <article class="ph-panel ph-is-knn">
                   <div class="ph-panel-words">
                     <h3>Nearest Neighbor</h3>
                     <p>
@@ -1286,7 +1303,7 @@
                     </svg>
                   </div>
                 </article>
-                <article class="ph-panel" hidden>
+                <article class="ph-panel ph-is-sum">
                   <div class="ph-panel-words">
                     <h3>Summary: similar homes win</h3>
                     <p>
@@ -1314,6 +1331,9 @@
 
         <!-- S5 Winner. -->
         <section aria-label="Why similar homes won">
+          <header class="ph-head">
+            <h2>Why similar homes won</h2>
+          </header>
           <div class="ph-body">
             <div class="ph-cols">
               <article class="fragment">
@@ -1362,6 +1382,9 @@
 
         <!-- S6 Caching. -->
         <section aria-label="Faster answers">
+          <header class="ph-head">
+            <h2>Faster answers</h2>
+          </header>
           <div class="ph-body">
             <div class="ph-cols">
               <article class="fragment">
@@ -1398,6 +1421,9 @@
 
         <!-- S7 Errors. -->
         <section aria-label="Errors you can act on">
+          <header class="ph-head">
+            <h2>Errors you can act on</h2>
+          </header>
           <div class="ph-body">
             <div class="ph-cols">
               <article class="fragment">
@@ -1420,15 +1446,44 @@
 
         <!-- S8 Modernised base. -->
         <section class="ph-caps" aria-label="Modernised base">
+          <header class="ph-head">
+            <h2>Modernised base</h2>
+          </header>
           <div class="ph-body">
             <div class="ph-cols">
               <article class="fragment">
                 <h3>Runtime</h3>
-                <p>
-                  python 3.10 &#8594; python 3.14; fastapi unpinned &#8594;
-                  fastapi 0.141.1; pydantic unpinned &#8594; pydantic 2.13.5;
-                  uvicorn unpinned &#8594; uvicorn 0.54.0.
-                </p>
+                <table class="ph-table">
+                  <thead>
+                    <tr>
+                      <th scope="col">Library</th>
+                      <th scope="col">From</th>
+                      <th scope="col">To</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <th scope="row">python</th>
+                      <td>3.10</td>
+                      <td>3.14</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">fastapi</th>
+                      <td>—</td>
+                      <td>0.141.1</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">pydantic</th>
+                      <td>—</td>
+                      <td>2.13.5</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">uvicorn</th>
+                      <td>—</td>
+                      <td>0.54.0</td>
+                    </tr>
+                  </tbody>
+                </table>
               </article>
               <article class="fragment">
                 <h3>Typed contracts</h3>
@@ -1470,6 +1525,9 @@
 
         <!-- S9 Close. -->
         <section class="ph-close" aria-label="What you get">
+          <header class="ph-head">
+            <h2>What you get</h2>
+          </header>
           <div class="ph-body">
             <ol class="ph-close-grid">
               <li class="fragment">
@@ -1496,6 +1554,9 @@
 
         <!-- S10 Appendix: demo runbook, not presented. -->
         <section data-visibility="hidden" aria-label="Appendix demo runbook">
+          <header class="ph-head">
+            <h2>Appendix demo runbook</h2>
+          </header>
           <div class="ph-body">
             <ol>
               <li>
@@ -1536,52 +1597,6 @@
         if (value != null) el.textContent = value;
       });
 
-      /* S4 staging: fragment clicks drive top/bottom state. Bottom clears each step. */
-      const S4_STAGES = [
-        "is-stage-0",
-        "is-stage-1",
-        "is-stage-2",
-        "is-stage-3",
-        "is-stage-4",
-      ];
-      function setS4Stage(n) {
-        const s4 = document.querySelector("section[data-s4]");
-        if (!s4) return;
-        s4.classList.remove(...S4_STAGES);
-        s4.classList.add("is-stage-" + n);
-        s4.querySelectorAll(".ph-panel").forEach((p, i) => {
-          p.hidden = i !== Number(n) - 1;
-        });
-      }
-
-      /* Persistent chrome: title mirrors the current slide's aria-label, except the cover.
-         Slide changes cross-fade via .is-swap so the swap tracks the Reveal transition. */
-      let titleTimer = 0;
-      function setGlobalTitle(slide, animate) {
-        const el = document.getElementById("ph-global-title");
-        if (!el || !slide) return;
-        const title = slide.classList.contains("ph-cover")
-          ? ""
-          : slide.getAttribute("aria-label") || "";
-        const reduce = window.matchMedia(
-          "(prefers-reduced-motion: reduce)",
-        ).matches;
-        if (!animate || reduce || el.textContent === title) {
-          window.clearTimeout(titleTimer);
-          el.classList.remove("is-swap");
-          if (el.textContent !== title) el.textContent = title;
-          el.classList.toggle("is-empty", !title);
-          return;
-        }
-        window.clearTimeout(titleTimer);
-        el.classList.add("is-swap");
-        titleTimer = window.setTimeout(() => {
-          el.textContent = title;
-          el.classList.toggle("is-empty", !title);
-          if (title) void el.offsetWidth;
-          el.classList.remove("is-swap");
-        }, 180);
-      }
 
       Reveal.initialize({
         width: 1270,
@@ -1597,48 +1612,6 @@
         backgroundTransition: "none",
       });
 
-      Reveal.on("ready", (e) => {
-        setGlobalTitle(e.currentSlide);
-        //Reveal.nextFragment();
-      });
-      function s4Index(fragment) {
-        return Array.prototype.indexOf.call(
-          document.querySelectorAll(".ph-s4-go"),
-          fragment,
-        );
-      }
-      Reveal.on("fragmentshown", (e) => {
-        const i = s4Index(e.fragment);
-        if (i > -1) setS4Stage(String(i + 1));
-      });
-      Reveal.on("fragmenthidden", (e) => {
-        const i = s4Index(e.fragment);
-        if (i > -1) setS4Stage(String(i));
-      });
-      Reveal.on("slidechanged", (e) => {
-        const s4 = document.querySelector("section[data-s4]");
-        const prev = e.previousSlide;
-        const onS4 = e.currentSlide && e.currentSlide.hasAttribute("data-s4");
-        if (onS4) {
-          if (prev && prev.compareDocumentPosition(s4) & 4) {
-            /* Forward entry (S3 -> S4): land clean at stage 0, no boxes.
-               No nested Reveal.slide: slidechanged fires before the fragment
-               step completes; re-entering here cancels the S4 transition. */
-            setS4Stage("0");
-          } else if (prev) {
-            /* Backward entry (S5 -> S4): sync stage to visible fragments. */
-            const n = Array.prototype.filter.call(
-              document.querySelectorAll(".ph-s4-go"),
-              (f) => f.classList.contains("visible"),
-            ).length;
-            setS4Stage(String(n));
-          }
-        } else if (s4 && prev === s4 && !s4.classList.contains("is-stage-0")) {
-          /* Backing out of S4: parked slide resets to stage 0. */
-          setS4Stage("0");
-        }
-        setGlobalTitle(e.currentSlide, true);
-      });
     </script>
   </body>
 </html>
