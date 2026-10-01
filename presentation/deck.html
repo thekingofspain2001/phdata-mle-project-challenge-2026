@@ -1,1457 +1,1346 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link
-      rel="icon"
-      sizes="32x32"
-      href="https://i0.wp.com/www.phdata.io/wp-content/uploads/2020/03/cropped-phData_color_dark_blue-01-1-32x32.png"
-    />
-    <title>Sound Realty — Valuation API Production Hardening</title>
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/reveal.js@4/dist/reveal.css"
-    />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap"
-    />
-    <style>
-      /* Single change point: every value below is a token. No raw sizes outside :root. */
-      :root {
-        --ph-navy: #111f3a;
-        --ph-mint: #a5feca;
-        --ph-mist: #bcccd4;
-        --ph-card-border: rgba(165, 254, 202, 0.5);
-        --ph-card-bg: rgba(12, 20, 46, 0.72);
-        --ph-ink-on-dark: #ffffff;
-        --ph-ink-muted: rgba(255, 255, 255, 0.75);
-        --ph-cap-bg: #f0f1f5;
-        --ph-cap-h: #232a43;
-        --ph-client-font: "Inter", system-ui, sans-serif;
-        --ph-font: "Aspekta", "Inter", system-ui, sans-serif;
 
-        /* Approach colors: one per fill-in method, reused in S4 detail + S5. */
-        --av: #e8b04b;
-        --md: #7fb6d9;
-        --knn: #c792ea;
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" sizes="32x32"
+    href="https://i0.wp.com/www.phdata.io/wp-content/uploads/2020/03/cropped-phData_color_dark_blue-01-1-32x32.png" />
+  <title>Sound Realty — Valuation API Production Hardening</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4/dist/reveal.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" />
+  <style>
+    /* Single change point: every value below is a token. No raw sizes outside :root. */
+    :root {
+      --ph-navy: #111f3a;
+      --ph-mint: #a5feca;
+      --ph-mist: #bcccd4;
+      --ph-card-border: rgba(165, 254, 202, 0.5);
+      --ph-card-bg: rgba(12, 20, 46, 0.72);
+      --ph-ink-on-dark: #ffffff;
+      --ph-ink-muted: rgba(255, 255, 255, 0.75);
+      --ph-cap-bg: #f0f1f5;
+      --ph-cap-h: #232a43;
+      --ph-client-font: "Inter", system-ui, sans-serif;
+      --ph-font: "Aspekta", "Inter", system-ui, sans-serif;
 
-        /* Type scale (slide px at 1270x961 design size; reveal scales uniformly). */
-        --fs-brand: 16px;
-        --fs-h1: 52px;
-        --fs-h2: 29px;
-        --fs-h3: 21px;
-        --fs-lead: 22px;
-        --fs-body: 18px;
-        --fs-caption: 14px;
+      /* Approach colors: one per fill-in method, reused in S4 detail + S5. */
+      --av: #e8b04b;
+      --md: #7fb6d9;
+      --knn: #c792ea;
 
-        /* Spacing scale (slide px at 1270x961; chrome bands stay viewport). */
-        --sp-xs: 8px;
-        --sp-sm: 15px;
-        --sp-md: 23px;
-        --gap-sm: 13px;
-        --gap-md: 25px;
-        --ph-header-h: 10vh;
-        --ph-footer-h: 8vh;
-        /* Slide-coord pads: top clears chrome, sides match slide rhythm. */
-        --pad-x: 60px;
-        --pad-y: 104px;
-        --pad-foot: 72px;
-        /* ponytail: chrome bands + pads hand-tuned at 1440x900; recompute if slide size changes. */
-        /* One motion language: reveal.js slide (0.8s) + fast fade (0.18s). */
-        --ph-t-slide: 0.8s;
-        --ph-t-fade: 0.18s;
-        --ph-ease: cubic-bezier(0.26, 0.86, 0.44, 0.985);
-        /* Shape + line tokens. */
-        --rad-card: 12px;
-        --rad-cell: 10px;
-        --line-sm: 2px;
-        --line-md: 3px;
-        --logo-size: 6vh;
+      /* Type scale (slide px at 1270x961 design size; reveal scales uniformly). */
+      --fs-brand: 16px;
+      --fs-h1: 52px;
+      --fs-h2: 29px;
+      --fs-h3: 21px;
+      --fs-lead: 22px;
+      --fs-body: 18px;
+      --fs-caption: 14px;
 
-        /* Motif at 50% size, pinned bottom-right. */
-        --ph-motif-size: 50% auto;
+      /* Spacing scale (slide px at 1270x961; chrome bands stay viewport). */
+      --sp-xs: 8px;
+      --sp-sm: 15px;
+      --sp-md: 23px;
+      --gap-sm: 13px;
+      --gap-md: 25px;
+      --ph-header-h: 10vh;
+      --ph-footer-h: 8vh;
+      /* Slide-coord pads: top clears chrome, sides match slide rhythm. */
+      --pad-x: 60px;
+      --pad-y: 104px;
+      --pad-foot: 72px;
+      /* ponytail: chrome bands + pads hand-tuned at 1440x900; recompute if slide size changes. */
+      /* One motion language: reveal.js slide (0.8s) + fast fade (0.18s). */
+      --ph-t-slide: 0.8s;
+      --ph-t-fade: 0.18s;
+      --ph-ease: cubic-bezier(0.26, 0.86, 0.44, 0.985);
+      /* Shape + line tokens. */
+      --rad-card: 12px;
+      --rad-cell: 10px;
+      --line-sm: 2px;
+      --line-md: 3px;
+      --logo-size: 6vh;
 
-        --ph-pattern: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='783' height='642' viewBox='0 0 783 642' fill='none'%3E%3Cg opacity='0.22'%3E%3Cg opacity='0.25'%3E%3Cpath d='M382.852 169.936H315.956V173.702H382.852V169.936Z' fill='%23BCCCD4'/%3E%3Cpath d='M402.188 85.625H398.418V152.476H402.188V85.625Z' fill='%23BCCCD4'/%3E%3C/g%3E%3Cpath d='M202.685 185.314H198.916V252.165H202.685V185.314Z' fill='%23B1D9C5'/%3E%3Cpath d='M284.86 269.625H217.965V273.392H284.86V269.625Z' fill='%23B1D9C5'/%3E%3Cpath d='M304.196 185.314H300.427V252.165H304.196V185.314Z' fill='%23B1D9C5'/%3E%3Cg opacity='0.25'%3E%3Cpath d='M382.852 269.625H315.956V273.392H382.852V269.625Z' fill='%23BCCCD4'/%3E%3Cpath d='M402.188 185.314H398.418V252.165H402.188V185.314Z' fill='%23BCCCD4'/%3E%3C/g%3E%3Cpath d='M183.349 365.795H116.453V369.562H183.349V365.795Z' fill='%23B1D9C5'/%3E%3Cpath d='M202.685 281.479H198.916V348.329H202.685V281.479Z' fill='%23B1D9C5'/%3E%3Cpath d='M284.86 365.795H217.965V369.562H284.86V365.795Z' fill='%23B1D9C5'/%3E%3Cpath d='M304.196 281.479H300.427V348.329H304.196V281.479Z' fill='%23B1D9C5'/%3E%3Cpath d='M382.852 365.795H315.956V369.562H382.852V365.795Z' fill='%23B1D9C5'/%3E%3Cpath d='M402.188 281.479H398.418V348.329H402.188V281.479Z' fill='%23B1D9C5'/%3E%3Cpath d='M3.76919 486.121H0V552.972H3.76919V486.121Z' fill='%23B1D9C5'/%3E%3Cpath opacity='0.25' d='M84.1811 468.115H17.2855V471.881H84.1811V468.115Z' fill='%23B1D9C5'/%3E%3Cpath d='M103.525 383.802H99.7554V450.653H103.525V383.802Z' fill='%23BCCCD4'/%3E%3Cpath d='M103.525 486.121H99.7554V552.972H103.525V486.121Z' fill='%23B1D9C5'/%3E%3Cg opacity='0.25'%3E%3Cpath d='M183.349 468.115H116.453V471.881H183.349V468.115Z' fill='%23BCCCD4'/%3E%3Cpath d='M202.685 383.802H198.915V450.653H202.685V383.802Z' fill='%23BCCCD4'/%3E%3C/g%3E%3Cg opacity='0.25'%3E%3Cpath d='M202.685 486.121H198.916V552.972H202.685V486.121Z' fill='%23BCCCD4'/%3E%3Cpath d='M202.685 575.025H198.916V641.876H202.685V575.025Z' fill='%23BCCCD4'/%3E%3C/g%3E%3Cpath d='M284.861 468.115H217.965V471.881H284.861V468.115Z' fill='%23B1D9C5'/%3E%3Cpath d='M304.197 383.802H300.427V450.653H304.197V383.802Z' fill='%23B1D9C5'/%3E%3Cpath d='M304.196 486.121H300.427V552.972H304.196V486.121Z' fill='%23B1D9C5'/%3E%3Cpath opacity='0.25' d='M304.196 575.025H300.427V641.876H304.196V575.025Z' fill='%23BCCCD4'/%3E%3Cg opacity='0.25'%3E%3Cpath d='M382.852 468.115H315.956V471.881H382.852V468.115Z' fill='%23BCCCD4'/%3E%3Cpath d='M402.188 383.802H398.419V450.653H402.188V383.802Z' fill='%23BCCCD4'/%3E%3C/g%3E%3Cg opacity='0.25'%3E%3Cpath d='M484.122 169.936H417.227V173.702H484.122V169.936Z' fill='%23BCCCD4'/%3E%3Cpath d='M503.458 85.625H499.689V152.476H503.458V85.625Z' fill='%23BCCCD4'/%3E%3C/g%3E%3Cg opacity='0.25'%3E%3Cpath d='M583.289 169.936H516.393V173.702H583.289V169.936Z' fill='%23BCCCD4'/%3E%3Cpath d='M583.289 73.2891H516.393V77.0557H583.289V73.2891Z' fill='%23BCCCD4'/%3E%3Cpath d='M602.625 85.625H598.856V152.476H602.625V85.625Z' fill='%23BCCCD4'/%3E%3Cpath d='M602.625 0H598.856V66.8509H602.625V0Z' fill='%23BCCCD4'/%3E%3C/g%3E%3Cg opacity='0.25'%3E%3Cpath d='M684.801 169.936H617.906V173.702H684.801V169.936Z' fill='%23BCCCD4'/%3E%3Cpath d='M704.137 85.625H700.368V152.476H704.137V85.625Z' fill='%23BCCCD4'/%3E%3C/g%3E%3Cpath d='M782.793 169.936H715.897V173.702H782.793V169.936Z' fill='%23B1D9C5'/%3E%3Cpath d='M484.122 269.625H417.227V273.392H484.122V269.625Z' fill='%23B1D9C5'/%3E%3Cpath d='M503.458 185.314H499.689V252.165H503.458V185.314Z' fill='%23B1D9C5'/%3E%3Cpath d='M583.289 269.625H516.394V273.392H583.289V269.625Z' fill='%23BCCCD4'/%3E%3Cpath d='M602.626 185.314H598.856V252.165H602.626V185.314Z' fill='%23B1D9C5'/%3E%3Cpath d='M684.801 269.625H617.906V273.392H684.801V269.625Z' fill='%23BCCCD4'/%3E%3Cpath d='M704.137 185.314H700.368V252.165H704.137V185.314Z' fill='%23B1D9C5'/%3E%3Cpath d='M782.793 269.625H715.897V273.392H782.793V269.625Z' fill='%23BCCCD4'/%3E%3Cpath d='M484.122 365.795H417.227V369.562H484.122V365.795Z' fill='%23B1D9C5'/%3E%3Cpath d='M503.458 281.479H499.689V348.329H503.458V281.479Z' fill='%23B1D9C5'/%3E%3Cpath d='M583.289 365.795H516.394V369.562H583.289V365.795Z' fill='%23BCCCD4'/%3E%3Cpath d='M602.626 281.479H598.856V348.329H602.626V281.479Z' fill='%23BCCCD4'/%3E%3Cpath d='M684.801 365.795H617.906V369.562H684.801V365.795Z' fill='%23BCCCD4'/%3E%3Cpath d='M704.137 281.479H700.368V348.329H704.137V281.479Z' fill='%23B1D9C5'/%3E%3Cg opacity='0.25'%3E%3Cpath d='M782.793 365.795H715.897V369.562H782.793V365.795Z' fill='%23BCCCD4'/%3E%3C/g%3E%3Cg opacity='0.25'%3E%3Cpath d='M484.123 468.115H417.227V471.881H484.123V468.115Z' fill='%23BCCCD4'/%3E%3Cpath d='M503.459 383.802H499.689V450.653H503.459V383.802Z' fill='%23BCCCD4'/%3E%3C/g%3E%3Cg opacity='0.25'%3E%3Cpath d='M503.458 486.121H499.689V552.972H503.458V486.121Z' fill='%23BCCCD4'/%3E%3C/g%3E%3Cg opacity='0.25'%3E%3Cpath d='M583.289 468.115H516.393V471.881H583.289V468.115Z' fill='%23BCCCD4'/%3E%3Cpath d='M602.625 383.802H598.856V450.653H602.625V383.802Z' fill='%23BCCCD4'/%3E%3C/g%3E%3Cg opacity='0.25'%3E%3Cpath d='M602.627 486.121H598.857V552.972H602.627V486.121Z' fill='%23BCCCD4'/%3E%3C/g%3E%3Cg opacity='0.25'%3E%3Cpath d='M684.801 468.115H617.906V471.881H684.801V468.115Z' fill='%23BCCCD4'/%3E%3Cpath d='M704.137 383.802H700.368V450.653H704.137V383.802Z' fill='%23BCCCD4'/%3E%3C/g%3E%3Cg opacity='0.25'%3E%3Cpath d='M704.137 486.121H700.368V552.972H704.137V486.121Z' fill='%23BCCCD4'/%3E%3C/g%3E%3Cg opacity='0.25'%3E%3Cpath d='M782.793 468.115H715.897V471.881H782.793V468.115Z' fill='%23BCCCD4'/%3E%3C/g%3E%3C/g%3E%3Cpath d='M382.852 365.795H315.956V369.562H382.852V365.795Z' fill='%23A5FECA'/%3E%3Cpath d='M402.188 281.479H398.418V348.329H402.188V281.479Z' fill='%23A5FECA'/%3E%3Cpath d='M402.188 383.802H398.419V450.653H402.188V383.802Z' fill='%23A5FECA'/%3E%3Cpath d='M484.122 365.795H417.227V369.562H484.122V365.795Z' fill='%23A5FECA'/%3E%3Cpath d='M583.29 269.625H516.395V273.392H583.29V269.625Z' fill='%23A5FECA'/%3E%3Cpath d='M684.801 269.625H617.905V273.392H684.801V269.625Z' fill='%23A5FECA'/%3E%3Cpath d='M602.626 281.479H598.856V348.329H602.626V281.479Z' fill='%23111F3A'/%3E%3Cpath d='M602.626 185.314H598.856V252.165H602.626V185.314Z' fill='%23A5FECA'/%3E%3C/svg%3E");
-      }
+      /* Motif at 50% size, pinned bottom-right. */
+      --ph-motif-size: 50% auto;
 
-      /* Page shell. Reveal.js owns geometry below .reveal. */
-      html,
-      body {
-        height: 100vh;
-        margin: 0;
-        overflow: hidden;
-        background-color: var(--ph-navy);
-      }
+      --ph-pattern: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='783' height='642' viewBox='0 0 783 642' fill='none'%3E%3Cg opacity='0.22'%3E%3Cg opacity='0.25'%3E%3Cpath d='M382.852 169.936H315.956V173.702H382.852V169.936Z' fill='%23BCCCD4'/%3E%3Cpath d='M402.188 85.625H398.418V152.476H402.188V85.625Z' fill='%23BCCCD4'/%3E%3C/g%3E%3Cpath d='M202.685 185.314H198.916V252.165H202.685V185.314Z' fill='%23B1D9C5'/%3E%3Cpath d='M284.86 269.625H217.965V273.392H284.86V269.625Z' fill='%23B1D9C5'/%3E%3Cpath d='M304.196 185.314H300.427V252.165H304.196V185.314Z' fill='%23B1D9C5'/%3E%3Cg opacity='0.25'%3E%3Cpath d='M382.852 269.625H315.956V273.392H382.852V269.625Z' fill='%23BCCCD4'/%3E%3Cpath d='M402.188 185.314H398.418V252.165H402.188V185.314Z' fill='%23BCCCD4'/%3E%3C/g%3E%3Cpath d='M183.349 365.795H116.453V369.562H183.349V365.795Z' fill='%23B1D9C5'/%3E%3Cpath d='M202.685 281.479H198.916V348.329H202.685V281.479Z' fill='%23B1D9C5'/%3E%3Cpath d='M284.86 365.795H217.965V369.562H284.86V365.795Z' fill='%23B1D9C5'/%3E%3Cpath d='M304.196 281.479H300.427V348.329H304.196V281.479Z' fill='%23B1D9C5'/%3E%3Cpath d='M382.852 365.795H315.956V369.562H382.852V365.795Z' fill='%23B1D9C5'/%3E%3Cpath d='M402.188 281.479H398.418V348.329H402.188V281.479Z' fill='%23B1D9C5'/%3E%3Cpath d='M3.76919 486.121H0V552.972H3.76919V486.121Z' fill='%23B1D9C5'/%3E%3Cpath opacity='0.25' d='M84.1811 468.115H17.2855V471.881H84.1811V468.115Z' fill='%23B1D9C5'/%3E%3Cpath d='M103.525 383.802H99.7554V450.653H103.525V383.802Z' fill='%23BCCCD4'/%3E%3Cpath d='M103.525 486.121H99.7554V552.972H103.525V486.121Z' fill='%23B1D9C5'/%3E%3Cg opacity='0.25'%3E%3Cpath d='M183.349 468.115H116.453V471.881H183.349V468.115Z' fill='%23BCCCD4'/%3E%3Cpath d='M202.685 383.802H198.915V450.653H202.685V383.802Z' fill='%23BCCCD4'/%3E%3C/g%3E%3Cg opacity='0.25'%3E%3Cpath d='M202.685 486.121H198.916V552.972H202.685V486.121Z' fill='%23BCCCD4'/%3E%3Cpath d='M202.685 575.025H198.916V641.876H202.685V575.025Z' fill='%23BCCCD4'/%3E%3C/g%3E%3Cpath d='M284.861 468.115H217.965V471.881H284.861V468.115Z' fill='%23B1D9C5'/%3E%3Cpath d='M304.197 383.802H300.427V450.653H304.197V383.802Z' fill='%23B1D9C5'/%3E%3Cpath d='M304.196 486.121H300.427V552.972H304.196V486.121Z' fill='%23B1D9C5'/%3E%3Cpath opacity='0.25' d='M304.196 575.025H300.427V641.876H304.196V575.025Z' fill='%23BCCCD4'/%3E%3Cg opacity='0.25'%3E%3Cpath d='M382.852 468.115H315.956V471.881H382.852V468.115Z' fill='%23BCCCD4'/%3E%3Cpath d='M402.188 383.802H398.419V450.653H402.188V383.802Z' fill='%23BCCCD4'/%3E%3C/g%3E%3Cg opacity='0.25'%3E%3Cpath d='M484.122 169.936H417.227V173.702H484.122V169.936Z' fill='%23BCCCD4'/%3E%3Cpath d='M503.458 85.625H499.689V152.476H503.458V85.625Z' fill='%23BCCCD4'/%3E%3C/g%3E%3Cg opacity='0.25'%3E%3Cpath d='M583.289 169.936H516.393V173.702H583.289V169.936Z' fill='%23BCCCD4'/%3E%3Cpath d='M583.289 73.2891H516.393V77.0557H583.289V73.2891Z' fill='%23BCCCD4'/%3E%3Cpath d='M602.625 85.625H598.856V152.476H602.625V85.625Z' fill='%23BCCCD4'/%3E%3Cpath d='M602.625 0H598.856V66.8509H602.625V0Z' fill='%23BCCCD4'/%3E%3C/g%3E%3Cg opacity='0.25'%3E%3Cpath d='M684.801 169.936H617.906V173.702H684.801V169.936Z' fill='%23BCCCD4'/%3E%3Cpath d='M704.137 85.625H700.368V152.476H704.137V85.625Z' fill='%23BCCCD4'/%3E%3C/g%3E%3Cpath d='M782.793 169.936H715.897V173.702H782.793V169.936Z' fill='%23B1D9C5'/%3E%3Cpath d='M484.122 269.625H417.227V273.392H484.122V269.625Z' fill='%23B1D9C5'/%3E%3Cpath d='M503.458 185.314H499.689V252.165H503.458V185.314Z' fill='%23B1D9C5'/%3E%3Cpath d='M583.289 269.625H516.394V273.392H583.289V269.625Z' fill='%23BCCCD4'/%3E%3Cpath d='M602.626 185.314H598.856V252.165H602.626V185.314Z' fill='%23B1D9C5'/%3E%3Cpath d='M684.801 269.625H617.906V273.392H684.801V269.625Z' fill='%23BCCCD4'/%3E%3Cpath d='M704.137 185.314H700.368V252.165H704.137V185.314Z' fill='%23B1D9C5'/%3E%3Cpath d='M782.793 269.625H715.897V273.392H782.793V269.625Z' fill='%23BCCCD4'/%3E%3Cpath d='M484.122 365.795H417.227V369.562H484.122V365.795Z' fill='%23B1D9C5'/%3E%3Cpath d='M503.458 281.479H499.689V348.329H503.458V281.479Z' fill='%23B1D9C5'/%3E%3Cpath d='M583.289 365.795H516.394V369.562H583.289V365.795Z' fill='%23BCCCD4'/%3E%3Cpath d='M602.626 281.479H598.856V348.329H602.626V281.479Z' fill='%23BCCCD4'/%3E%3Cpath d='M684.801 365.795H617.906V369.562H684.801V365.795Z' fill='%23BCCCD4'/%3E%3Cpath d='M704.137 281.479H700.368V348.329H704.137V281.479Z' fill='%23B1D9C5'/%3E%3Cg opacity='0.25'%3E%3Cpath d='M782.793 365.795H715.897V369.562H782.793V365.795Z' fill='%23BCCCD4'/%3E%3C/g%3E%3Cg opacity='0.25'%3E%3Cpath d='M484.123 468.115H417.227V471.881H484.123V468.115Z' fill='%23BCCCD4'/%3E%3Cpath d='M503.459 383.802H499.689V450.653H503.459V383.802Z' fill='%23BCCCD4'/%3E%3C/g%3E%3Cg opacity='0.25'%3E%3Cpath d='M503.458 486.121H499.689V552.972H503.458V486.121Z' fill='%23BCCCD4'/%3E%3C/g%3E%3Cg opacity='0.25'%3E%3Cpath d='M583.289 468.115H516.393V471.881H583.289V468.115Z' fill='%23BCCCD4'/%3E%3Cpath d='M602.625 383.802H598.856V450.653H602.625V383.802Z' fill='%23BCCCD4'/%3E%3C/g%3E%3Cg opacity='0.25'%3E%3Cpath d='M602.627 486.121H598.857V552.972H602.627V486.121Z' fill='%23BCCCD4'/%3E%3C/g%3E%3Cg opacity='0.25'%3E%3Cpath d='M684.801 468.115H617.906V471.881H684.801V468.115Z' fill='%23BCCCD4'/%3E%3Cpath d='M704.137 383.802H700.368V450.653H704.137V383.802Z' fill='%23BCCCD4'/%3E%3C/g%3E%3Cg opacity='0.25'%3E%3Cpath d='M704.137 486.121H700.368V552.972H704.137V486.121Z' fill='%23BCCCD4'/%3E%3C/g%3E%3Cg opacity='0.25'%3E%3Cpath d='M782.793 468.115H715.897V471.881H782.793V468.115Z' fill='%23BCCCD4'/%3E%3C/g%3E%3C/g%3E%3Cpath d='M382.852 365.795H315.956V369.562H382.852V365.795Z' fill='%23A5FECA'/%3E%3Cpath d='M402.188 281.479H398.418V348.329H402.188V281.479Z' fill='%23A5FECA'/%3E%3Cpath d='M402.188 383.802H398.419V450.653H402.188V383.802Z' fill='%23A5FECA'/%3E%3Cpath d='M484.122 365.795H417.227V369.562H484.122V365.795Z' fill='%23A5FECA'/%3E%3Cpath d='M583.29 269.625H516.395V273.392H583.29V269.625Z' fill='%23A5FECA'/%3E%3Cpath d='M684.801 269.625H617.905V273.392H684.801V269.625Z' fill='%23A5FECA'/%3E%3Cpath d='M602.626 281.479H598.856V348.329H602.626V281.479Z' fill='%23111F3A'/%3E%3Cpath d='M602.626 185.314H598.856V252.165H602.626V185.314Z' fill='%23A5FECA'/%3E%3C/svg%3E");
+    }
 
-      /* Fixed viewport background: solid navy + motif pinned bottom-right.
+    /* Page shell. Reveal.js owns geometry below .reveal. */
+    html,
+    body {
+      height: 100vh;
+      margin: 0;
+      overflow: hidden;
+      background-color: var(--ph-navy);
+    }
+
+    /* Fixed viewport background: solid navy + motif pinned bottom-right.
    Lives on .reveal so it never moves during slide transitions. */
-      .reveal {
-        font-family: var(--ph-font);
-        line-height: 1.5;
-        color: #ffffff;
-        background-color: #111f3a;
-        background-image: var(--ph-pattern);
-        background-size: var(--ph-motif-size);
-        background-repeat: no-repeat;
-        background-position: 100% 100%;
-      }
+    .reveal {
+      font-family: var(--ph-font);
+      line-height: 1.5;
+      color: #ffffff;
+      background-color: #111f3a;
+      background-image: var(--ph-pattern);
+      background-size: var(--ph-motif-size);
+      background-repeat: no-repeat;
+      background-position: 100% 100%;
+    }
 
-      /* Section is the flex column: header fixed, body fills the rest.
+    /* Section is the flex column: header fixed, body fills the rest.
          Reveal.js sets inline display:block; !important restores flex.
          Native element order, no sync JS. */
-      .reveal .slides section.present {
-        height: 100% !important;
-        display: flex !important;
-        flex-direction: column;
-        background: transparent;
-        text-align: left;
-      }
+    .reveal .slides section.present {
+      height: 100% !important;
+      display: flex !important;
+      flex-direction: column;
+      background: transparent;
+      text-align: left;
+    }
 
-      /* Persistent chrome: brand | client left, one row. Fixed above slides. */
-      /* Titles live in-slide (.ph-head); nothing to sync here. */
-      .ph-global-top {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: var(--ph-header-h);
-        z-index: 30;
-        display: flex;
-        align-items: center;
-        justify-content: flex-start;
-        gap: var(--gap-md);
-        padding: 0 var(--gap-md);
-        box-sizing: border-box;
-        pointer-events: none;
-      }
-      .ph-brandline {
-        display: flex;
-        align-items: center;
-        gap: calc(var(--gap-sm) * 1.51);
-        margin: 0;
-        font-size: var(--fs-brand);
-        white-space: nowrap;
-      }
-      .ph-logo {
-        height: var(--logo-size);
-        flex: 0 0 auto;
-        margin-right: calc(var(--gap-sm) * -0.51);
-      }
-      .ph-brandline .ph-sep {
-        color: var(--ph-ink-muted);
-      }
-      .ph-brandline .ph-client {
-        display: flex;
-        align-items: center;
-        gap: var(--gap-sm);
-        font-family: Georgia, "Palatino Linotype", "Times New Roman", serif;
-        font-size: 28px;
-        line-height: 27px;
-        color: var(--ph-ink-on-dark);
-        white-space: nowrap;
-      }
-      .ph-client-logo {
-        width: 27px;
-        height: 27px;
-        flex: 0 0 auto;
-        color: #e8b04b;
-        transform: translateY(-1px);
-      }
-      .ph-client-logo svg {
-        display: block;
-        width: 100%;
-        height: 100%;
-      }
-      /* In-slide header: upper right, same row as the brandline.
+    /* Persistent chrome: brand | client left, one row. Fixed above slides. */
+    /* Titles live in-slide (.ph-head); nothing to sync here. */
+    .ph-global-top {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: var(--ph-header-h);
+      z-index: 30;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: var(--gap-md);
+      padding: 0 var(--gap-md);
+      box-sizing: border-box;
+      pointer-events: none;
+    }
+
+    .ph-brandline {
+      display: flex;
+      align-items: center;
+      gap: calc(var(--gap-sm) * 1.51);
+      margin: 0;
+      font-size: var(--fs-brand);
+      white-space: nowrap;
+    }
+
+    .ph-logo {
+      height: var(--logo-size);
+      flex: 0 0 auto;
+      margin-right: calc(var(--gap-sm) * -0.51);
+    }
+
+    .ph-brandline .ph-sep {
+      color: var(--ph-ink-muted);
+    }
+
+    .ph-brandline .ph-client {
+      display: flex;
+      align-items: center;
+      gap: var(--gap-sm);
+      font-family: Georgia, "Palatino Linotype", "Times New Roman", serif;
+      font-size: 28px;
+      line-height: 27px;
+      color: var(--ph-ink-on-dark);
+      white-space: nowrap;
+    }
+
+    .ph-client-logo {
+      width: 27px;
+      height: 27px;
+      flex: 0 0 auto;
+      color: #e8b04b;
+      transform: translateY(-1px);
+    }
+
+    .ph-client-logo svg {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* In-slide header: upper right, same row as the brandline.
          Title baseline meets the Sound Realty baseline; sub stacks below. */
-      .ph-head {
-        flex: 0 0 auto;
-        display: flex;
-        flex-direction: column;
-        align-items: flex-end;
-        gap: 0;
-        text-align: right;
-        padding: 12px var(--pad-x) 0;
-        min-height: 81px;
-        box-sizing: border-box;
-      }
-      .ph-head h2 {
-        margin: 0;
-        text-align: right;
-        font-weight: 400;
-        font-size: var(--fs-h2);
-        line-height: 1.25;
-        color: var(--ph-mint);
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
+    .ph-head {
+      flex: 0 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 0;
+      text-align: right;
+      padding: 12px var(--pad-x) 0;
+      min-height: 81px;
+      box-sizing: border-box;
+    }
 
-      /* Draw area: fills the rest; can never write over header or footer. */
-      .ph-body {
-        flex: 1 1 auto;
-        min-height: 0;
-        width: 100%;
-        overflow: hidden;
-        display: flex;
-        flex-direction: column;
-        gap: var(--sp-sm);
-        padding: var(--sp-sm) var(--pad-x) var(--pad-foot);
-        box-sizing: border-box;
-      }
+    .ph-head h2 {
+      margin: 0;
+      text-align: right;
+      font-weight: 400;
+      font-size: var(--fs-h2);
+      line-height: 1.25;
+      color: var(--ph-mint);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
 
-      .reveal h1 {
-        color: var(--ph-ink-on-dark);
-        font-size: var(--fs-h1);
-      }
-      .reveal h2 {
-        color: var(--ph-mint);
-      }
-      .reveal h3 {
-        color: var(--ph-ink-on-dark);
-        font-size: var(--fs-h3);
-      }
-      .reveal p {
-        font-size: var(--fs-body);
-      }
+    /* Draw area: fills the rest; can never write over header or footer. */
+    .ph-body {
+      flex: 1 1 auto;
+      min-height: 0;
+      width: 100%;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-sm);
+      padding: var(--sp-sm) var(--pad-x) var(--pad-foot);
+      box-sizing: border-box;
+    }
 
-      /* Cover: true slide center on both axes. Chrome hidden while cover
-         presents so viewport center == visual center. */
-      .reveal:has(.slides > section.ph-cover.present) .ph-global-top {
-        display: none;
-      }
-      .ph-cover .ph-body {
-        justify-content: center;
-        align-items: center;
-        text-align: center;
-        padding: 0;
-      }
-      .ph-cover h1 {
-        margin: auto;
-        max-width: 20ch;
-        line-height: 1.15;
-        text-align: center;
-      }
+    .reveal h1 {
+      color: var(--ph-ink-on-dark);
+      font-size: var(--fs-h1);
+    }
 
-      /* Summary lead + SCR list. Solid fills on bordered items. */
-      .ph-action {
-        color: var(--ph-ink-on-dark);
-        font-size: var(--fs-lead);
-        margin: 0;
-      }
-      .ph-scr {
-        flex: 1 1 auto;
-        min-height: 0;
-        list-style: none;
-        margin: 0;
-        padding: 0;
-        display: flex;
-        flex-wrap: wrap;
-        align-content: stretch;
-        gap: var(--sp-sm) var(--gap-md);
-      }
-      .ph-scr li {
-        flex: 1 1 340px;
-        background-color: var(--ph-card-bg);
-        -webkit-backdrop-filter: blur(2px);
-        backdrop-filter: blur(2px);
-        border-left: var(--line-md) solid var(--ph-card-border);
-        padding-left: var(--gap-sm);
-      }
-      .ph-scr h3 {
-        margin: 0 0 var(--sp-xs);
-      }
-      .ph-scr p {
-        color: var(--ph-ink-muted);
-        margin: 0;
-      }
+    .reveal h2 {
+      color: var(--ph-mint);
+    }
 
-      /* Three-column click-reveal. Solid fills on bordered items. */
-      .ph-cols {
-        flex: 1 1 auto;
-        min-height: 0;
-        display: flex;
-        gap: var(--gap-md);
-      }
-      .ph-cols article {
-        flex: 1 1 0;
-        min-width: 0;
-        background-color: var(--ph-card-bg);
-        -webkit-backdrop-filter: blur(2px);
-        backdrop-filter: blur(2px);
-        border: var(--line-sm) solid var(--ph-card-border);
-        border-radius: var(--rad-card);
-        padding: var(--sp-sm) var(--gap-sm);
-      }
-      .ph-cols h3,
-      .ph-cols h4 {
-        color: var(--ph-mint);
-        font-size: var(--fs-h3);
-        margin: 0 0 var(--sp-sm);
-      }
-      /* Nested boxes: distinct color, same spacing/scale. */
-      .ph-cols article article {
-        border-color: var(--ph-mist);
-      }
-      .ph-cols article article h3,
-      .ph-cols article article h4 {
-        color: var(--ph-mist);
-      }
-      .ph-cols p {
-        color: var(--ph-ink-muted);
-        margin: 0;
-      }
-      /* Version table: tabular numbers, muted from-column. */
-      .ph-table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: var(--fs-body);
-        font-variant-numeric: tabular-nums;
-      }
-      .ph-table th,
-      .ph-table td {
-        padding: 2px 8px 2px 0;
-        text-align: left;
-        font-weight: 400;
-      }
-      .ph-table thead th {
-        color: var(--ph-mint);
-        font-size: var(--fs-caption);
-      }
-      .ph-table tbody th {
-        color: var(--ph-ink-on-dark);
-      }
-      .ph-table tbody td {
-        color: var(--ph-ink-muted);
-      }
-      .ph-table tbody td + td {
-        color: var(--ph-ink-on-dark);
-      }
-      /* S2 stacked variant: same bordered cards, full-width rows. */
-      .ph-cols.ph-is-stack {
-        flex-direction: column;
-      }
+    .reveal h3 {
+      color: var(--ph-ink-on-dark);
+      font-size: var(--fs-h3);
+    }
 
-      .ph-houses-top {
-        flex: 0 0 50%;
-        min-height: 0;
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-start;
-        transition: flex-basis var(--ph-t-slide) var(--ph-ease);
-      }
-      section[data-s4]:not(:has(.ph-s4-go:nth-of-type(1).visible)) .ph-houses-top {
-        flex: 1 1 auto;
-        justify-content: center;
-      }
-      #houses-svg {
-        width: 100%;
-        height: 100%;
-        flex: 1 1 auto;
-        min-height: 0;
-        max-height: 380px;
-      }
-      section[data-s4]:not(:has(.ph-s4-go:nth-of-type(1).visible)) #houses-svg {
-        max-height: 540px;
-      }
-      /* Shared sub-slide title: one step below the slide title, accent-colored
+    .reveal p {
+      font-size: var(--fs-body);
+    }
+
+    .ph-cover .ph-body {
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 0;
+    }
+
+    .ph-cover h1 {
+      margin: auto;
+      max-width: 20ch;
+      line-height: 1.15;
+      text-align: center;
+    }
+
+    /* Summary lead + SCR list. Solid fills on bordered items. */
+    .ph-action {
+      color: var(--ph-ink-on-dark);
+      font-size: var(--fs-lead);
+      margin: 0;
+    }
+
+    .ph-scr {
+      flex: 1 1 auto;
+      min-height: 0;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-wrap: wrap;
+      align-content: stretch;
+      gap: var(--sp-sm) var(--gap-md);
+    }
+
+    .ph-scr li {
+      flex: 1 1 340px;
+      background-color: var(--ph-card-bg);
+      -webkit-backdrop-filter: blur(2px);
+      backdrop-filter: blur(2px);
+      border-left: var(--line-md) solid var(--ph-card-border);
+      padding-left: var(--gap-sm);
+    }
+
+    .ph-scr h3 {
+      margin: 0 0 var(--sp-xs);
+    }
+
+    .ph-scr p {
+      color: var(--ph-ink-muted);
+      margin: 0;
+    }
+
+    /* Three-column click-reveal. Solid fills on bordered items. */
+    .ph-cols {
+      flex: 1 1 auto;
+      min-height: 0;
+      display: flex;
+      gap: var(--gap-md);
+    }
+
+    .ph-cols article {
+      flex: 1 1 0;
+      min-width: 0;
+      background-color: var(--ph-card-bg);
+      -webkit-backdrop-filter: blur(2px);
+      backdrop-filter: blur(2px);
+      border: var(--line-sm) solid var(--ph-card-border);
+      border-radius: var(--rad-card);
+      padding: var(--sp-sm) var(--gap-sm);
+    }
+
+    .ph-cols h3,
+    .ph-cols h4 {
+      color: var(--ph-mint);
+      font-size: var(--fs-h3);
+      margin: 0 0 var(--sp-sm);
+    }
+
+    /* Nested boxes: distinct color, same spacing/scale. */
+    .ph-cols article article {
+      border-color: var(--ph-mist);
+    }
+
+    .ph-cols article article h3,
+    .ph-cols article article h4 {
+      color: var(--ph-mist);
+    }
+
+    .ph-cols p {
+      color: var(--ph-ink-muted);
+      margin: 0;
+    }
+
+    /* Version table: tabular numbers, muted from-column. */
+    .ph-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: var(--fs-body);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .ph-table th,
+    .ph-table td {
+      padding: 2px 8px 2px 0;
+      text-align: left;
+      font-weight: 400;
+    }
+
+    /* Header keeps the title treatment (mint), at item size, just bolder. */
+    .ph-table thead th {
+      color: var(--ph-mint);
+      font-weight: 600;
+    }
+
+    .ph-table tbody th {
+      color: var(--ph-ink-on-dark);
+    }
+
+    .ph-table tbody td {
+      color: var(--ph-ink-muted);
+    }
+
+    .ph-table tbody th {
+      color: var(--ph-ink-on-dark);
+    }
+ 
+    .ph-table tbody tr.ph-muted * {
+      color: var(--ph-ink-muted);
+    }
+
+    /* S8 split: chips pick the pane. Layout + fragment state only; card
+       fills, borders and type come from .ph-scr / .ph-cols. */
+    .ph-s8 {
+      flex: 1 1 auto;
+      min-height: 0;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 2.1fr);
+      gap: var(--gap-md);
+    }
+
+    .ph-s8-chips {
+      flex-wrap: nowrap;
+      flex-direction: column;
+      gap: var(--sp-xs);
+    }
+
+    .ph-s8-chips .ph-s8-chip {
+      flex: 1 1 0;
+      display: flex;
+      align-items: center;
+      gap: var(--gap-sm);
+      padding-right: var(--gap-sm);
+    }
+
+    /* Chips stay listed through every step; current one reads as selected. */
+    .ph-caps .ph-s8 .ph-s8-chip.fragment {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    /* Selected chip: mint on navy, per the phData palette. No light fill. */
+    .ph-caps .ph-s8 .ph-s8-chip.current-fragment {
+      background-color: rgba(165, 254, 202, 0.12);
+      border-left-color: var(--ph-mint);
+      color: var(--ph-mint);
+    }
+
+    /* Panes stack in one cell. Reveal keeps .visible on past fragments, so
+       only the current one is painted. */
+    .ph-s8-panes {
+      display: grid;
+    }
+
+    .ph-s8-panes .ph-s8-pane {
+      grid-area: 1 / 1;
+      min-width: 0;
+    }
+
+    /* Runtime table: centred in the pane, rows spread over the vertical slack. */
+    .ph-s8-panes .ph-table {
+      width: auto;
+      margin-inline: auto;
+    }
+
+    .ph-s8-panes .ph-table th,
+    .ph-s8-panes .ph-table td {
+      padding: var(--sp-xs) var(--gap-sm) var(--sp-xs) 0;
+    }
+
+    /* Keep the table centred, but give the value columns room so it uses
+       the horizontal space instead of hugging the middle. */
+    .ph-s8-panes .ph-table thead th:not(:first-child),
+    .ph-s8-panes .ph-table tbody td {
+      min-width: 12ch;
+    }
+
+    .ph-caps .ph-s8 .ph-s8-pane.fragment {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    .ph-caps .ph-s8 .ph-s8-pane.fragment.current-fragment {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    /* Code listings: inset navy block, mint-tinted frame. Markdown fenced
+       blocks: never soft-wrap, so the source line breaks stay as written. */
+    .ph-code {
+      margin: 0 0 var(--sp-sm);
+      padding: var(--gap-sm);
+      background-color: rgba(8, 14, 34, 0.6);
+      border: var(--line-sm) solid var(--ph-card-border);
+      border-radius: var(--rad-cell);
+      color: var(--ph-ink-on-dark);
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: var(--fs-body);
+      line-height: 1.35;
+      white-space: pre;
+      overflow-x: auto;
+    }
+
+    /* Pane subheading: below the h3 in size, mist instead of mint, tight to
+       its block, one rhythm for every Was/Now pair. */
+    .ph-s8-pane h4 {
+      color: var(--ph-mist);
+      font-size: var(--fs-body);
+      font-weight: 600;
+      margin: var(--sp-sm) 0 var(--sp-xs);
+    }
+
+    .ph-s8-pane > h4:first-of-type {
+      margin-top: 0;
+    }
+
+    .ph-code code {
+      font: inherit;
+    }
+ 
+    /* S2 stacked variant: same bordered cards, full-width rows. */
+    .ph-cols.ph-is-stack {
+      flex-direction: column;
+    }
+
+    .ph-houses-top {
+      flex: 0 0 50%;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      transition: flex-basis var(--ph-t-slide) var(--ph-ease);
+    }
+
+    section[data-s4]:not(:has(.ph-s4-go:nth-of-type(1).visible)) .ph-houses-top {
+      flex: 1 1 auto;
+      justify-content: center;
+    }
+
+    #houses-svg {
+      width: 100%;
+      height: 100%;
+      flex: 1 1 auto;
+      min-height: 0;
+      max-height: 380px;
+    }
+
+    section[data-s4]:not(:has(.ph-s4-go:nth-of-type(1).visible)) #houses-svg {
+      max-height: 540px;
+    }
+
+    /* Shared sub-slide title: one step below the slide title, accent-colored
          per context. Right-aligned under the title. */
-      .ph-subtitle {
-        margin: 0;
-        text-align: right;
-        font-size: var(--fs-h3);
-        font-weight: 400;
-        line-height: 1.25;
-        color: var(--ph-mint);
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-      /* S4 staged subs: grid stack reserves one line; drivers are native
+    .ph-subtitle {
+      margin: 0;
+      text-align: right;
+      font-size: var(--fs-h3);
+      font-weight: 400;
+      line-height: 1.25;
+      color: var(--ph-mint);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* S4 staged subs: grid stack reserves one line; drivers are native
          fragments, CSS reacts to reveal's .visible — no JS staging. */
-      .ph-subs {
-        display: grid;
-        margin-top: var(--sp-xs);
-        margin-bottom: 0;
-        min-height: calc(var(--fs-h3) * 1.3);
-      }
-      .ph-subs > * {
-        grid-area: 1 / 1;
-      }
-      .ph-s4-sub {
-        display: none;
-      }
-      section[data-s4]:has(.ph-s4-go:nth-of-type(1).visible):not(:has(.ph-s4-go:nth-of-type(2).visible)) .ph-s4-sub.ph-is-av,
-      section[data-s4]:has(.ph-s4-go:nth-of-type(2).visible):not(:has(.ph-s4-go:nth-of-type(3).visible)) .ph-s4-sub.ph-is-md,
-      section[data-s4]:has(.ph-s4-go:nth-of-type(3).visible):not(:has(.ph-s4-go:nth-of-type(4).visible)) .ph-s4-sub.ph-is-knn {
-        display: block;
-      }
-      .ph-is-av {
-        color: var(--av);
-      }
-      .ph-is-md {
-        color: var(--md);
-      }
-      .ph-is-knn {
-        color: var(--knn);
-      }
-      .ph-stage-hint {
-        color: var(--ph-ink-muted);
-        font-size: var(--fs-caption);
-        margin: 0;
-      }
-      section[data-s4]:has(.ph-s4-go:nth-of-type(1).visible) .ph-stage-hint {
-        display: none;
-      }
-      .houses-svg .h {
-        transition: opacity var(--ph-t-fade) var(--ph-ease);
-      }
-      .houses-svg .mk,
-      .houses-svg .bx {
-        opacity: 0;
-        transform-box: fill-box;
-        transform-origin: center;
-        transition:
-          opacity var(--ph-t-slide) var(--ph-ease),
-          transform var(--ph-t-slide) var(--ph-ease);
-      }
-      /* Per-stage eq houses + input boxes; summary shows all three, winners big. */
-      section[data-s4]:has(.ph-s4-go:nth-of-type(1).visible):not(:has(.ph-s4-go:nth-of-type(2).visible)) #mk-avg,
-      section[data-s4]:has(.ph-s4-go:nth-of-type(2).visible):not(:has(.ph-s4-go:nth-of-type(3).visible)) #mk-med,
-      section[data-s4]:has(.ph-s4-go:nth-of-type(3).visible):not(:has(.ph-s4-go:nth-of-type(4).visible)) #mk-knn,
-      section[data-s4]:has(.ph-s4-go:nth-of-type(4).visible) #mk-avg,
-      section[data-s4]:has(.ph-s4-go:nth-of-type(4).visible) #mk-med,
-      section[data-s4]:has(.ph-s4-go:nth-of-type(4).visible) #mk-knn {
-        opacity: 1;
-      }
-      section[data-s4]:has(.ph-s4-go:nth-of-type(1).visible):not(:has(.ph-s4-go:nth-of-type(2).visible)) #bx-avg,
-      section[data-s4]:has(.ph-s4-go:nth-of-type(2).visible):not(:has(.ph-s4-go:nth-of-type(3).visible)) #bx-med,
-      section[data-s4]:has(.ph-s4-go:nth-of-type(3).visible):not(:has(.ph-s4-go:nth-of-type(4).visible)) #bx-knn,
-      section[data-s4]:has(.ph-s4-go:nth-of-type(4).visible) #bx-knn {
-        opacity: 1;
-      }
-      section[data-s4]:has(.ph-s4-go:nth-of-type(4).visible) #mk-avg,
-      section[data-s4]:has(.ph-s4-go:nth-of-type(4).visible) #mk-med {
-        transform: scale(0.72);
-      }
-      section[data-s4]:has(.ph-s4-go:nth-of-type(4).visible) #mk-knn {
-        transform: scale(1.25);
-      }
-      .ph-stage-bottom {
-        flex: 0 0 0;
-        min-height: 0;
-        overflow: hidden;
-      }
-      section[data-s4]:has(.ph-s4-go:nth-of-type(1).visible) .ph-stage-bottom {
-        flex: 0 0 50%;
-        overflow: hidden;
-      }
-      .ph-panels {
-        height: 100%;
-        display: flex;
-        gap: var(--gap-md);
-      }
-      .ph-panel {
-        flex: 1 1 0;
-        min-width: 0;
-        display: flex;
-        gap: var(--gap-md);
-        background-color: var(--ph-card-bg);
-        -webkit-backdrop-filter: blur(2px);
-        backdrop-filter: blur(2px);
-        border: var(--line-sm) solid var(--ph-card-border);
-        border-radius: var(--rad-card);
-        padding: var(--sp-sm) var(--gap-sm);
-        overflow: hidden;
-      }
-      section[data-s4] .ph-panel {
-        display: none;
-      }
-      section[data-s4]:has(.ph-s4-go:nth-of-type(1).visible):not(:has(.ph-s4-go:nth-of-type(2).visible)) .ph-panel.ph-is-av,
-      section[data-s4]:has(.ph-s4-go:nth-of-type(2).visible):not(:has(.ph-s4-go:nth-of-type(3).visible)) .ph-panel.ph-is-md,
-      section[data-s4]:has(.ph-s4-go:nth-of-type(3).visible):not(:has(.ph-s4-go:nth-of-type(4).visible)) .ph-panel.ph-is-knn,
-      section[data-s4]:has(.ph-s4-go:nth-of-type(4).visible) .ph-panel.ph-is-sum {
-        display: flex;
-      }
-      .ph-panel-words {
-        flex: 1 1 50%;
-        min-width: 0;
-      }
-      .ph-panel-words h3 {
-        margin: 0 0 var(--sp-xs);
-      }
-      .ph-panel-words p {
-        color: var(--ph-ink-muted);
-        margin: 0;
-      }
-      .ph-panel-pick {
-        flex: 1 1 50%;
-        min-width: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-      .ph-panel-pick svg {
-        width: 100%;
-        max-height: 240px;
-      }
-      .ph-panel.ph-is-av {
-        border-color: var(--av);
-      }
-      .ph-panel.ph-is-av h3 {
-        color: var(--av);
-      }
-      .ph-panel.ph-is-md {
-        border-color: var(--md);
-      }
-      .ph-panel.ph-is-md h3 {
-        color: var(--md);
-      }
-      .ph-panel.ph-is-knn {
-        border-color: var(--knn);
-      }
-      .ph-panel.ph-is-knn h3 {
-        color: var(--knn);
-      }
-      .s4-drivers {
-        position: absolute;
-        width: 0;
-        height: 0;
-        overflow: hidden;
-      }
+    .ph-subs {
+      display: grid;
+      margin-top: var(--sp-xs);
+      margin-bottom: 0;
+      min-height: calc(var(--fs-h3) * 1.3);
+    }
 
-      /* Winner bars. */
-      .ph-bars {
-        list-style: none;
-        margin: 0;
-        padding: 0;
-        display: flex;
-        flex-direction: column;
-        gap: var(--sp-xs);
-      }
-      .ph-bars li {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: var(--sp-xs) var(--gap-sm);
-        color: var(--ph-ink-muted);
-      }
-      .ph-bars li:nth-child(1) span {
-        color: var(--av);
-      }
-      .ph-bars li:nth-child(2) span {
-        color: var(--md);
-      }
-      .ph-bars li:nth-child(n + 3) span {
-        color: var(--knn);
-      }
-      .ph-bars meter {
-        flex: 1 1 100%;
-        width: 100%;
-        accent-color: var(--ph-mint);
-      }
+    .ph-subs>* {
+      grid-area: 1 / 1;
+    }
 
-      /* Footnote. */
-      .ph-foot {
-        color: var(--ph-ink-muted);
-        font-size: var(--fs-caption);
-        opacity: 80%;
-        margin: 0;
-      }
+    .ph-s4-sub {
+      display: none;
+    }
 
-      /* Template A: Why thirds. Solid fills on bordered items. */
-      .ph-close-grid {
-        flex: 1 1 auto;
-        min-height: 0;
-        list-style: none;
-        margin: 0;
-        padding: 0;
-        display: flex;
-        gap: var(--gap-md);
-      }
-      .ph-close-grid li {
-        flex: 1 1 0;
-        background-color: var(--ph-card-bg);
-        -webkit-backdrop-filter: blur(2px);
-        backdrop-filter: blur(2px);
-        border: var(--line-sm) solid var(--ph-card-border);
-        border-radius: var(--rad-card);
-        padding: var(--sp-sm) var(--gap-sm);
-      }
-      .ph-num {
-        color: var(--ph-mint);
-        font-size: var(--fs-h3);
-        margin: 0;
-      }
-      .ph-close-grid h3 {
-        margin: var(--sp-xs) 0;
-      }
-      .ph-close-grid p:last-child {
-        color: var(--ph-ink-muted);
-        margin: 0;
-      }
-      .ph-handoff {
-        color: var(--ph-ink-on-dark);
-        font-size: var(--fs-lead);
-        margin: 0;
-      }
+    section[data-s4]:has(.ph-s4-go:nth-of-type(1).visible):not(:has(.ph-s4-go:nth-of-type(2).visible)) .ph-s4-sub.ph-is-av,
+    section[data-s4]:has(.ph-s4-go:nth-of-type(2).visible):not(:has(.ph-s4-go:nth-of-type(3).visible)) .ph-s4-sub.ph-is-md,
+    section[data-s4]:has(.ph-s4-go:nth-of-type(3).visible):not(:has(.ph-s4-go:nth-of-type(4).visible)) .ph-s4-sub.ph-is-knn {
+      display: block;
+    }
 
-      /* Template B: Capabilities six-cell grid. */
-      .ph-caps-grid {
-        flex: 1 1 auto;
-        min-height: 0;
-        list-style: none;
-        margin: 0;
-        padding: 0;
-        display: flex;
-        flex-wrap: wrap;
-        align-content: stretch;
-        gap: var(--gap-md);
-      }
-      .ph-caps-grid li {
-        flex: 1 1 320px;
-        background-color: var(--ph-cap-bg);
-        border-radius: var(--rad-cell);
-        padding: var(--sp-sm) var(--gap-sm);
-      }
-      .ph-caps-grid h3 {
-        color: var(--ph-cap-h);
-        margin: 0 0 var(--sp-xs);
-      }
-      .ph-caps-grid p {
-        color: var(--ph-cap-h);
-        margin: 0;
-        opacity: 80%;
-      }
+    .ph-is-av {
+      color: var(--av);
+    }
 
-      /* Controls: muted phData arrows, pinned to the static footer band. */
-      .reveal .controls {
-        color: #6f8590;
-        bottom: calc((var(--ph-footer-h) - 36px) / 2);
-      }
-      .reveal .controls .navigate-left,
-      .reveal .controls .navigate-right,
-      .reveal .controls .navigate-up,
-      .reveal .controls .navigate-down {
-        color: currentColor;
-      }
-      .reveal .controls .enabled:hover,
-      .reveal .controls .enabled:focus-visible,
-      .reveal .controls .enabled:active {
-        color: var(--ph-mint);
-      }
+    .ph-is-md {
+      color: var(--md);
+    }
 
-      /* Slide number: reveal.js default placement; themed paint only. */
-      .reveal .slide-number {
-        font-size: 26px;
-        color: var(--ph-mist);
-        background-color: transparent;
-        text-decoration: none;
-      }
-      .reveal .slide-number a {
-        text-decoration: none;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="reveal">
-      <header class="ph-global-top">
-        <p class="ph-brandline">
-          <img
-            class="ph-logo"
-            src="https://www.phdata.io/wp-content/uploads/2023/09/phData_white_rgb.png"
-            alt="phData logo"
-          /><span class="ph-sep" aria-hidden="true">|</span
-          ><span class="ph-client"
-            ><span
-              class="ph-client-logo"
-              role="img"
-              aria-label="Sound Realty logo"
-              ><svg
-                viewBox="2 2 20 20"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2.2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                aria-hidden="true"
-              >
-                <path d="M3 11.5 12 3l9 8.5" />
-                <path d="M5.5 10.5V21h13V10.5" />
-                <path d="M10 21v-6h4v6" /></svg></span
-            >Sound Realty</span
-          >
-        </p>
-      </header>
-      <div class="slides">
-        <!-- S1 Cover. -->
-        <section class="ph-cover" aria-label="Cover">
-          <div class="ph-body">
-            <h1>Housing Price Prediction Service Analysis</h1>
+    .ph-is-knn {
+      color: var(--knn);
+    }
+
+    .ph-stage-hint {
+      color: var(--ph-ink-muted);
+      font-size: var(--fs-caption);
+      margin: 0;
+    }
+
+    section[data-s4]:has(.ph-s4-go:nth-of-type(1).visible) .ph-stage-hint {
+      display: none;
+    }
+
+    .houses-svg .h {
+      transition: opacity var(--ph-t-fade) var(--ph-ease);
+    }
+
+    .houses-svg .mk,
+    .houses-svg .bx {
+      opacity: 0;
+      transform-box: fill-box;
+      transform-origin: center;
+      transition:
+        opacity var(--ph-t-slide) var(--ph-ease),
+        transform var(--ph-t-slide) var(--ph-ease);
+    }
+
+    /* Per-stage eq houses + input boxes; summary shows all three, winners big. */
+    section[data-s4]:has(.ph-s4-go:nth-of-type(1).visible):not(:has(.ph-s4-go:nth-of-type(2).visible)) #mk-avg,
+    section[data-s4]:has(.ph-s4-go:nth-of-type(2).visible):not(:has(.ph-s4-go:nth-of-type(3).visible)) #mk-med,
+    section[data-s4]:has(.ph-s4-go:nth-of-type(3).visible):not(:has(.ph-s4-go:nth-of-type(4).visible)) #mk-knn,
+    section[data-s4]:has(.ph-s4-go:nth-of-type(4).visible) #mk-avg,
+    section[data-s4]:has(.ph-s4-go:nth-of-type(4).visible) #mk-med,
+    section[data-s4]:has(.ph-s4-go:nth-of-type(4).visible) #mk-knn {
+      opacity: 1;
+    }
+
+    section[data-s4]:has(.ph-s4-go:nth-of-type(1).visible):not(:has(.ph-s4-go:nth-of-type(2).visible)) #bx-avg,
+    section[data-s4]:has(.ph-s4-go:nth-of-type(2).visible):not(:has(.ph-s4-go:nth-of-type(3).visible)) #bx-med,
+    section[data-s4]:has(.ph-s4-go:nth-of-type(3).visible):not(:has(.ph-s4-go:nth-of-type(4).visible)) #bx-knn,
+    section[data-s4]:has(.ph-s4-go:nth-of-type(4).visible) #bx-knn {
+      opacity: 1;
+    }
+
+    section[data-s4]:has(.ph-s4-go:nth-of-type(4).visible) #mk-avg,
+    section[data-s4]:has(.ph-s4-go:nth-of-type(4).visible) #mk-med {
+      transform: scale(0.72);
+    }
+
+    section[data-s4]:has(.ph-s4-go:nth-of-type(4).visible) #mk-knn {
+      transform: scale(1.25);
+    }
+
+    .ph-stage-bottom {
+      flex: 0 0 0;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    section[data-s4]:has(.ph-s4-go:nth-of-type(1).visible) .ph-stage-bottom {
+      flex: 0 0 50%;
+      overflow: hidden;
+    }
+
+    .ph-panels {
+      height: 100%;
+      display: flex;
+      gap: var(--gap-md);
+    }
+
+    .ph-panel {
+      flex: 1 1 0;
+      min-width: 0;
+      display: flex;
+      gap: var(--gap-md);
+      background-color: var(--ph-card-bg);
+      -webkit-backdrop-filter: blur(2px);
+      backdrop-filter: blur(2px);
+      border: var(--line-sm) solid var(--ph-card-border);
+      border-radius: var(--rad-card);
+      padding: var(--sp-sm) var(--gap-sm);
+      overflow: hidden;
+    }
+
+    section[data-s4] .ph-panel {
+      display: none;
+    }
+
+    section[data-s4]:has(.ph-s4-go:nth-of-type(1).visible):not(:has(.ph-s4-go:nth-of-type(2).visible)) .ph-panel.ph-is-av,
+    section[data-s4]:has(.ph-s4-go:nth-of-type(2).visible):not(:has(.ph-s4-go:nth-of-type(3).visible)) .ph-panel.ph-is-md,
+    section[data-s4]:has(.ph-s4-go:nth-of-type(3).visible):not(:has(.ph-s4-go:nth-of-type(4).visible)) .ph-panel.ph-is-knn,
+    section[data-s4]:has(.ph-s4-go:nth-of-type(4).visible) .ph-panel.ph-is-sum {
+      display: flex;
+    }
+
+    .ph-panel-words {
+      flex: 1 1 50%;
+      min-width: 0;
+    }
+
+    .ph-panel-words h3 {
+      margin: 0 0 var(--sp-xs);
+    }
+
+    .ph-panel-words p {
+      color: var(--ph-ink-muted);
+      margin: 0;
+    }
+
+    .ph-panel-pick {
+      flex: 1 1 50%;
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .ph-panel-pick svg {
+      width: 100%;
+      max-height: 240px;
+    }
+
+    .ph-panel.ph-is-av {
+      border-color: var(--av);
+    }
+
+    .ph-panel.ph-is-av h3 {
+      color: var(--av);
+    }
+
+    .ph-panel.ph-is-md {
+      border-color: var(--md);
+    }
+
+    .ph-panel.ph-is-md h3 {
+      color: var(--md);
+    }
+
+    .ph-panel.ph-is-knn {
+      border-color: var(--knn);
+    }
+
+    .ph-panel.ph-is-knn h3 {
+      color: var(--knn);
+    }
+
+    .s4-drivers {
+      position: absolute;
+      width: 0;
+      height: 0;
+      overflow: hidden;
+    }
+
+    /* Winner bars. */
+    .ph-bars {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-xs);
+    }
+
+    .ph-bars li {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--sp-xs) var(--gap-sm);
+      color: var(--ph-ink-muted);
+    }
+
+    .ph-bars li:nth-child(1) span {
+      color: var(--av);
+    }
+
+    .ph-bars li:nth-child(2) span {
+      color: var(--md);
+    }
+
+    .ph-bars li:nth-child(n + 3) span {
+      color: var(--knn);
+    }
+
+    .ph-bars meter {
+      flex: 1 1 100%;
+      width: 100%;
+      accent-color: var(--ph-mint);
+    }
+
+    /* Footnote. */
+    .ph-foot {
+      color: var(--ph-ink-muted);
+      font-size: var(--fs-caption);
+      opacity: 80%;
+      margin: 0;
+    }
+
+    /* Template A: Why thirds. Solid fills on bordered items. */
+    .ph-close-grid {
+      flex: 1 1 auto;
+      min-height: 0;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      gap: var(--gap-md);
+    }
+
+    .ph-close-grid li {
+      flex: 1 1 0;
+      background-color: var(--ph-card-bg);
+      -webkit-backdrop-filter: blur(2px);
+      backdrop-filter: blur(2px);
+      border: var(--line-sm) solid var(--ph-card-border);
+      border-radius: var(--rad-card);
+      padding: var(--sp-sm) var(--gap-sm);
+    }
+
+    .ph-num {
+      color: var(--ph-mint);
+      font-size: var(--fs-h3);
+      margin: 0;
+    }
+
+    .ph-close-grid h3 {
+      margin: var(--sp-xs) 0;
+    }
+
+    .ph-close-grid p:last-child {
+      color: var(--ph-ink-muted);
+      margin: 0;
+    }
+
+    .ph-handoff {
+      color: var(--ph-ink-on-dark);
+      font-size: var(--fs-lead);
+      margin: 0;
+    }
+
+    .ph-table tbody .ph-strike {
+      text-decoration: line-through;
+    }
+
+    /* Template B: Capabilities six-cell grid. */
+    .ph-caps-grid {
+      flex: 1 1 auto;
+      min-height: 0;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-wrap: wrap;
+      align-content: stretch;
+      gap: var(--gap-md);
+    }
+
+    .ph-caps-grid li {
+      flex: 1 1 320px;
+      background-color: var(--ph-cap-bg);
+      border-radius: var(--rad-cell);
+      padding: var(--sp-sm) var(--gap-sm);
+    }
+
+    .ph-caps-grid h3 {
+      color: var(--ph-cap-h);
+      margin: 0 0 var(--sp-xs);
+    }
+
+    .ph-caps-grid p {
+      color: var(--ph-cap-h);
+      margin: 0;
+      opacity: 80%;
+    }
+
+    /* Controls: muted phData arrows, pinned to the static footer band. */
+    .reveal .controls {
+      color: #6f8590;
+      bottom: calc((var(--ph-footer-h) - 36px) / 2);
+    }
+
+    .reveal .controls .navigate-left,
+    .reveal .controls .navigate-right,
+    .reveal .controls .navigate-up,
+    .reveal .controls .navigate-down {
+      color: currentColor;
+    }
+
+    .reveal .controls .enabled:hover,
+    .reveal .controls .enabled:focus-visible,
+    .reveal .controls .enabled:active {
+      color: var(--ph-mint);
+    }
+
+    /* Slide number: reveal.js default placement; themed paint only. */
+    .reveal .slide-number {
+      font-size: 26px;
+      color: var(--ph-mist);
+      background-color: transparent;
+      text-decoration: none;
+    }
+
+    .reveal .slide-number a {
+      text-decoration: none;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="reveal">
+    <header class="ph-global-top">
+      <p class="ph-brandline">
+        <img class="ph-logo" src="https://www.phdata.io/wp-content/uploads/2023/09/phData_white_rgb.png"
+          alt="phData logo" /><span class="ph-sep" aria-hidden="true">|</span><span class="ph-client"><span
+            class="ph-client-logo" role="img" aria-label="Sound Realty logo"><svg viewBox="2 2 20 20" fill="none"
+              stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"
+              aria-hidden="true">
+              <path d="M3 11.5 12 3l9 8.5" />
+              <path d="M5.5 10.5V21h13V10.5" />
+              <path d="M10 21v-6h4v6" />
+            </svg></span>Sound Realty</span>
+      </p>
+    </header>
+    <div class="slides">
+      <!-- S1 Cover. -->
+      <section class="ph-cover" aria-label="Cover">
+        <div class="ph-body">
+          <h1>Housing Price Prediction Service Analysis</h1>
+        </div>
+      </section>
+
+      <!-- S2 Executive summary. -->
+      <section aria-label="Executive summary">
+        <header class="ph-head">
+          <h2>Executive summary</h2>
+        </header>
+        <div class="ph-body">
+          <div class="ph-cols ph-is-stack">
+            <article>
+              <h3>Problem</h3>
+              <div class="ph-cols">
+                <article>
+                  <h4>Problem</h4>
+                  <p>
+                    Predict service only works if all fields are provided.
+                  </p>
+                </article>
+                <article>
+                  <h4>Impact</h4>
+                  <p>10 to 20% of data is missing at least one field.</p>
+                </article>
+                <article>
+                  <h4>Cost</h4>
+                  <p>
+                    Rejected requests delay listings and cost agent time
+                    (placeholder estimate).
+                  </p>
+                </article>
+              </div>
+            </article>
+            <article>
+              <h3>Performance</h3>
+              <div></div>
+            </article>
+            <article>
+              <h3>Modernization</h3>
+              <div></div>
+            </article>
           </div>
-        </section>
+        </div>
+      </section>
 
-        <!-- S2 Executive summary. -->
-        <section aria-label="Executive summary">
-          <header class="ph-head">
-            <h2>Executive summary</h2>
-          </header>
-          <div class="ph-body">
-            <div class="ph-cols ph-is-stack">
-              <article>
-                <h3>Problem</h3>
-                <div class="ph-cols">
-                  <article>
-                    <h4>Problem</h4>
-                    <p>
-                      Predict service only works if all fields are provided.
-                    </p>
-                  </article>
-                  <article>
-                    <h4>Impact</h4>
-                    <p>10 to 20% of data is missing at least one field.</p>
-                  </article>
-                  <article>
-                    <h4>Cost</h4>
-                    <p>
-                      Rejected requests delay listings and cost agent time
-                      (placeholder estimate).
-                    </p>
-                  </article>
-                </div>
-              </article>
-              <article>
-                <h3>Performance</h3>
-                <div></div>
-              </article>
-              <article>
-                <h3>Modernization</h3>
-                <div></div>
-              </article>
-            </div>
+      <!-- S3 Core problem. -->
+      <section aria-label="Listings with blanks get turned away">
+        <header class="ph-head">
+          <h2>Listings with blanks get turned away</h2>
+        </header>
+        <div class="ph-body">
+          <div class="ph-cols">
+            <article class="fragment">
+              <h3>Problem</h3>
+              <p>
+                A seller's listing is missing the bathroom count or the plot
+                size. The API rejects the whole request. No price comes back.
+              </p>
+            </article>
+            <article class="fragment">
+              <h3>Impact</h3>
+              <p>
+                Up to <span data-metric="nnr.recovered">10–20%</span> of live
+                requests stall. The agent phones back, the seller waits, the
+                valuation queue stops.
+              </p>
+            </article>
+            <article class="fragment">
+              <h3>Cost</h3>
+              <p>
+                Every rejected listing is a conversation restarted and a deal
+                delayed. Coverage, not accuracy, is what leaks.
+              </p>
+            </article>
           </div>
-        </section>
+        </div>
+      </section>
 
-        <!-- S3 Core problem. -->
-        <section aria-label="Listings with blanks get turned away">
-          <header class="ph-head">
-            <h2>Listings with blanks get turned away</h2>
-          </header>
-          <div class="ph-body">
-            <div class="ph-cols">
-              <article class="fragment">
-                <h3>Problem</h3>
-                <p>
-                  A seller's listing is missing the bathroom count or the plot
-                  size. The API rejects the whole request. No price comes back.
-                </p>
-              </article>
-              <article class="fragment">
-                <h3>Impact</h3>
-                <p>
-                  Up to <span data-metric="nnr.recovered">10–20%</span> of live
-                  requests stall. The agent phones back, the seller waits, the
-                  valuation queue stops.
-                </p>
-              </article>
-              <article class="fragment">
-                <h3>Cost</h3>
-                <p>
-                  Every rejected listing is a conversation restarted and a deal
-                  delayed. Coverage, not accuracy, is what leaks.
-                </p>
-              </article>
-            </div>
+      <!-- S4 Three options: 12 houses, staged detail. -->
+      <section data-s4 aria-label="Missing value approaches">
+        <header class="ph-head">
+          <h2>Missing value approaches</h2>
+          <div class="ph-subs" aria-live="off">
+            <p class="ph-subtitle ph-s4-sub ph-is-av">Average Value</p>
+            <p class="ph-subtitle ph-s4-sub ph-is-md">Mean value</p>
+            <p class="ph-subtitle ph-s4-sub ph-is-knn">Nearest Neighbor</p>
           </div>
-        </section>
-
-        <!-- S4 Three options: 12 houses, staged detail. -->
-        <section data-s4 aria-label="Missing value approaches">
-          <header class="ph-head">
-            <h2>Missing value approaches</h2>
-            <div class="ph-subs" aria-live="off">
-              <p class="ph-subtitle ph-s4-sub ph-is-av">Average Value</p>
-              <p class="ph-subtitle ph-s4-sub ph-is-md">Mean value</p>
-              <p class="ph-subtitle ph-s4-sub ph-is-knn">Nearest Neighbor</p>
-            </div>
-          </header>
-          <div class="ph-body ph-houses">
-            <div class="ph-houses-top">
-              <svg
-                id="houses-svg"
-                class="houses-svg"
-                viewBox="15 -80 1195 340"
-                fill="none"
-                role="img"
-                aria-label="Twelve houses in four groups of three, sorted smallest to largest"
-              >
-                <defs>
-                  <g id="hs"  stroke="#BCCCD4" stroke-width="3">
-                    <rect
-                      x="-20"
-                      y="-30"
-                      width="40"
-                      height="30"
-                    />
-                    <path d="M-25 -30 L0 -48 L25 -30 Z" stroke-width="3" />
-                    <rect
-                      x="-6"
-                      y="-16"
-                      width="12"
-                      height="16"
-                    />
-                  </g>
-                  <marker
-                    id="arr-av"
-                    viewBox="0 0 10 10"
-                    refX="8"
-                    refY="5"
-                    markerWidth="7"
-                    markerHeight="7"
-                    orient="auto-start-reverse"
-                  >
-                    <path d="M0 0 L10 5 L0 10 z" fill="var(--av)" />
-                  </marker>
-                  <marker
-                    id="arr-md"
-                    viewBox="0 0 10 10"
-                    refX="8"
-                    refY="5"
-                    markerWidth="7"
-                    markerHeight="7"
-                    orient="auto-start-reverse"
-                  >
-                    <path d="M0 0 L10 5 L0 10 z" fill="var(--md)" />
-                  </marker>
-                  <marker
-                    id="arr-knn"
-                    viewBox="0 0 10 10"
-                    refX="8"
-                    refY="5"
-                    markerWidth="7"
-                    markerHeight="7"
-                    orient="auto-start-reverse"
-                  >
-                    <path d="M0 0 L10 5 L0 10 z" fill="var(--knn)" />
-                  </marker>
-                </defs>
-                <!-- Group A: intra 44u clears roofs (need 39); left edge pinned at 35 -->
-                <g
-                  class="h"
-                 
-                  transform="translate(54,210) scale(0.76)"
-                >
+        </header>
+        <div class="ph-body ph-houses">
+          <div class="ph-houses-top">
+            <svg id="houses-svg" class="houses-svg" viewBox="15 -80 1195 340" fill="none" role="img"
+              aria-label="Twelve houses in four groups of three, sorted smallest to largest">
+              <defs>
+                <g id="hs" stroke="#BCCCD4" stroke-width="3">
+                  <rect x="-20" y="-30" width="40" height="30" />
+                  <path d="M-25 -30 L0 -48 L25 -30 Z" stroke-width="3" />
+                  <rect x="-6" y="-16" width="12" height="16" />
+                </g>
+                <marker id="arr-av" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7"
+                  orient="auto-start-reverse">
+                  <path d="M0 0 L10 5 L0 10 z" fill="var(--av)" />
+                </marker>
+                <marker id="arr-md" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7"
+                  orient="auto-start-reverse">
+                  <path d="M0 0 L10 5 L0 10 z" fill="var(--md)" />
+                </marker>
+                <marker id="arr-knn" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7"
+                  orient="auto-start-reverse">
+                  <path d="M0 0 L10 5 L0 10 z" fill="var(--knn)" />
+                </marker>
+              </defs>
+              <!-- Group A: intra 44u clears roofs (need 39); left edge pinned at 35 -->
+              <g class="h" transform="translate(54,210) scale(0.76)">
+                <use href="#hs" />
+              </g>
+              <g class="h" transform="translate(98,210) scale(0.8)">
+                <use href="#hs" />
+              </g>
+              <g class="h" transform="translate(142,210) scale(0.84)">
+                <use href="#hs" />
+              </g>
+              <!-- Group B: intra 56u clears roofs (need 51); gap A-B = 99u (1x) -->
+              <g class="h" transform="translate(241,210) scale(0.95)">
+                <use href="#hs" />
+              </g>
+              <g class="h" transform="translate(297,210) scale(1.0)">
+                <use href="#hs" />
+              </g>
+              <g class="h" transform="translate(353,210) scale(1.05)">
+                <use href="#hs" />
+              </g>
+              <!-- Group C: intra 68u clears roofs (need 64); gap B-C = 198u (2x) -->
+              <g class="h h-nn" stroke="#BCCCD4" transform="translate(551,210) scale(1.1875)">
+                <use href="#hs" />
+              </g>
+              <g class="h h-nn" transform="translate(619,210) scale(1.25)">
+                <use href="#hs" />
+              </g>
+              <g class="h h-nn" transform="translate(687,210) scale(1.3125)">
+                <use href="#hs" />
+              </g>
+              <!-- Group D: intra 82u clears roofs (need 80); gap C-D = 297u (3x); right edge pinned at 1188 -->
+              <g class="h h-nn" transform="translate(984,210) scale(1.484)">
+                <use href="#hs" />
+              </g>
+              <g class="h h-nn" transform="translate(1066,210) scale(1.5625)">
+                <use href="#hs" />
+              </g>
+              <g class="h" transform="translate(1148,210) scale(1.6406)">
+                <use href="#hs" />
+              </g>
+              <!-- Sorted-size baseline -->
+              <line x1="35" y1="214" x2="1188" y2="214" stroke="#BCCCD4" stroke-width="1" opacity="0.4" />
+              <!-- House size data (sqft, proportional to scale) -->
+              <text x="54" y="232" text-anchor="middle" font-size="14" fill="#BCCCD4">
+                640
+              </text>
+              <text x="98" y="232" text-anchor="middle" font-size="14" fill="#BCCCD4">
+                710
+              </text>
+              <text x="142" y="232" text-anchor="middle" font-size="14" fill="#BCCCD4">
+                780
+              </text>
+              <text x="241" y="232" text-anchor="middle" font-size="14" fill="#BCCCD4">
+                1060
+              </text>
+              <text x="297" y="232" text-anchor="middle" font-size="14" fill="#BCCCD4">
+                1110
+              </text>
+              <text x="353" y="232" text-anchor="middle" font-size="14" fill="#BCCCD4">
+                1170
+              </text>
+              <text x="551" y="232" text-anchor="middle" font-size="14" fill="#BCCCD4">
+                1330
+              </text>
+              <text x="619" y="232" text-anchor="middle" font-size="14" fill="#BCCCD4">
+                1390
+              </text>
+              <text x="687" y="232" text-anchor="middle" font-size="14" fill="#BCCCD4">
+                1460
+              </text>
+              <text x="984" y="232" text-anchor="middle" font-size="14" fill="#BCCCD4">
+                1660
+              </text>
+              <text x="1066" y="232" text-anchor="middle" font-size="14" fill="#BCCCD4">
+                1740
+              </text>
+              <text x="1148" y="232" text-anchor="middle" font-size="14" fill="#BCCCD4">
+                1830
+              </text>
+              <!-- Input boxes: dashed eq inputs on the housing line, fade per fragment -->
+              <rect id="bx-avg" class="bx" x="16" y="116" width="1190" height="132" fill="none" stroke="var(--av)"
+                stroke-width="2" stroke-dasharray="8 5" />
+              <rect id="bx-med" class="bx" x="324" y="116" width="260" height="132" fill="none" stroke="var(--md)"
+                stroke-width="2" stroke-dasharray="8 5" />
+              <rect id="bx-knn" class="bx" x="584" y="116" width="611" height="132" fill="none" stroke="var(--knn)"
+                stroke-width="2" stroke-dasharray="8 5" />
+              <!-- Average marker: house lifted clear; equal text gaps; down arrow to box -->
+              <g id="mk-avg" class="mk" stroke="var(--av)">
+                <g transform="translate(380,10) scale(1.44)">
                   <use href="#hs" />
                 </g>
-                <g
-                  class="h"
-                  transform="translate(98,210) scale(0.8)"
-                >
+                <text x="380" y="-66" text-anchor="middle" font-size="20" fill="var(--av)" stroke="none">
+                  Avg
+                </text>
+                <text x="380" y="30" text-anchor="middle" font-size="16" fill="var(--av)" stroke="none">
+                  1211 sq ft
+                </text>
+                <line x1="380" y1="44" x2="380" y2="108" stroke-width="2" marker-end="url(#arr-av)" />
+              </g>
+              <!-- Median marker -->
+              <g id="mk-med" class="mk" stroke="var(--md)">
+                <g transform="translate(455,10) scale(1.44)">
                   <use href="#hs" />
                 </g>
-                <g
-                  class="h"
-                  transform="translate(142,210) scale(0.84)"
-                >
+                <text x="455" y="-66" text-anchor="middle" font-size="20" fill="var(--md)" stroke="none">
+                  Med
+                </text>
+                <text x="455" y="30" text-anchor="middle" font-size="16" fill="var(--md)" stroke="none">
+                  1250 sq ft
+                </text>
+                <line x1="455" y1="44" x2="455" y2="108" stroke-width="2" marker-end="url(#arr-md)" />
+              </g>
+              <!-- KNN marker cluster -->
+              <g id="mk-knn" class="mk" stroke="var(--knn)">
+                <g transform="translate(900,10) scale(1.44)">
                   <use href="#hs" />
                 </g>
-                <!-- Group B: intra 56u clears roofs (need 51); gap A-B = 99u (1x) -->
-                <g
-                  class="h"
-
-                  transform="translate(241,210) scale(0.95)"
-                >
-                  <use href="#hs" />
-                </g>
-                <g
-                  class="h"
-
-                  transform="translate(297,210) scale(1.0)"
-                >
-                  <use href="#hs" />
-                </g>
-                <g
-                  class="h"
-
-                  transform="translate(353,210) scale(1.05)"
-                >
-                  <use href="#hs" />
-                </g>
-                <!-- Group C: intra 68u clears roofs (need 64); gap B-C = 198u (2x) -->
-                <g
-                  class="h h-nn"
-                  stroke="#BCCCD4"
-                  transform="translate(551,210) scale(1.1875)"
-                >
-                  <use href="#hs" />
-                </g>
-                <g
-                  class="h h-nn"
-
-                  transform="translate(619,210) scale(1.25)"
-                >
-                  <use href="#hs" />
-                </g>
-                <g
-                  class="h h-nn"
-
-                  transform="translate(687,210) scale(1.3125)"
-                >
-                  <use href="#hs" />
-                </g>
-                <!-- Group D: intra 82u clears roofs (need 80); gap C-D = 297u (3x); right edge pinned at 1188 -->
-                <g
-                  class="h h-nn"
-
-                  transform="translate(984,210) scale(1.484)"
-                >
-                  <use href="#hs" />
-                </g>
-                <g
-                  class="h h-nn"
-
-                  transform="translate(1066,210) scale(1.5625)"
-                >
-                  <use href="#hs" />
-                </g>
-                <g
-                  class="h"
-
-                  transform="translate(1148,210) scale(1.6406)"
-                >
-                  <use href="#hs" />
-                </g>
-                <!-- Sorted-size baseline -->
-                <line
-                  x1="35"
-                  y1="214"
-                  x2="1188"
-                  y2="214"
-                  stroke="#BCCCD4"
-                  stroke-width="1"
-                  opacity="0.4"
-                />
-                <!-- House size data (sqft, proportional to scale) -->
-                <text
-                  x="54"
-                  y="232"
-                  text-anchor="middle"
-                  font-size="14"
-                  fill="#BCCCD4"
-                >
-                  640
+                <text x="900" y="-66" text-anchor="middle" font-size="20" fill="var(--knn)" stroke="none">
+                  5-NN
                 </text>
-                <text
-                  x="98"
-                  y="232"
-                  text-anchor="middle"
-                  font-size="14"
-                  fill="#BCCCD4"
-                >
-                  710
+                <text x="900" y="30" text-anchor="middle" font-size="16" fill="var(--knn)" stroke="none">
+                  1740 sq ft
                 </text>
-                <text
-                  x="142"
-                  y="232"
-                  text-anchor="middle"
-                  font-size="14"
-                  fill="#BCCCD4"
-                >
-                  780
-                </text>
-                <text
-                  x="241"
-                  y="232"
-                  text-anchor="middle"
-                  font-size="14"
-                  fill="#BCCCD4"
-                >
-                  1060
-                </text>
-                <text
-                  x="297"
-                  y="232"
-                  text-anchor="middle"
-                  font-size="14"
-                  fill="#BCCCD4"
-                >
-                  1110
-                </text>
-                <text
-                  x="353"
-                  y="232"
-                  text-anchor="middle"
-                  font-size="14"
-                  fill="#BCCCD4"
-                >
-                  1170
-                </text>
-                <text
-                  x="551"
-                  y="232"
-                  text-anchor="middle"
-                  font-size="14"
-                  fill="#BCCCD4"
-                >
-                  1330
-                </text>
-                <text
-                  x="619"
-                  y="232"
-                  text-anchor="middle"
-                  font-size="14"
-                  fill="#BCCCD4"
-                >
-                  1390
-                </text>
-                <text
-                  x="687"
-                  y="232"
-                  text-anchor="middle"
-                  font-size="14"
-                  fill="#BCCCD4"
-                >
-                  1460
-                </text>
-                <text
-                  x="984"
-                  y="232"
-                  text-anchor="middle"
-                  font-size="14"
-                  fill="#BCCCD4"
-                >
-                  1660
-                </text>
-                <text
-                  x="1066"
-                  y="232"
-                  text-anchor="middle"
-                  font-size="14"
-                  fill="#BCCCD4"
-                >
-                  1740
-                </text>
-                <text
-                  x="1148"
-                  y="232"
-                  text-anchor="middle"
-                  font-size="14"
-                  fill="#BCCCD4"
-                >
-                  1830
-                </text>
-                <!-- Input boxes: dashed eq inputs on the housing line, fade per fragment -->
-                <rect
-                  id="bx-avg"
-                  class="bx"
-                  x="16"
-                  y="116"
-                  width="1190"
-                  height="132"
-                  fill="none"
-                  stroke="var(--av)"
-                  stroke-width="2"
-                  stroke-dasharray="8 5"
-                />
-                <rect
-                  id="bx-med"
-                  class="bx"
-                  x="324"
-                  y="116"
-                  width="260"
-                  height="132"
-                  fill="none"
-                  stroke="var(--md)"
-                  stroke-width="2"
-                  stroke-dasharray="8 5"
-                />
-                <rect
-                  id="bx-knn"
-                  class="bx"
-                  x="584"
-                  y="116"
-                  width="611"
-                  height="132"
-                  fill="none"
-                  stroke="var(--knn)"
-                  stroke-width="2"
-                  stroke-dasharray="8 5"
-                />
-                <!-- Average marker: house lifted clear; equal text gaps; down arrow to box -->
-                <g id="mk-avg" class="mk" stroke="var(--av)">
-                  <g transform="translate(380,10) scale(1.44)">
-                    <use href="#hs" />
-                  </g>
-                  <text
-                    x="380"
-                    y="-66"
-                    text-anchor="middle"
-                    font-size="20"
-                    fill="var(--av)"
-                    stroke="none"
-                  >
-                    Avg
-                  </text>
-                  <text
-                    x="380"
-                    y="30"
-                    text-anchor="middle"
-                    font-size="16"
-                    fill="var(--av)"
-                    stroke="none"
-                  >
-                    1211 sq ft
-                  </text>
-                  <line
-                    x1="380"
-                    y1="44"
-                    x2="380"
-                    y2="108"
-                    stroke-width="2"
-                    marker-end="url(#arr-av)"
-                  />
-                </g>
-                <!-- Median marker -->
-                <g id="mk-med" class="mk" stroke="var(--md)">
-                  <g transform="translate(455,10) scale(1.44)">
-                    <use href="#hs" />
-                  </g>
-                  <text
-                    x="455"
-                    y="-66"
-                    text-anchor="middle"
-                    font-size="20"
-                    fill="var(--md)"
-                    stroke="none"
-                  >
-                    Med
-                  </text>
-                  <text
-                    x="455"
-                    y="30"
-                    text-anchor="middle"
-                    font-size="16"
-                    fill="var(--md)"
-                    stroke="none"
-                  >
-                    1250 sq ft
-                  </text>
-                  <line
-                    x1="455"
-                    y1="44"
-                    x2="455"
-                    y2="108"
-                    stroke-width="2"
-                    marker-end="url(#arr-md)"
-                  />
-                </g>
-                <!-- KNN marker cluster -->
-                <g id="mk-knn" class="mk" stroke="var(--knn)">
-                  <g transform="translate(900,10) scale(1.44)">
-                    <use href="#hs" />
-                  </g>
-                  <text
-                    x="900"
-                    y="-66"
-                    text-anchor="middle"
-                    font-size="20"
-                    fill="var(--knn)"
-                    stroke="none"
-                  >
-                    5-NN
-                  </text>
-                  <text
-                    x="900"
-                    y="30"
-                    text-anchor="middle"
-                    font-size="16"
-                    fill="var(--knn)"
-                    stroke="none"
-                  >
-                    1740 sq ft
-                  </text>
-                  <line
-                    x1="900"
-                    y1="44"
-                    x2="900"
-                    y2="108"
-                    stroke-width="2"
-                    marker-end="url(#arr-knn)"
-                  />
-                </g>
+                <line x1="900" y1="44" x2="900" y2="108" stroke-width="2" marker-end="url(#arr-knn)" />
+              </g>
               <p class="ph-stage-hint">
                 Twelve homes, four groups of three. Each group runs 25% bigger
                 than the last; labels are living area in sq ft. Click for each
                 approach.
               </p>
-            </div>
-            <div class="ph-stage-bottom">
-              <div class="ph-panels">
-                <article class="ph-panel ph-is-av">
-                  <div class="ph-panel-words">
-                    <h3>Average Value</h3>
-                    <p>
-                      Add all twelve sizes, divide by twelve. One city-wide
-                      number fills every blank. Simple; ignores the house.
-                    </p>
-                  </div>
-                  <div class="ph-panel-pick">
-                    <svg
-                      viewBox="0 0 260 120"
-                      fill="none"
-                      stroke="var(--av)"
-                      stroke-width="3"
-                      role="img"
-                      aria-label="Single average-size house"
-                    >
-                      <use
-                        href="#hs"
-                        transform="translate(100,95) scale(1.44)"
-                      />
-                      <text
-                        x="100"
-                        y="20"
-                        text-anchor="middle"
-                        font-size="14"
-                        fill="var(--av)"
-                        stroke="none"
-                      >
-                        AVG 1211 = Σ14530/12
-                      </text>
-                    </svg>
-                  </div>
-                </article>
-                <article class="ph-panel ph-is-md">
-                  <div class="ph-panel-words">
-                    <h3>Mean value</h3>
-                    <p>
-                      Sort the row, take the middle. Mansions stop skewing the
-                      answer. Still one number for all blanks.
-                    </p>
-                  </div>
-                  <div class="ph-panel-pick">
-                    <svg
-                      viewBox="0 0 260 120"
-                      fill="none"
-                      stroke="var(--md)"
-                      stroke-width="3"
-                      role="img"
-                      aria-label="Single middle-size house"
-                    >
-                      <use
-                        href="#hs"
-                        transform="translate(100,95) scale(1.4)"
-                      />
-                      <text
-                        x="100"
-                        y="20"
-                        text-anchor="middle"
-                        font-size="14"
-                        fill="var(--md)"
-                        stroke="none"
-                      >
-                        MED 1250 = mid(1170,1330)
-                      </text>
-                    </svg>
-                  </div>
-                </article>
-                <article class="ph-panel ph-is-knn">
-                  <div class="ph-panel-words">
-                    <h3>Nearest Neighbor</h3>
-                    <p>
-                      Take the 5 nearest sizes; closer homes count more. Each
-                      blank gets its own answer from its own street.
-                    </p>
-                  </div>
-                  <div class="ph-panel-pick">
-                    <svg
-                      viewBox="0 0 300 120"
-                      fill="none"
-                      stroke="var(--knn)"
-                      stroke-width="3"
-                      role="img"
-                      aria-label="Five similar houses and the blank"
-                    >
-                      <g transform="translate(35,95) scale(0.9)">
-                        <use href="#hs" />
-                      </g>
-                      <g transform="translate(92,95) scale(1.0)">
-                        <use href="#hs" />
-                      </g>
-                      <g transform="translate(150,95) scale(1.15)">
-                        <use href="#hs" />
-                      </g>
-                      <g transform="translate(208,95) scale(1.0)">
-                        <use href="#hs" />
-                      </g>
-                      <g transform="translate(265,95) scale(0.9)">
-                        <use href="#hs" />
-                      </g>
-                      <text
-                        x="150"
-                        y="20"
-                        text-anchor="middle"
-                        font-size="14"
-                        fill="var(--knn)"
-                        stroke="none"
-                      >
-                        5-NN → 1740 = w-avg(5)
-                      </text>
-                    </svg>
-                  </div>
-                </article>
-                <article class="ph-panel ph-is-sum">
-                  <div class="ph-panel-words">
-                    <h3>Summary: similar homes win</h3>
-                    <p>
-                      Average and middle value give every blank the same
-                      city-wide guess. Similar homes adapt to the house —
-                      price-moving fields [knn.range] than averages.
-                    </p>
-                  </div>
-                  <div class="ph-panel-pick">
-                    <p class="ph-panel-nums">
-                      AVG 1211 · MED 1250 · 5-NN → 1740
-                    </p>
-                  </div>
-                </article>
-              </div>
-            </div>
-            <div class="s4-drivers" aria-hidden="true">
-              <span class="fragment ph-s4-go"></span>
-              <span class="fragment ph-s4-go"></span>
-              <span class="fragment ph-s4-go"></span>
-              <span class="fragment ph-s4-go"></span>
-            </div>
           </div>
-        </section>
-
-        <!-- S5 Winner. -->
-        <section aria-label="Why similar homes won">
-          <header class="ph-head">
-            <h2>Why similar homes won</h2>
-          </header>
-          <div class="ph-body">
-            <div class="ph-cols">
-              <article class="fragment">
-                <h3>Problem</h3>
-                <p>
-                  Averages ignore the house in front of us. A flat and a family
-                  home get the same guess.
-                </p>
+          <div class="ph-stage-bottom">
+            <div class="ph-panels">
+              <article class="ph-panel ph-is-av">
+                <div class="ph-panel-words">
+                  <h3>Average Value</h3>
+                  <p>
+                    Add all twelve sizes, divide by twelve. One city-wide
+                    number fills every blank. Simple; ignores the house.
+                  </p>
+                </div>
+                <div class="ph-panel-pick">
+                  <svg viewBox="0 0 260 120" fill="none" stroke="var(--av)" stroke-width="3" role="img"
+                    aria-label="Single average-size house">
+                    <use href="#hs" transform="translate(100,95) scale(1.44)" />
+                    <text x="100" y="20" text-anchor="middle" font-size="14" fill="var(--av)" stroke="none">
+                      AVG 1211 = Σ14530/12
+                    </text>
+                  </svg>
+                </div>
               </article>
-              <article class="fragment">
-                <h3>Impact</h3>
-                <p>
-                  Similar homes track the features that move price: size, grade,
-                  age, bathrooms.
-                </p>
+              <article class="ph-panel ph-is-md">
+                <div class="ph-panel-words">
+                  <h3>Mean value</h3>
+                  <p>
+                    Sort the row, take the middle. Mansions stop skewing the
+                    answer. Still one number for all blanks.
+                  </p>
+                </div>
+                <div class="ph-panel-pick">
+                  <svg viewBox="0 0 260 120" fill="none" stroke="var(--md)" stroke-width="3" role="img"
+                    aria-label="Single middle-size house">
+                    <use href="#hs" transform="translate(100,95) scale(1.4)" />
+                    <text x="100" y="20" text-anchor="middle" font-size="14" fill="var(--md)" stroke="none">
+                      MED 1250 = mid(1170,1330)
+                    </text>
+                  </svg>
+                </div>
               </article>
-              <article class="fragment">
-                <h3>Savings</h3>
-                <ul class="ph-bars">
-                  <li>
-                    Upper floor area
-                    <span data-metric="knn.sqftAbove">17% closer</span
-                    ><meter min="0" max="20" value="17">17 of 20</meter>
-                  </li>
-                  <li>
-                    Bathrooms <span data-metric="knn.bathrooms">16% closer</span
-                    ><meter min="0" max="20" value="16">16 of 20</meter>
-                  </li>
-                  <li>
-                    Floors <span data-metric="knn.floors">15% closer</span
-                    ><meter min="0" max="20" value="15">15 of 20</meter>
-                  </li>
-                  <li>
-                    Grade <span data-metric="knn.grade">14% closer</span
-                    ><meter min="0" max="20" value="14">14 of 20</meter>
-                  </li>
-                </ul>
+              <article class="ph-panel ph-is-knn">
+                <div class="ph-panel-words">
+                  <h3>Nearest Neighbor</h3>
+                  <p>
+                    Take the 5 nearest sizes; closer homes count more. Each
+                    blank gets its own answer from its own street.
+                  </p>
+                </div>
+                <div class="ph-panel-pick">
+                  <svg viewBox="0 0 300 120" fill="none" stroke="var(--knn)" stroke-width="3" role="img"
+                    aria-label="Five similar houses and the blank">
+                    <g transform="translate(35,95) scale(0.9)">
+                      <use href="#hs" />
+                    </g>
+                    <g transform="translate(92,95) scale(1.0)">
+                      <use href="#hs" />
+                    </g>
+                    <g transform="translate(150,95) scale(1.15)">
+                      <use href="#hs" />
+                    </g>
+                    <g transform="translate(208,95) scale(1.0)">
+                      <use href="#hs" />
+                    </g>
+                    <g transform="translate(265,95) scale(0.9)">
+                      <use href="#hs" />
+                    </g>
+                    <text x="150" y="20" text-anchor="middle" font-size="14" fill="var(--knn)" stroke="none">
+                      5-NN → 1740 = w-avg(5)
+                    </text>
+                  </svg>
+                </div>
               </article>
-            </div>
-            <p class="ph-foot fragment">
-              Caveat: the headline average hides this — two plot-size fields
-              with wild outliers swamp it.
-            </p>
-          </div>
-        </section>
-
-        <!-- S6 Caching. -->
-        <section aria-label="Faster answers">
-          <header class="ph-head">
-            <h2>Faster answers</h2>
-          </header>
-          <div class="ph-body">
-            <div class="ph-cols">
-              <article class="fragment">
-                <h3>Problem</h3>
-                <p>
-                  Every request reloads the model, the maps, and the comparables
-                  from disk. Under load, that queues up.
-                </p>
-              </article>
-              <article class="fragment">
-                <h3>Impact</h3>
-                <p>
-                  Agents wait on every valuation. Peak traffic makes every
-                  answer slower.
-                </p>
-              </article>
-              <article class="fragment">
-                <h3>Savings</h3>
-                <p>
-                  Load once when the service wakes, serve from memory. Typical
-                  <span data-metric="perf.v1p50">56 ms</span> down to
-                  <span data-metric="perf.v2p50">9 ms</span>. Slow tail
-                  <span data-metric="perf.v1p95">79 ms</span> down to
-                  <span data-metric="perf.v2p95">13 ms</span>.
-                </p>
-              </article>
-            </div>
-            <p class="ph-foot fragment">
-              Local harness, 30 repeated calls, same machine — not a production
-              promise.
-            </p>
-          </div>
-        </section>
-
-        <!-- S7 Errors. -->
-        <section aria-label="Errors you can act on">
-          <header class="ph-head">
-            <h2>Errors you can act on</h2>
-          </header>
-          <div class="ph-body">
-            <div class="ph-cols">
-              <article class="fragment">
-                <h3>Before</h3>
-                <p>
-                  A mistyped area code blows up. The agent sees a dead end and
-                  starts over.
-                </p>
-              </article>
-              <article class="fragment">
-                <h3>After</h3>
-                <p>
-                  A plain-words reply names the bad code. Fix the digit, move
-                  on.
-                </p>
+              <article class="ph-panel ph-is-sum">
+                <div class="ph-panel-words">
+                  <h3>Summary: similar homes win</h3>
+                  <p>
+                    Average and middle value give every blank the same
+                    city-wide guess. Similar homes adapt to the house —
+                    price-moving fields [knn.range] than averages.
+                  </p>
+                </div>
+                <div class="ph-panel-pick">
+                  <p class="ph-panel-nums">
+                    AVG 1211 · MED 1250 · 5-NN → 1740
+                  </p>
+                </div>
               </article>
             </div>
           </div>
-        </section>
+          <div class="s4-drivers" aria-hidden="true">
+            <span class="fragment ph-s4-go"></span>
+            <span class="fragment ph-s4-go"></span>
+            <span class="fragment ph-s4-go"></span>
+            <span class="fragment ph-s4-go"></span>
+          </div>
+        </div>
+      </section>
 
-        <!-- S8 Modernised base. -->
-        <section class="ph-caps" aria-label="Modernised base">
-          <header class="ph-head">
-            <h2>Modernised base</h2>
-          </header>
-          <div class="ph-body">
-            <div class="ph-cols">
-              <article class="fragment">
+      <!-- S5 Winner. -->
+      <section aria-label="Why similar homes won">
+        <header class="ph-head">
+          <h2>Why similar homes won</h2>
+        </header>
+        <div class="ph-body">
+          <div class="ph-cols">
+            <article class="fragment">
+              <h3>Problem</h3>
+              <p>
+                Averages ignore the house in front of us. A flat and a family
+                home get the same guess.
+              </p>
+            </article>
+            <article class="fragment">
+              <h3>Impact</h3>
+              <p>
+                Similar homes track the features that move price: size, grade,
+                age, bathrooms.
+              </p>
+            </article>
+            <article class="fragment">
+              <h3>Savings</h3>
+              <ul class="ph-bars">
+                <li>
+                  Upper floor area
+                  <span data-metric="knn.sqftAbove">17% closer</span><meter min="0" max="20" value="17">17 of 20</meter>
+                </li>
+                <li>
+                  Bathrooms <span data-metric="knn.bathrooms">16% closer</span><meter min="0" max="20" value="16">16 of
+                    20</meter>
+                </li>
+                <li>
+                  Floors <span data-metric="knn.floors">15% closer</span><meter min="0" max="20" value="15">15 of
+                    20</meter>
+                </li>
+                <li>
+                  Grade <span data-metric="knn.grade">14% closer</span><meter min="0" max="20" value="14">14 of
+                    20</meter>
+                </li>
+              </ul>
+            </article>
+          </div>
+          <p class="ph-foot fragment">
+            Caveat: the headline average hides this — two plot-size fields
+            with wild outliers swamp it.
+          </p>
+        </div>
+      </section>
+
+      <!-- S6 Caching. -->
+      <section aria-label="Faster answers">
+        <header class="ph-head">
+          <h2>Faster answers</h2>
+        </header>
+        <div class="ph-body">
+          <div class="ph-cols">
+            <article class="fragment">
+              <h3>Problem</h3>
+              <p>
+                Every request reloads the model, the maps, and the comparables
+                from disk. Under load, that queues up.
+              </p>
+            </article>
+            <article class="fragment">
+              <h3>Impact</h3>
+              <p>
+                Agents wait on every valuation. Peak traffic makes every
+                answer slower.
+              </p>
+            </article>
+            <article class="fragment">
+              <h3>Savings</h3>
+              <p>
+                Load once when the service wakes, serve from memory. Typical
+                <span data-metric="perf.v1p50">56 ms</span> down to
+                <span data-metric="perf.v2p50">9 ms</span>. Slow tail
+                <span data-metric="perf.v1p95">79 ms</span> down to
+                <span data-metric="perf.v2p95">13 ms</span>.
+              </p>
+            </article>
+          </div>
+          <p class="ph-foot fragment">
+            Local harness, 30 repeated calls, same machine — not a production
+            promise.
+          </p>
+        </div>
+      </section>
+
+      <!-- S7 Errors. -->
+      <section aria-label="Errors you can act on">
+        <header class="ph-head">
+          <h2>Errors you can act on</h2>
+        </header>
+        <div class="ph-body">
+          <div class="ph-cols">
+            <article class="fragment">
+              <h3>Before</h3>
+              <p>
+                A mistyped area code blows up. The agent sees a dead end and
+                starts over.
+              </p>
+            </article>
+            <article class="fragment">
+              <h3>After</h3>
+              <p>
+                A plain-words reply names the bad code. Fix the digit, move
+                on.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- S8 Modernised base. -->
+      <section class="ph-caps ph-s8" aria-label="Modernised base">
+        <header class="ph-head">
+          <h2>Modernised base</h2>
+        </header>
+        <div class="ph-body">
+          <div class="ph-s8">
+            <ol class="ph-scr ph-s8-chips">
+              <li class="ph-s8-chip fragment" data-fragment-index="0">
+                <span class="ph-num">01</span>
+                <span>Runtime</span>
+              </li>
+              <li class="ph-s8-chip fragment" data-fragment-index="1">
+                <span class="ph-num">02</span>
+                <span>Type hints</span>
+              </li>
+              <li class="ph-s8-chip fragment" data-fragment-index="2">
+                <span class="ph-num">03</span>
+                <span>Input validation</span>
+              </li>
+              <li class="ph-s8-chip fragment" data-fragment-index="3">
+                <span class="ph-num">04</span>
+                <span>Swagger schema</span>
+              </li>
+            </ol>
+            <div class="ph-cols ph-s8-panes">
+              <article class="fragment ph-s8-pane" data-fragment-index="0">
                 <h3>Runtime</h3>
                 <table class="ph-table">
                   <thead>
@@ -1463,155 +1352,225 @@
                   </thead>
                   <tbody>
                     <tr>
+                      <th scope="row">docker image</th>
+                      <td>3.10 slim</td>
+                      <td>3.14 slim</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">fastapi</th>
+                      <td>0.85.1</td>
+                      <td>0.141.1</td>
+                    </tr>
+                    <tr class="ph-muted">
+                      <th class="ph-strike" scope="row">httpx</th>
+                      <td class="ph-strike">0.24.0</td>
+                      <td>-</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">httpx2</th>
+                      <td>-</td>
+                      <td>2.13.1</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">hypothesis</th>
+                      <td>6.82.0</td>
+                      <td>6.168.3</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">matplotlib</th>
+                      <td>6.82.0</td>
+                      <td>3.11.2</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">numpy</th>
+                      <td>1.23.4</td>
+                      <td>2.5.3</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">pandas</th>
+                      <td>1.5.1</td>
+                      <td>3.0.6</td>
+                    </tr>
+                    <tr class="ph-muted">
+                      <th class="ph-strike" scope="row">pip</th>
+                      <td class="ph-strike">23.0.1</td>
+                      <td>-</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">uv</th>
+                      <td>-</td>
+                      <td>0.12.21</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">pydantic</th>
+                      <td>1.10.2</td>
+                      <td>2.13.5</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">pytest</th>
+                      <td>7.4.0</td>
+                      <td>9.1.1</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">pytest-cov</th>
+                      <td>4.1.0</td>
+                      <td>7.1.0</td>
+                    </tr>
+                    <tr>
                       <th scope="row">python</th>
                       <td>3.10</td>
                       <td>3.14</td>
                     </tr>
                     <tr>
-                      <th scope="row">fastapi</th>
-                      <td>—</td>
-                      <td>0.141.1</td>
-                    </tr>
-                    <tr>
-                      <th scope="row">pydantic</th>
-                      <td>—</td>
-                      <td>2.13.5</td>
+                      <th scope="row">scikit-learn</th>
+                      <td>1.1.2</td>
+                      <td>1.9.1</td>
                     </tr>
                     <tr>
                       <th scope="row">uvicorn</th>
-                      <td>—</td>
+                      <td>0.19</td>
                       <td>0.54.0</td>
                     </tr>
                   </tbody>
                 </table>
               </article>
-              <article class="fragment">
-                <h3>Typed contracts</h3>
-                <article>
-                  <h4>Was</h4>
-                  <p><code>predict(home) -&gt; dict[str, float]</code></p>
-                </article>
-                <article>
-                  <h4>Now</h4>
-                  <p>
-                    <code
-                      >predict_v2(HomeFeaturesV2) -&gt; PredictionResponse</code
-                    >
-                  </p>
-                </article>
+              <article class="fragment ph-s8-pane" data-fragment-index="1">
+                <h3>Type hints</h3>
+                <h4>Was</h4>
+                <pre class="ph-code"><code class="language-python">def predict(home_features):</code></pre>
+                <h4>Now</h4>
+                <pre class="ph-code"><code class="language-python">def predict_v2(
+    home_features: HomeFeaturesV2,
+    request: Request,
+) -&gt; PredictionResponse:</code></pre>
+
+
+               
               </article>
-            </div>
-            <div class="ph-cols">
-              <article class="fragment">
+              <article class="fragment ph-s8-pane" data-fragment-index="2">
                 <h3>Input validation</h3>
-                <p>
-                  <code>HomeFeaturesV2</code>: bedrooms, bathrooms, sqft_living,
-                  sqft_lot, floors, sqft_above, sqft_basement nullable, &#8805;
-                  0; zipcode required, <code>^\d{5}$</code>.
-                </p>
+                <h4>Was</h4>
+                <pre class="ph-code"><code class="language-python">class HomeFeatures:
+    bedrooms: int
+    bathrooms: float
+    sqft_living: float
+    ...
+    zipcode: str</code></pre>
+                <h4>Now</h4>
+                <pre class="ph-code"><code class="language-python">class HomeFeaturesV2:
+    bedrooms: int | None = None
+    bathrooms: float | None = None
+    sqft_living: float | None = None
+    ...
+    zipcode: str = Field(pattern=r"^\d{5}$")</code></pre>
               </article>
-              <article class="fragment">
+              <article class="fragment ph-s8-pane" data-fragment-index="3">
                 <h3>Swagger schema</h3>
+                <h4>Was</h4>
                 <p>
                   v1 <code>/predict</code>: generic object, no error model
-                  stated. v2 <code>/predict/v2</code>:
-                  <code>{"predicted_price": 394708.0}</code>, 404/500 &#8594;
-                  <code>ErrorDetail</code> as returned.
+                  stated in the docs.
                 </p>
+                <h4>Now</h4>
+                <pre class="ph-code"><code>{"predicted_price": 394708.0}</code></pre>
+                <p>404/500 &#8594; <code>ErrorDetail</code> as returned.</p>
               </article>
             </div>
           </div>
-        </section>
+        </div>
+      </section>
 
-        <!-- S9 Close. -->
-        <section class="ph-close" aria-label="What you get">
-          <header class="ph-head">
-            <h2>What you get</h2>
-          </header>
-          <div class="ph-body">
-            <ol class="ph-close-grid">
-              <li class="fragment">
-                <p class="ph-num">01</p>
-                <h3>No listing left behind</h3>
-                <p>Incomplete paperwork still prices.</p>
-              </li>
-              <li class="fragment">
-                <p class="ph-num">02</p>
-                <h3>Answers in milliseconds</h3>
-                <p>Headroom for busy days.</p>
-              </li>
-              <li class="fragment">
-                <p class="ph-num">03</p>
-                <h3>Errors you can act on</h3>
-                <p>On a base we can maintain.</p>
-              </li>
-            </ol>
-            <p class="ph-handoff fragment">
-              Next: live demo — a blank, a bad area code, and speed.
-            </p>
-          </div>
-        </section>
+      <!-- S9 Close. -->
+      <section class="ph-close" aria-label="What you get">
+        <header class="ph-head">
+          <h2>What you get</h2>
+        </header>
+        <div class="ph-body">
+          <ol class="ph-close-grid">
+            <li class="fragment">
+              <p class="ph-num">01</p>
+              <h3>No listing left behind</h3>
+              <p>Incomplete paperwork still prices.</p>
+            </li>
+            <li class="fragment">
+              <p class="ph-num">02</p>
+              <h3>Answers in milliseconds</h3>
+              <p>Headroom for busy days.</p>
+            </li>
+            <li class="fragment">
+              <p class="ph-num">03</p>
+              <h3>Errors you can act on</h3>
+              <p>On a base we can maintain.</p>
+            </li>
+          </ol>
+          <p class="ph-handoff fragment">
+            Next: live demo — a blank, a bad area code, and speed.
+          </p>
+        </div>
+      </section>
 
-        <!-- S10 Appendix: demo runbook, not presented. -->
-        <section data-visibility="hidden" aria-label="Appendix demo runbook">
-          <header class="ph-head">
-            <h2>Appendix demo runbook</h2>
-          </header>
-          <div class="ph-body">
-            <ol>
-              <li>
-                Blank fields score; same payload to the old endpoint fails.
-              </li>
-              <li>Bad area code returns a named plain-words reply.</li>
-              <li>
-                Load-once versus per-request; cite harness numbers, offer live
-                rerun.
-              </li>
-              <li>Health check passes when ready, fails clearly when not.</li>
-              <li>Docs show typed responses with examples.</li>
-            </ol>
-          </div>
-        </section>
-      </div>
+      <!-- S10 Appendix: demo runbook, not presented. -->
+      <section data-visibility="hidden" aria-label="Appendix demo runbook">
+        <header class="ph-head">
+          <h2>Appendix demo runbook</h2>
+        </header>
+        <div class="ph-body">
+          <ol>
+            <li>
+              Blank fields score; same payload to the old endpoint fails.
+            </li>
+            <li>Bad area code returns a named plain-words reply.</li>
+            <li>
+              Load-once versus per-request; cite harness numbers, offer live
+              rerun.
+            </li>
+            <li>Health check passes when ready, fails clearly when not.</li>
+            <li>Docs show typed responses with examples.</li>
+          </ol>
+        </div>
+      </section>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4/dist/reveal.js"></script>
-    <script>
-      /* Single source for every number on the slides. Edit here, all renders update. */
-      const DECK_METRICS = {
-        perf: { v1p50: "56 ms", v1p95: "79 ms", v2p50: "9 ms", v2p95: "13 ms" },
-        nnr: { recovered: "10–20%" },
-        knn: {
-          k: "5",
-          range: "14–17% closer",
-          sqftAbove: "17% closer",
-          bathrooms: "16% closer",
-          floors: "15% closer",
-          grade: "14% closer",
-        },
-      };
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@4/dist/reveal.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@4/plugin/markdown/markdown.js"></script>
+  <script>
+    /* Single source for every number on the slides. Edit here, all renders update. */
+    const DECK_METRICS = {
+      perf: { v1p50: "56 ms", v1p95: "79 ms", v2p50: "9 ms", v2p95: "13 ms" },
+      nnr: { recovered: "10–20%" },
+      knn: {
+        k: "5",
+        range: "14–17% closer",
+        sqftAbove: "17% closer",
+        bathrooms: "16% closer",
+        floors: "15% closer",
+        grade: "14% closer",
+      },
+    };
 
-      document.querySelectorAll("[data-metric]").forEach((el) => {
-        const value = el.dataset.metric
-          .split(".")
-          .reduce((obj, key) => (obj ? obj[key] : undefined), DECK_METRICS);
-        if (value != null) el.textContent = value;
-      });
+    document.querySelectorAll("[data-metric]").forEach((el) => {
+      const value = el.dataset.metric
+        .split(".")
+        .reduce((obj, key) => (obj ? obj[key] : undefined), DECK_METRICS);
+      if (value != null) el.textContent = value;
+    });
 
+    Reveal.initialize({
+      width: 1270,
+      height: 961,
+      margin: 0.04,
+      minScale: 0.2,
+      maxScale: 2.0,
+      center: true,
+      hash: true,
+      slideNumber: true,
+      controlsLayout: "edges",
+      transition: "slide",
+      plugins: [RevealMarkdown],
+      backgroundTransition: "none",
+    });
 
-      Reveal.initialize({
-        width: 1270,
-        height: 961,
-        margin: 0.04,
-        minScale: 0.2,
-        maxScale: 2.0,
-        center: true,
-        hash: true,
-        slideNumber: true,
-        controlsLayout: "edges",
-        transition: "slide",
-        backgroundTransition: "none",
-      });
+  </script>
+</body>
 
-    </script>
-  </body>
 </html>

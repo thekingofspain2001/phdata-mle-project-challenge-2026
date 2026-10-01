@@ -168,12 +168,41 @@ verbatim from `deck.html` CSS.
   values 17/16/15/14 (`min="0" max="20"`). Plus `p.ph-foot`
   (`deck.html:447-452`): dim, `var(--fs-caption)`, `opacity:80%`,
   margin 0.
-  - T-caps-6 — used by S8. `section.ph-caps > div.ph-body >
-    ul.ph-caps-grid` (wrapping, `flex:1 1 auto`, `align-content:stretch`,
-    `gap:var(--gap-md)`); cells `li` `flex:1 1 26vw`, light fill
-    `var(--ph-cap-bg)` (`#F0F1F5`), `border-radius:var(--rad-cell)`, dark text
-    `var(--ph-cap-h)` (`h3` full, `p` at `opacity:80%`). Fragments: 6
-    cells in DOM order.
+  - T-caps-6 — no longer used by S8 (S8 is now T-s8-split, below).
+    `section.ph-caps > div.ph-body > ul.ph-caps-grid` (wrapping,
+    `flex:1 1 auto`, `align-content:stretch`, `gap:var(--gap-md)`); cells
+    `li` `flex:1 1 26vw`, light fill `var(--ph-cap-bg)` (`#F0F1F5`),
+    `border-radius:var(--rad-cell)`, dark text `var(--ph-cap-h)` (`h3`
+    full, `p` at `opacity:80%`).
+  - T-s8-split — used by S8. `section.ph-caps.ph-s8 > div.ph-body >
+    div.ph-s8` (`flex:1 1 auto`, `grid-template-columns: minmax(0,1fr)
+    minmax(0,2.1fr)`, `gap:var(--gap-md)`). Left
+    `ol.ph-scr.ph-s8-chips` (`flex-direction:column`,
+    `flex-wrap:nowrap`, `gap:var(--sp-xs)`); `li.ph-s8-chip.fragment`
+    (`flex:1 1 0`, `display:flex`, `align-items:center`, `gap:var(--gap-sm)`)
+    always visible, `span.ph-num` for the number; the
+    `.current-fragment` chip reads as selected with mint text, mint left
+    border and `rgba(165,254,202,0.12)` fill — no light fill, so the
+    chip column stays navy. Right `div.ph-cols.ph-s8-panes`
+    (`display:grid`, panes stretch to the full body height);
+    `article.ph-s8-pane` all at `grid-area:1 / 1`, only `.current-fragment`
+    shown, so reveal keeps `.visible` on past panes while CSS shows the
+    current one. Fills, borders and type come from `.ph-scr` / `.ph-cols`.
+    Code listings use `pre.ph-code` with `code.language-*` (inset navy
+    fill, mint-tinted frame, `--fs-body`, `white-space:pre` so source line
+    breaks hold) instead of inline `code`. Pane subheadings `h4` sit below
+    the `h3`: 18px/600 `--ph-mist` vs 21px/700 mint, `margin:var(--sp-sm)
+    0 var(--sp-xs)`, first one flush. `thead th` is mint at item size with
+    `font-weight:600`; body cells stay 400. The runtime table fills its
+    pane: `width:100%` with `padding:var(--sp-xs) var(--gap-sm)
+    var(--sp-xs) 0` cells, so 16 rows at ~39px fill 90% of the pane height
+    (measured 658/659px wide, 657/730px tall). No `r-fit-text` on it:
+    reveal's auto-size sets `display:inline-block` and grows the table to
+    24px, which collapses the column spacing and breaks `border-collapse`;
+    `r-fit-text` stays cover-title-only per the auto-size rule.
+    No `data-markdown` either — that attribute only works on a `<section>`,
+    and a nested section becomes a vertical slide, which would break the
+    chip/pane fragment steps.
   - T-why-3 + handoff — used by S9. `section.ph-why > div.ph-body >
     ol.ph-why-grid` (`flex:1 1 auto`, `gap:var(--gap-md)`); each `li`
     `flex:1 1 0`, dark fill, full mint-tinted border,
@@ -348,29 +377,25 @@ Layout: T-cols-2. Fragments: 2, no foot.
 - Source: `src/api/shared.py:151-153` (404 `Unknown zipcode`); tests
   `test/unit/test_api_unit.py:57-83`.
 
-## S8 — Modernised base (title same, `section.ph-caps`)
+## S8 — Modernised base (title same, `section.ph-caps.ph-s8`)
 
-Layout: T-caps-6. Fragments: 6.
+Layout: two columns, `div.ph-s8` inside `.ph-body` — `ol.ph-s8-chips` left,
+`div.ph-s8-panes` right. Fragments: 4, paired by `data-fragment-index`, so each
+step lights one chip and swaps one pane. Chips stay visible (override of
+reveal's `.fragment` opacity); only `.current-fragment` pane is shown.
 
-| Item | Content |
-|------|---------|
-| Cell 1 h3 | Missing-data handling |
-| Cell 1 body | Blanks filled from similar homes. |
-| Cell 2 h3 | Load-once serving |
-| Cell 2 body | Model and data cached at startup. |
-| Cell 3 h3 | Clear errors |
-| Cell 3 body | Unknown areas named in plain words. |
-| Cell 4 h3 | Current runtime |
-| Cell 4 body | One supported version, locked installs. |
-| Cell 5 h3 | Typed contracts |
-| Cell 5 body | Docs promise what the API returns. |
-| Cell 6 h3 | Tested paths |
-| Cell 6 body | Blank, missing, zero, and bad-area covered. |
+| Step | Chip | Pane content |
+|------|------|--------------|
+| 1 | 01 Runtime | `table.ph-table`: Library / From / To. `httpx` and `pip` struck as dropped (`class="ph-muted"`), `httpx2` and `uv` as replacements. |
+| 2 | 02 Type hints | Was `def predict(home_features):`; now `def predict_v2(home_features: HomeFeaturesV2, request: Request) -> PredictionResponse:`. |
+| 3 | 03 Input validation | Was `HomeFeatures` (every field required); now `HomeFeaturesV2` (nullable fields + `zipcode` pattern `^\d{5}$`). |
+| 4 | 04 Swagger schema | v1 `/predict` generic object, no error model; v2 `/predict/v2` returns `{"predicted_price": 394708.0}` with 404/500 `ErrorDetail`. |
 
-- Say (one line each): "Messy data scores. One load. Plain errors.
-  Supported runtime. True docs. Covered edges."
-- Sources: Python 3.10 → 3.14, pip → uv lockfile; `PredictionResponse` /
-  `HealthResponse` / `ErrorDetail` typed models.
+- Say (one line each): "Locked installs. Annotated defs. Nullable input.
+  Honest schema."
+- Sources: `src/api/endpoints_v2.py:30-55` (`HomeFeaturesV2`, `predict_v2`),
+  `src/api/endpoints.py:11-34` (`HomeFeatures`, `predict`); `uv.lock` +
+  PyPI for the To column.
 
 ## S9 — Close (title `What you get`, `section.ph-why`)
 
