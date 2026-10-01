@@ -1,9 +1,12 @@
 """API endpoints for home price prediction."""
 
-from fastapi import APIRouter
-from pydantic import BaseModel, Field
+from typing import Annotated
 
-from api.shared import load_artifacts, predict_price
+import pandas as pd
+from fastapi import APIRouter, Body
+from pydantic import BaseModel
+
+from api.shared import listing_examples, load_predict_artifacts
 
 router = APIRouter(tags=["default"])
 
@@ -11,14 +14,14 @@ router = APIRouter(tags=["default"])
 class HomeFeatures(BaseModel):
     """Input features for home price prediction."""
 
-    bedrooms: int = Field(examples=[3])
-    bathrooms: float = Field(examples=[1.0])
-    sqft_living: float = Field(examples=[1600.0])
-    sqft_lot: float = Field(examples=[5001.0])
-    floors: float = Field(examples=[1.5])
-    sqft_above: float = Field(examples=[1080.0])
-    sqft_basement: float = Field(examples=[520.0])
-    zipcode: str = Field(examples=["98125"])
+    bedrooms: int
+    bathrooms: float
+    sqft_living: float
+    sqft_lot: float
+    floors: float
+    sqft_above: float
+    sqft_basement: float
+    zipcode: str
 
 
 @router.get("/health")
@@ -31,10 +34,30 @@ def health_check() -> dict[str, str]:
 
 
 @router.post("/predict")
-def predict(home_features: HomeFeatures) -> dict[str, float]:
+def predict(
+    home_features: Annotated[HomeFeatures, Body(openapi_examples=listing_examples())],
+) -> dict[str, float]:
     """Predict a home sale price from listing and demographic features."""
-    artifacts = load_artifacts()
+    artifacts = load_predict_artifacts()
     try:
-        return predict_price(home_features.model_dump(), artifacts)
+        demographics = artifacts.demographics
+        input_data: pd.DataFrame = pd.DataFrame([home_features.model_dump()])
+
+        # Combine input data with demographic data
+        demographic_info = (
+            demographics[demographics["zipcode"] == home_features.zipcode]
+            .drop(
+                columns="zipcode",
+            )
+            .reset_index(drop=True)
+        )
+        input_data = pd.concat([input_data, demographic_info], axis=1)
+        print(input_data)
+
+        # Ensure the input data has the correct features
+        input_data = input_data[artifacts.model_features]
+        # Make prediction
+        prediction = artifacts.model.predict(input_data)
+        return {"predicted_price": prediction[0]}
     finally:
         del artifacts
