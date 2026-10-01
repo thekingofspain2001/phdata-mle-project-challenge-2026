@@ -3,7 +3,11 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="icon" href="data:," />
+    <link
+      rel="icon"
+      sizes="32x32"
+      href="https://i0.wp.com/www.phdata.io/wp-content/uploads/2020/03/cropped-phData_color_dark_blue-01-1-32x32.png"
+    />
     <title>Sound Realty — Valuation API Production Hardening</title>
     <link
       rel="stylesheet"
@@ -21,9 +25,9 @@
         --ph-mint: #a5feca;
         --ph-mist: #bcccd4;
         --ph-card-border: rgba(165, 254, 202, 0.5);
-        --ph-card-bg: #0c142e;
-        --ph-why-h: #ffffff;
-        --ph-why-body: rgba(255, 255, 255, 0.75);
+        --ph-card-bg: rgba(12, 20, 46, 0.72);
+        --ph-ink-on-dark: #ffffff;
+        --ph-ink-muted: rgba(255, 255, 255, 0.75);
         --ph-cap-bg: #f0f1f5;
         --ph-cap-h: #232a43;
         --ph-client-font: "Inter", system-ui, sans-serif;
@@ -51,7 +55,12 @@
         --gap-md: 2vw;
         --ph-header-h: 10vh;
         --ph-footer-h: 8vh;
-
+        /* Approx reveal.js edge-arrow keep-out: .8em offset + 3.6em arrow @10px base. */
+        --ph-arrow-x: 48px;
+        /* One motion language: reveal.js slide (0.8s) + fast fade (0.18s). */
+        --ph-t-slide: 0.8s;
+        --ph-t-fade: 0.18s;
+        --ph-ease: cubic-bezier(0.26, 0.86, 0.44, 0.985);
         /* Shape + line tokens. */
         --rad-card: 1.2vh;
         --rad-cell: 1vh;
@@ -87,12 +96,9 @@
         background-position: 100% 100%;
       }
 
-      /* Reveal owns .slides geometry; sections flex-fill the slide box it provides.
-         .present included: reveal.css sets .present to display:block and would
-         otherwise beat this rule on the visible slide. */
+      /* Reveal.js sets inline display:block (beats stylesheets) and owns width/position;
+         keep height:100% so .ph-body has a box to fill, paint only otherwise. */
       .reveal .slides section.present {
-        display: flex;
-        flex-direction: column;
         height: 100%;
         background: transparent;
         text-align: left;
@@ -129,7 +135,7 @@
         margin-right: calc(var(--gap-sm) * -0.51);
       }
       .ph-brandline .ph-sep {
-        color: var(--ph-why-body);
+        color: var(--ph-ink-muted);
       }
       .ph-brandline .ph-client {
         display: flex;
@@ -138,7 +144,7 @@
         font-family: Georgia, "Palatino Linotype", "Times New Roman", serif;
         font-size: 28px;
         line-height: 27px;
-        color: var(--ph-why-h);
+        color: var(--ph-ink-on-dark);
         white-space: nowrap;
       }
       .ph-client-logo {
@@ -167,7 +173,9 @@
         text-overflow: ellipsis;
         opacity: 1;
         transform: none;
-        transition: opacity 180ms ease, transform 180ms ease;
+        transition:
+          opacity var(--ph-t-fade) var(--ph-ease),
+          transform var(--ph-t-fade) var(--ph-ease);
       }
       #ph-global-title.is-swap {
         opacity: 0;
@@ -177,42 +185,47 @@
         visibility: hidden;
       }
 
-      /* Body flex-fills the slide box reveal.js provides; padding reserves
-         the overlay header/footer bands so titles align at any viewport. */
+      /* Body inherits reveal's slide box; vertical insets clear the overlay
+         header/footer bands. Header/footer live in unscaled viewport px while
+         .ph-body lives in scaled slide coords: divide by reveal's viewport-owned
+         --slide-scale, then subtract the centered slide offset
+         ((100vh - slide-height*scale)/2) so content starts/ends exactly at the
+         chrome edges instead of overshooting by the slide top margin. */
       .ph-body {
-        flex: 1 1 auto;
-        min-height: 0;
+        width: inherit;
+        height: inherit;
         overflow: hidden;
         display: flex;
         flex-direction: column;
         gap: var(--sp-sm);
-        padding: var(--ph-header-h) var(--gap-md) var(--ph-footer-h);
+        padding-top: calc(var(--ph-header-h) / var(--slide-scale, 1) - 50vh / var(--slide-scale, 1) + var(--slide-height, 961px) / 2);
+        padding-right: calc(var(--gap-md) / var(--slide-scale, 1) + var(--ph-arrow-x) / var(--slide-scale, 1));
+        padding-bottom: calc(var(--ph-footer-h) / var(--slide-scale, 1) - 50vh / var(--slide-scale, 1) + var(--slide-height, 961px) / 2);
+        padding-left: calc(var(--gap-md) / var(--slide-scale, 1) + var(--ph-arrow-x) / var(--slide-scale, 1));
         box-sizing: border-box;
       }
 
       .reveal h1 {
-        color: var(--ph-why-h);
+        color: var(--ph-ink-on-dark);
         font-size: var(--fs-h1);
       }
       .reveal h2 {
         color: var(--ph-mint);
       }
       .reveal h3 {
-        color: var(--ph-why-h);
+        color: var(--ph-ink-on-dark);
         font-size: var(--fs-h3);
       }
       .reveal p {
         font-size: var(--fs-body);
       }
 
-      /* Cover centers its content in the slide box. */
+      /* Cover: true slide center on both axes, no chrome insets. */
       .ph-cover .ph-body {
-        flex: 1 1 auto;
-        min-height: 0;
         justify-content: center;
         align-items: center;
         text-align: center;
-        padding-bottom: var(--ph-header-h);
+        padding: 0;
       }
       .ph-cover h1 {
         margin: 0;
@@ -221,7 +234,7 @@
 
       /* Summary lead + SCR list. Solid fills on bordered items. */
       .ph-action {
-        color: var(--ph-why-h);
+        color: var(--ph-ink-on-dark);
         font-size: var(--fs-lead);
         margin: 0;
       }
@@ -239,6 +252,8 @@
       .ph-scr li {
         flex: 1 1 28vw;
         background-color: var(--ph-card-bg);
+        -webkit-backdrop-filter: blur(2px);
+        backdrop-filter: blur(2px);
         border-left: var(--line-md) solid var(--ph-card-border);
         padding-left: var(--gap-sm);
       }
@@ -246,7 +261,7 @@
         margin: 0 0 var(--sp-xs);
       }
       .ph-scr p {
-        color: var(--ph-why-body);
+        color: var(--ph-ink-muted);
         margin: 0;
       }
 
@@ -261,6 +276,8 @@
         flex: 1 1 0;
         min-width: 0;
         background-color: var(--ph-card-bg);
+        -webkit-backdrop-filter: blur(2px);
+        backdrop-filter: blur(2px);
         border: var(--line-sm) solid var(--ph-card-border);
         border-radius: var(--rad-card);
         padding: var(--sp-sm) var(--gap-sm);
@@ -280,7 +297,7 @@
         color: var(--ph-mist);
       }
       .ph-cols p {
-        color: var(--ph-why-body);
+        color: var(--ph-ink-muted);
         margin: 0;
       }
       /* S2 stacked variant: same bordered cards, full-width rows. */
@@ -289,18 +306,16 @@
       }
 
       .ph-houses-top {
-        flex: 1 1 auto;
+        flex: 0 0 50%;
         min-height: 0;
         display: flex;
         flex-direction: column;
-        justify-content: center;
+        justify-content: flex-start;
+        transition: flex-basis var(--ph-t-slide) var(--ph-ease);
       }
-      #s4.is-stage-1 .ph-houses-top,
-      #s4.is-stage-2 .ph-houses-top,
-      #s4.is-stage-3 .ph-houses-top,
-      #s4.is-stage-4 .ph-houses-top {
-        flex: 0 0 50%;
-        justify-content: flex-end;
+      section[data-s4].is-stage-0 .ph-houses-top {
+        flex: 1 1 auto;
+        justify-content: center;
       }
       #houses-svg {
         width: 100%;
@@ -309,7 +324,7 @@
         min-height: 0;
         max-height: 48vh;
       }
-      #s4.is-stage-0 #houses-svg {
+      section[data-s4].is-stage-0 #houses-svg {
         max-height: 68vh;
       }
       .ph-s4-subs {
@@ -324,9 +339,9 @@
         margin: 0;
         display: none;
       }
-      #s4.is-stage-1 .ph-is-av,
-      #s4.is-stage-2 .ph-is-md,
-      #s4.is-stage-3 .ph-is-knn {
+      section[data-s4].is-stage-1 .ph-is-av,
+      section[data-s4].is-stage-2 .ph-is-md,
+      section[data-s4].is-stage-3 .ph-is-knn {
         display: block;
       }
       .ph-is-av {
@@ -339,52 +354,66 @@
         color: var(--knn);
       }
       .ph-stage-hint {
-        color: var(--ph-why-body);
+        color: var(--ph-ink-muted);
         font-size: var(--fs-caption);
         margin: 0;
       }
-      #s4.is-stage-1 .ph-stage-hint,
-      #s4.is-stage-2 .ph-stage-hint,
-      #s4.is-stage-3 .ph-stage-hint,
-      #s4.is-stage-4 .ph-stage-hint {
+      section[data-s4].is-stage-1 .ph-stage-hint,
+      section[data-s4].is-stage-2 .ph-stage-hint,
+      section[data-s4].is-stage-3 .ph-stage-hint,
+      section[data-s4].is-stage-4 .ph-stage-hint {
         display: none;
       }
       .houses-svg .h {
-        transition: opacity 0.3s;
+        transition: opacity var(--ph-t-fade) var(--ph-ease);
       }
-      .houses-svg .mk {
+      .houses-svg .mk,
+      .houses-svg .bx {
         opacity: 0;
-        transition: opacity 0.3s;
-      }
-      /* First fragment enters with a rise + fade instead of a blank slide. */
-      .reveal .fragment {
+        transform-box: fill-box;
+        transform-origin: center;
         transition:
-          opacity 0.45s ease,
-          transform 0.45s ease;
+          opacity var(--ph-t-slide) var(--ph-ease),
+          transform var(--ph-t-slide) var(--ph-ease);
       }
-      .reveal .fragment:not(.visible) {
-        transform: translateY(12px);
-      }
-      .reveal .fragment.visible {
-        transform: none;
-      }
-      /* The 12 houses never change color, opacity, or position across stages. */
-      #s4.is-stage-1 #mk-avg,
-      #s4.is-stage-2 #mk-med,
-      #s4.is-stage-3 #mk-knn {
+      /* Per-stage eq houses + input boxes; summary shows all three, winners big. */
+      section[data-s4].is-stage-1 #mk-avg,
+      section[data-s4].is-stage-2 #mk-med,
+      section[data-s4].is-stage-3 #mk-knn {
         opacity: 1;
       }
-      .ph-stage-bottom {
-        flex: 0 0 auto;
-        min-height: 0;
+      section[data-s4].is-stage-1 #bx-avg,
+      section[data-s4].is-stage-2 #bx-med,
+      section[data-s4].is-stage-3 #bx-knn {
+        opacity: 1;
       }
-      #s4.is-stage-0 .ph-stage-bottom .ph-panels {
+      section[data-s4].is-stage-4 #mk-avg,
+      section[data-s4].is-stage-4 #mk-med,
+      section[data-s4].is-stage-4 #mk-knn {
+        opacity: 1;
+      }
+      section[data-s4].is-stage-4 #bx-knn {
+        opacity: 1;
+      }
+      section[data-s4].is-stage-4 #mk-avg,
+      section[data-s4].is-stage-4 #mk-med {
+        transform: scale(0.72);
+      }
+      section[data-s4].is-stage-4 #mk-knn {
+        transform: scale(1.25);
+      }
+      .ph-stage-bottom {
+        flex: 0 0 0;
+        min-height: 0;
+        overflow: hidden;
+      }
+      section[data-s4].is-stage-0 .ph-stage-bottom .ph-panels {
         display: none;
       }
-      #s4.is-stage-1 .ph-stage-bottom,
-      #s4.is-stage-2 .ph-stage-bottom,
-      #s4.is-stage-3 .ph-stage-bottom,
-      #s4.is-stage-4 .ph-stage-bottom {
+      section[data-s4].is-stage-1 .ph-stage-bottom,
+      section[data-s4].is-stage-2 .ph-stage-bottom,
+      section[data-s4].is-stage-3 .ph-stage-bottom,
+      section[data-s4].is-stage-4 .ph-stage-bottom {
         flex: 0 0 50%;
         overflow: hidden;
       }
@@ -399,10 +428,15 @@
         display: flex;
         gap: var(--gap-md);
         background-color: var(--ph-card-bg);
+        -webkit-backdrop-filter: blur(2px);
+        backdrop-filter: blur(2px);
         border: var(--line-sm) solid var(--ph-card-border);
         border-radius: var(--rad-card);
         padding: var(--sp-sm) var(--gap-sm);
         overflow: hidden;
+      }
+      .ph-panel[hidden] {
+        display: none;
       }
       .ph-panel-words {
         flex: 1 1 50%;
@@ -412,7 +446,7 @@
         margin: 0 0 var(--sp-xs);
       }
       .ph-panel-words p {
-        color: var(--ph-why-body);
+        color: var(--ph-ink-muted);
         margin: 0;
       }
       .ph-panel-pick {
@@ -465,7 +499,7 @@
         flex-wrap: wrap;
         align-items: center;
         gap: var(--sp-xs) var(--gap-sm);
-        color: var(--ph-why-body);
+        color: var(--ph-ink-muted);
       }
       .ph-bars li:nth-child(1) span {
         color: var(--av);
@@ -484,14 +518,14 @@
 
       /* Footnote. */
       .ph-foot {
-        color: var(--ph-why-body);
+        color: var(--ph-ink-muted);
         font-size: var(--fs-caption);
         opacity: 80%;
         margin: 0;
       }
 
       /* Template A: Why thirds. Solid fills on bordered items. */
-      .ph-why-grid {
+      .ph-close-grid {
         flex: 1 1 auto;
         min-height: 0;
         list-style: none;
@@ -500,9 +534,11 @@
         display: flex;
         gap: var(--gap-md);
       }
-      .ph-why-grid li {
+      .ph-close-grid li {
         flex: 1 1 0;
         background-color: var(--ph-card-bg);
+        -webkit-backdrop-filter: blur(2px);
+        backdrop-filter: blur(2px);
         border: var(--line-sm) solid var(--ph-card-border);
         border-radius: var(--rad-card);
         padding: var(--sp-sm) var(--gap-sm);
@@ -512,15 +548,15 @@
         font-size: var(--fs-h3);
         margin: 0;
       }
-      .ph-why-grid h3 {
+      .ph-close-grid h3 {
         margin: var(--sp-xs) 0;
       }
-      .ph-why-grid p:last-child {
-        color: var(--ph-why-body);
+      .ph-close-grid p:last-child {
+        color: var(--ph-ink-muted);
         margin: 0;
       }
       .ph-handoff {
-        color: var(--ph-why-h);
+        color: var(--ph-ink-on-dark);
         font-size: var(--fs-lead);
         margin: 0;
       }
@@ -570,15 +606,12 @@
         color: var(--ph-mint);
       }
 
-      /* Slide number: transparent text docked left of the arrows, never stacked. */
+      /* Slide number: reveal.js default placement; themed paint only. */
       .reveal .slide-number {
         font-size: 26px;
         color: var(--ph-mist);
         background-color: transparent;
         text-decoration: none;
-        padding: 4px 10px;
-        right: 150px;
-        bottom: calc((var(--ph-footer-h) - 34px) / 2);
       }
       .reveal .slide-number a {
         text-decoration: none;
@@ -614,7 +647,7 @@
             >Sound Realty</span
           >
         </p>
-        <h2 id="ph-global-title">Valuation API</h2>
+        <h2 id="ph-global-title" class="is-empty"></h2>
       </header>
       <div class="slides">
         <!-- S1 Cover. -->
@@ -633,7 +666,9 @@
                 <div class="ph-cols">
                   <article>
                     <h4>Problem</h4>
-                    <p>Predict service only works if all fields are provided.</p>
+                    <p>
+                      Predict service only works if all fields are provided.
+                    </p>
                   </article>
                   <article>
                     <h4>Impact</h4>
@@ -641,7 +676,10 @@
                   </article>
                   <article>
                     <h4>Cost</h4>
-                    <p>Rejected requests delay listings and cost agent time (placeholder estimate).</p>
+                    <p>
+                      Rejected requests delay listings and cost agent time
+                      (placeholder estimate).
+                    </p>
                   </article>
                 </div>
               </article>
@@ -689,7 +727,7 @@
 
         <!-- S4 Three options: 12 houses, staged detail. -->
         <section
-          id="s4"
+          data-s4
           class="is-stage-0"
           aria-label="Missing value approaches"
         >
@@ -727,91 +765,91 @@
                     />
                   </g>
                 </defs>
-                <!-- Group A: base 40 -->
+                <!-- Group A: mid scale .8, two doors = 19u intra; left edge pinned at 35 -->
                 <g
                   class="h"
                   stroke="#BCCCD4"
-                  transform="translate(60,210) scale(0.76)"
+                  transform="translate(54,210) scale(0.76)"
                 >
                   <use href="#hs" />
                 </g>
                 <g
                   class="h"
                   stroke="#BCCCD4"
-                  transform="translate(137,210) scale(0.8)"
+                  transform="translate(73,210) scale(0.8)"
                 >
                   <use href="#hs" />
                 </g>
                 <g
                   class="h"
                   stroke="#BCCCD4"
-                  transform="translate(214,210) scale(0.84)"
+                  transform="translate(92,210) scale(0.84)"
                 >
                   <use href="#hs" />
                 </g>
-                <!-- Group B: 25% bigger, base 50 -->
+                <!-- Group B: mid scale 1.0, two doors = 24u intra; gap A-B = 1 unit -->
                 <g
                   class="h"
                   stroke="#BCCCD4"
-                  transform="translate(368,210) scale(0.95)"
-                >
-                  <use href="#hs" />
-                </g>
-                <g
-                  class="h"
-                  stroke="#BCCCD4"
-                  transform="translate(445,210) scale(1.0)"
+                  transform="translate(254,210) scale(0.95)"
                 >
                   <use href="#hs" />
                 </g>
                 <g
                   class="h"
                   stroke="#BCCCD4"
-                  transform="translate(522,210) scale(1.05)"
+                  transform="translate(278,210) scale(1.0)"
                 >
                   <use href="#hs" />
                 </g>
-                <!-- Group C: base 62.5 -->
+                <g
+                  class="h"
+                  stroke="#BCCCD4"
+                  transform="translate(302,210) scale(1.05)"
+                >
+                  <use href="#hs" />
+                </g>
+                <!-- Group C: mid scale 1.25, two doors = 30u intra; gap B-C = 2 units -->
                 <g
                   class="h h-nn"
                   stroke="#BCCCD4"
-                  transform="translate(676,210) scale(1.1875)"
-                >
-                  <use href="#hs" />
-                </g>
-                <g
-                  class="h h-nn"
-                  stroke="#BCCCD4"
-                  transform="translate(753,210) scale(1.25)"
+                  transform="translate(592,210) scale(1.1875)"
                 >
                   <use href="#hs" />
                 </g>
                 <g
                   class="h h-nn"
                   stroke="#BCCCD4"
-                  transform="translate(830,210) scale(1.3125)"
-                >
-                  <use href="#hs" />
-                </g>
-                <!-- Group D: base 78.1 -->
-                <g
-                  class="h h-nn"
-                  stroke="#BCCCD4"
-                  transform="translate(984,210) scale(1.484)"
+                  transform="translate(622,210) scale(1.25)"
                 >
                   <use href="#hs" />
                 </g>
                 <g
                   class="h h-nn"
                   stroke="#BCCCD4"
-                  transform="translate(1061,210) scale(1.5625)"
+                  transform="translate(652,210) scale(1.3125)"
+                >
+                  <use href="#hs" />
+                </g>
+                <!-- Group D: mid scale 1.5625, two doors = 38u intra; gap C-D = 3 units; right edge pinned at 1188 -->
+                <g
+                  class="h h-nn"
+                  stroke="#BCCCD4"
+                  transform="translate(1080,210) scale(1.484)"
+                >
+                  <use href="#hs" />
+                </g>
+                <g
+                  class="h h-nn"
+                  stroke="#BCCCD4"
+                  transform="translate(1118,210) scale(1.5625)"
                 >
                   <use href="#hs" />
                 </g>
                 <g
                   class="h"
                   stroke="#BCCCD4"
-                  transform="translate(1138,210) scale(1.6406)"
+                  transform="translate(1156,210) scale(1.6406)"
                 >
                   <use href="#hs" />
                 </g>
@@ -827,190 +865,256 @@
                 />
                 <!-- House size data (sqft, proportional to scale) -->
                 <text
-                  x="60"
+                  x="54"
                   y="232"
                   text-anchor="middle"
                   font-size="12"
                   fill="#BCCCD4"
                 >
-                  $105k
+                  640
                 </text>
                 <text
-                  x="158"
+                  x="73"
                   y="232"
                   text-anchor="middle"
                   font-size="12"
                   fill="#BCCCD4"
                 >
-                  $201k
+                  710
                 </text>
                 <text
-                  x="256"
+                  x="92"
                   y="232"
                   text-anchor="middle"
                   font-size="12"
                   fill="#BCCCD4"
                 >
-                  $223k
+                  780
                 </text>
                 <text
-                  x="354"
+                  x="254"
                   y="232"
                   text-anchor="middle"
                   font-size="12"
                   fill="#BCCCD4"
                 >
-                  $249k
+                  1060
                 </text>
                 <text
-                  x="452"
+                  x="278"
                   y="232"
                   text-anchor="middle"
                   font-size="12"
                   fill="#BCCCD4"
                 >
-                  $267k
+                  1110
                 </text>
                 <text
-                  x="550"
+                  x="302"
                   y="232"
                   text-anchor="middle"
                   font-size="12"
                   fill="#BCCCD4"
                 >
-                  $284k
+                  1170
                 </text>
                 <text
-                  x="648"
+                  x="592"
                   y="232"
                   text-anchor="middle"
                   font-size="12"
                   fill="#BCCCD4"
                 >
-                  $303k
+                  1330
                 </text>
                 <text
-                  x="746"
+                  x="622"
                   y="232"
                   text-anchor="middle"
                   font-size="12"
                   fill="#BCCCD4"
                 >
-                  $326k
+                  1390
                 </text>
                 <text
-                  x="844"
+                  x="652"
                   y="232"
                   text-anchor="middle"
                   font-size="12"
                   fill="#BCCCD4"
                 >
-                  $350k
+                  1460
                 </text>
                 <text
-                  x="942"
+                  x="1080"
                   y="232"
                   text-anchor="middle"
                   font-size="12"
                   fill="#BCCCD4"
                 >
-                  $387k
+                  1660
                 </text>
                 <text
-                  x="1040"
+                  x="1118"
                   y="232"
                   text-anchor="middle"
                   font-size="12"
                   fill="#BCCCD4"
                 >
-                  $450k
+                  1740
                 </text>
                 <text
-                  x="1138"
+                  x="1156"
                   y="232"
                   text-anchor="middle"
                   font-size="12"
                   fill="#BCCCD4"
                 >
-                  $859k
+                  1830
                 </text>
-                <!-- Average marker above sorted position -->
+                <!-- Input boxes: dashed eq inputs on the housing line, fade per fragment -->
+                <rect
+                  id="bx-avg"
+                  class="bx"
+                  x="15"
+                  y="168"
+                  width="1193"
+                  height="62"
+                  fill="none"
+                  stroke="var(--av)"
+                  stroke-width="2"
+                  stroke-dasharray="8 5"
+                />
+                <rect
+                  id="bx-med"
+                  class="bx"
+                  x="278"
+                  y="168"
+                  width="400"
+                  height="62"
+                  fill="none"
+                  stroke="var(--md)"
+                  stroke-width="2"
+                  stroke-dasharray="8 5"
+                />
+                <rect
+                  id="bx-knn"
+                  class="bx"
+                  x="1005"
+                  y="168"
+                  width="190"
+                  height="62"
+                  fill="none"
+                  stroke="var(--knn)"
+                  stroke-width="2"
+                  stroke-dasharray="8 5"
+                />
+                <!-- Average marker: same pick line y=90 as all markers -->
                 <g id="mk-avg" class="mk" stroke="var(--av)">
                   <line
-                    x1="625"
+                    x1="380"
                     y1="98"
-                    x2="625"
+                    x2="380"
                     y2="122"
                     stroke-width="2"
                     stroke-dasharray="6 4"
                   />
-                  <g transform="translate(625,90) scale(1.44)">
+                  <g transform="translate(380,90) scale(1.44)">
                     <use href="#hs" />
                   </g>
                   <text
-                    x="625"
-                    y="143"
+                    x="380"
+                    y="60"
                     text-anchor="middle"
                     font-size="20"
                     fill="var(--av)"
                     stroke="none"
                   >
-                    Average Value
+                    AVG 1211 = Σ14530/12
+                  </text>
+                  <text
+                    x="380"
+                    y="143"
+                    text-anchor="middle"
+                    font-size="16"
+                    fill="var(--av)"
+                    stroke="none"
+                  >
+                    1211 sq ft
                   </text>
                 </g>
                 <!-- Median marker -->
                 <g id="mk-med" class="mk" stroke="var(--md)">
                   <line
-                    x1="600"
+                    x1="605"
                     y1="98"
-                    x2="600"
+                    x2="605"
                     y2="122"
                     stroke-width="2"
                     stroke-dasharray="6 4"
                   />
-                  <g transform="translate(600,90) scale(1.4)">
+                  <g transform="translate(605,90) scale(1.4)">
                     <use href="#hs" />
                   </g>
                   <text
-                    x="600"
-                    y="143"
+                    x="605"
+                    y="60"
                     text-anchor="middle"
                     font-size="20"
                     fill="var(--md)"
                     stroke="none"
                   >
-                    Mean value
+                    MED 1250 = mid(1170,1330)
+                  </text>
+                  <text
+                    x="605"
+                    y="143"
+                    text-anchor="middle"
+                    font-size="16"
+                    fill="var(--md)"
+                    stroke="none"
+                  >
+                    1250 sq ft
                   </text>
                 </g>
                 <!-- KNN marker cluster -->
                 <g id="mk-knn" class="mk" stroke="var(--knn)">
                   <line
-                    x1="775"
+                    x1="900"
                     y1="98"
-                    x2="775"
+                    x2="900"
                     y2="122"
                     stroke-width="2"
                     stroke-dasharray="6 4"
                   />
-                  <g transform="translate(775,90) scale(1.5)">
+                  <g transform="translate(900,90) scale(1.5)">
                     <use href="#hs" />
                   </g>
                   <text
-                    x="775"
-                    y="143"
+                    x="900"
+                    y="60"
                     text-anchor="middle"
                     font-size="20"
                     fill="var(--knn)"
                     stroke="none"
                   >
-                    Nearest Neighbor
+                    5-NN → 1740 = w-avg(5)
+                  </text>
+                  <text
+                    x="900"
+                    y="143"
+                    text-anchor="middle"
+                    font-size="16"
+                    fill="var(--knn)"
+                    stroke="none"
+                  >
+                    1740 sq ft
                   </text>
                 </g>
-              </svg>
               <p class="ph-stage-hint">
                 Twelve homes, four groups of three. Each group runs 25% bigger
-                than the last; inside a group two homes vary by ±5%. Click for
-                each approach.
+                than the last; labels are living area in sq ft. Click for each
+                approach.
               </p>
             </div>
             <div class="ph-stage-bottom">
@@ -1044,7 +1148,7 @@
                         fill="var(--av)"
                         stroke="none"
                       >
-                        AVG $334k = Σ/12
+                        AVG 1211 = Σ14530/12
                       </text>
                     </svg>
                   </div>
@@ -1078,7 +1182,7 @@
                         fill="var(--md)"
                         stroke="none"
                       >
-                        MED $294k = mid($284k,$303k)
+                        MED 1250 = mid(1170,1330)
                       </text>
                     </svg>
                   </div>
@@ -1093,37 +1197,37 @@
                   </div>
                   <div class="ph-panel-pick">
                     <svg
-                      viewBox="0 0 260 120"
+                      viewBox="0 0 300 120"
                       fill="none"
                       stroke="var(--knn)"
                       stroke-width="3"
                       role="img"
                       aria-label="Five similar houses and the blank"
                     >
-                      <g transform="translate(40,95) scale(1.1)">
+                      <g transform="translate(35,95) scale(0.9)">
                         <use href="#hs" />
                       </g>
-                      <g transform="translate(90,95) scale(1.3)">
+                      <g transform="translate(92,95) scale(1.0)">
                         <use href="#hs" />
                       </g>
-                      <g transform="translate(140,95) scale(1.5)">
+                      <g transform="translate(150,95) scale(1.15)">
                         <use href="#hs" />
                       </g>
-                      <g transform="translate(190,95) scale(1.2)">
+                      <g transform="translate(208,95) scale(1.0)">
                         <use href="#hs" />
                       </g>
-                      <g transform="translate(235,95) scale(1.4)">
+                      <g transform="translate(265,95) scale(0.9)">
                         <use href="#hs" />
                       </g>
                       <text
-                        x="140"
+                        x="150"
                         y="20"
                         text-anchor="middle"
                         font-size="14"
                         fill="var(--knn)"
                         stroke="none"
                       >
-                        5-NN → $293k = w-avg(5)
+                        5-NN → 1740 = w-avg(5)
                       </text>
                     </svg>
                   </div>
@@ -1139,7 +1243,7 @@
                   </div>
                   <div class="ph-panel-pick">
                     <p class="ph-panel-nums">
-                      AVG $334k · MED $294k · 5-NN → $293k
+                      AVG 1211 · MED 1250 · 5-NN → 1740
                     </p>
                   </div>
                 </article>
@@ -1280,7 +1384,11 @@
                 </article>
                 <article>
                   <h4>Now</h4>
-                  <p><code>predict_v2(HomeFeaturesV2) -&gt; PredictionResponse</code></p>
+                  <p>
+                    <code
+                      >predict_v2(HomeFeaturesV2) -&gt; PredictionResponse</code
+                    >
+                  </p>
                 </article>
               </article>
             </div>
@@ -1289,8 +1397,8 @@
                 <h3>Input validation</h3>
                 <p>
                   <code>HomeFeaturesV2</code>: bedrooms, bathrooms, sqft_living,
-                  sqft_lot, floors, sqft_above, sqft_basement nullable,
-                  &#8805; 0; zipcode required, <code>^\d{5}$</code>.
+                  sqft_lot, floors, sqft_above, sqft_basement nullable, &#8805;
+                  0; zipcode required, <code>^\d{5}$</code>.
                 </p>
               </article>
               <article class="fragment">
@@ -1307,9 +1415,9 @@
         </section>
 
         <!-- S9 Close. -->
-        <section class="ph-why" aria-label="What you get">
+        <section class="ph-close" aria-label="What you get">
           <div class="ph-body">
-            <ol class="ph-why-grid">
+            <ol class="ph-close-grid">
               <li class="fragment">
                 <p class="ph-num">01</p>
                 <h3>No listing left behind</h3>
@@ -1333,10 +1441,7 @@
         </section>
 
         <!-- S10 Appendix: demo runbook, not presented. -->
-        <section
-          data-visibility="hidden"
-          aria-label="Appendix demo runbook"
-        >
+        <section data-visibility="hidden" aria-label="Appendix demo runbook">
           <div class="ph-body">
             <ol>
               <li>
@@ -1378,9 +1483,15 @@
       });
 
       /* S4 staging: fragment clicks drive top/bottom state. Bottom clears each step. */
-      const S4_STAGES = ["is-stage-0", "is-stage-1", "is-stage-2", "is-stage-3", "is-stage-4"];
+      const S4_STAGES = [
+        "is-stage-0",
+        "is-stage-1",
+        "is-stage-2",
+        "is-stage-3",
+        "is-stage-4",
+      ];
       function setS4Stage(n) {
-        const s4 = document.getElementById("s4");
+        const s4 = document.querySelector("section[data-s4]");
         if (!s4) return;
         s4.classList.remove(...S4_STAGES);
         s4.classList.add("is-stage-" + n);
@@ -1398,7 +1509,9 @@
         const title = slide.classList.contains("ph-cover")
           ? ""
           : slide.getAttribute("aria-label") || "";
-        const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        const reduce = window.matchMedia(
+          "(prefers-reduced-motion: reduce)",
+        ).matches;
         if (!animate || reduce || el.textContent === title) {
           window.clearTimeout(titleTimer);
           el.classList.remove("is-swap");
@@ -1432,7 +1545,7 @@
 
       Reveal.on("ready", (e) => {
         setGlobalTitle(e.currentSlide);
-        Reveal.nextFragment();
+        //Reveal.nextFragment();
       });
       function s4Index(fragment) {
         return Array.prototype.indexOf.call(
@@ -1449,18 +1562,26 @@
         if (i > -1) setS4Stage(String(i));
       });
       Reveal.on("slidechanged", (e) => {
-        const s4 = document.getElementById("s4");
-        if (e.currentSlide && e.currentSlide.id === "s4") {
-          /* Re-entering S4: reveal keeps prior fragments visible; hide back to stage 0. */
-          Reveal.slide(Reveal.getIndices().h, 0, -1);
-          window.setTimeout(() => {
+        const s4 = document.querySelector("section[data-s4]");
+        const prev = e.previousSlide;
+        const onS4 = e.currentSlide && e.currentSlide.hasAttribute("data-s4");
+        if (onS4) {
+          if (prev && prev.compareDocumentPosition(s4) & 4) {
+            /* Forward entry (S3 -> S4): land clean at stage 0, no boxes.
+               No nested Reveal.slide: slidechanged fires before the fragment
+               step completes; re-entering here cancels the S4 transition. */
             setS4Stage("0");
-            Reveal.nextFragment();
-          }, 60);
-        } else if (s4 && !s4.classList.contains("is-stage-0")) {
+          } else if (prev) {
+            /* Backward entry (S5 -> S4): sync stage to visible fragments. */
+            const n = Array.prototype.filter.call(
+              document.querySelectorAll(".ph-s4-go"),
+              (f) => f.classList.contains("visible"),
+            ).length;
+            setS4Stage(String(n));
+          }
+        } else if (s4 && prev === s4 && !s4.classList.contains("is-stage-0")) {
+          /* Backing out of S4: parked slide resets to stage 0. */
           setS4Stage("0");
-        } else {
-          Reveal.nextFragment();
         }
         setGlobalTitle(e.currentSlide, true);
       });
