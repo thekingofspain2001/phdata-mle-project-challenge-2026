@@ -29,9 +29,10 @@ if TYPE_CHECKING:
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 EXAMPLES_CSV = REPO_ROOT / "src" / "data" / "future_unseen_examples.csv"
+sys.path.insert(0, str(Path(__file__).resolve().parent))  # so endpoints_v1_variants imports
 HOST = "127.0.0.1"
 PORT = 8936
-ENDPOINTS = ("/predict", "/predict/v2")
+ENDPOINTS = ("/predict", "/predict-noprint", "/predict-cached", "/predict/v2")
 
 type Scalar = str | int | float
 type Payload = dict[str, Scalar]
@@ -53,6 +54,12 @@ def load_app() -> FastAPI:
     if not isinstance(app, FastAPI):
         message = "src/main.py does not expose a FastAPI app"
         raise TypeError(message)
+    # Bench-only variants live beside this file so src/ stays untouched. Imported
+    # here because api.shared needs src/ on sys.path, which load_app sets first.
+    from endpoints_v1_variants import router_variants  # noqa: PLC0415
+
+    app.include_router(router_variants)
+
     return app
 
 
