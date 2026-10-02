@@ -529,12 +529,36 @@
       min-width: 12ch;
     }
 
+    /* Was/To side by side. Stacked, the taller To panel (419x750) ran past the
+       bottom of the slide; as columns each gets half the width and both stay
+       inside the pane, so the two read as a pair. */
     .ph-s8-input-validation {
       flex: 1 1 auto;
       min-height: 0;
       display: flex;
-      height: 100%;
       flex-direction: column;
+      height: 100%;
+    }
+
+    .ph-s8-input-validation .ph-shots {
+      flex: 1 1 auto;
+      min-height: 0;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--gap-md);
+      align-items: start;
+    }
+
+    .ph-shot {
+      margin: 0;
+      min-width: 0;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .ph-shot h4 {
+      margin-bottom: var(--sp-xs);
     }
 
     .ph-caps .ph-s8 .ph-s8-pane.fragment {
@@ -1026,15 +1050,15 @@
       text-decoration: none;
     }
 
+    /* Sized to fit the cell rather than stretched: the To capture is much taller
+       than the Was one, so `contain` keeps both fully readable side by side. */
     .input-validation {
-      flex: 1 1 auto;
-      background-size: contain;
-      /* Ensures the image fits within the area */
+      min-height: 0;
+      max-height: 100%;
+      width: 100%;
       background-repeat: no-repeat;
-      width: 90%;
-      height: auto;
-      background-size: 100% 100%;
-      justify-content: center;
+      background-position: top center;
+      background-size: contain;
     }
 
 
@@ -1833,10 +1857,16 @@
               <article class="fragment ph-s8-pane" data-fragment-index="2">
                 <div class="ph-s8-input-validation">
                   <h3>Input validation</h3>
-                  <h4>Was</h4>
-                  <div class="input-validation from"> </div>
-                  <h4>To</h4>
-                  <div class="input-validation to"></div>
+                  <div class="ph-shots">
+                    <figure class="ph-shot">
+                      <h4>Was</h4>
+                      <div class="input-validation from"></div>
+                    </figure>
+                    <figure class="ph-shot">
+                      <h4>To</h4>
+                      <div class="input-validation to"></div>
+                    </figure>
+                  </div>
 
                   <p>
                     Same eight fields. Swagger now demands one instead of eight,
