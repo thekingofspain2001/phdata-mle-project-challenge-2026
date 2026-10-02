@@ -1067,10 +1067,10 @@
         </header>
         <div class="ph-body ph-houses">
           <div class="ph-houses-top">
-            <svg id="houses-svg" class="houses-svg" viewBox="15 -80 1195 340" fill="none" role="img"
-              aria-label="Twelve houses in four groups of three, sorted smallest to largest">
+            <svg id="houses-svg" class="houses-svg" viewBox="15 -80 1195 340" fill="none" color="#BCCCD4"
+              role="img" aria-label="Twelve houses in four groups of three, sorted smallest to largest">
               <defs>
-                <g id="hs" stroke="#BCCCD4" stroke-width="3">
+                <g id="hs" stroke="currentColor" stroke-width="3">
                   <rect x="-20" y="-30" width="40" height="30" />
                   <path d="M-25 -30 L0 -48 L25 -30 Z" stroke-width="3" />
                   <rect x="-6" y="-16" width="12" height="16" />
@@ -1132,40 +1132,40 @@
               <line x1="35" y1="214" x2="1188" y2="214" stroke="#BCCCD4" stroke-width="1" opacity="0.4" />
               <!-- House size data (sqft, proportional to scale) -->
               <text x="54" y="232" text-anchor="middle" font-size="14" fill="#BCCCD4">
-                640
+                1235
               </text>
               <text x="98" y="232" text-anchor="middle" font-size="14" fill="#BCCCD4">
-                710
+                1300
               </text>
               <text x="142" y="232" text-anchor="middle" font-size="14" fill="#BCCCD4">
-                780
+                1365
               </text>
               <text x="241" y="232" text-anchor="middle" font-size="14" fill="#BCCCD4">
-                1060
+                1520
               </text>
               <text x="297" y="232" text-anchor="middle" font-size="14" fill="#BCCCD4">
-                1110
+                1600
               </text>
               <text x="353" y="232" text-anchor="middle" font-size="14" fill="#BCCCD4">
-                1170
+                1680
               </text>
               <text x="551" y="232" text-anchor="middle" font-size="14" fill="#BCCCD4">
-                1330
+                2090
               </text>
               <text x="619" y="232" text-anchor="middle" font-size="14" fill="#BCCCD4">
-                1390
+                2200
               </text>
               <text x="687" y="232" text-anchor="middle" font-size="14" fill="#BCCCD4">
-                1460
+                2310
               </text>
               <text x="984" y="232" text-anchor="middle" font-size="14" fill="#BCCCD4">
-                1660
+                3610
               </text>
               <text x="1066" y="232" text-anchor="middle" font-size="14" fill="#BCCCD4">
-                1740
+                3800
               </text>
               <text x="1148" y="232" text-anchor="middle" font-size="14" fill="#BCCCD4">
-                1830
+                3990
               </text>
               <!-- Input boxes: dashed eq inputs on the housing line, fade per fragment -->
               <rect id="bx-avg" class="bx" x="16" y="116" width="1190" height="132" fill="none" stroke="var(--av)"
@@ -1183,7 +1183,7 @@
                   Avg
                 </text>
                 <text x="380" y="30" text-anchor="middle" font-size="16" fill="var(--av)" stroke="none">
-                  1211
+                  2225
                 </text>
                 <line x1="380" y1="44" x2="380" y2="108" stroke-width="2" marker-end="url(#arr-av)" />
               </g>
@@ -1196,7 +1196,7 @@
                   Med
                 </text>
                 <text x="455" y="30" text-anchor="middle" font-size="16" fill="var(--md)" stroke="none">
-                  1250
+                  1885
                 </text>
                 <line x1="455" y1="44" x2="455" y2="108" stroke-width="2" marker-end="url(#arr-md)" />
               </g>
@@ -1209,7 +1209,7 @@
                   NN(5)
                 </text>
                 <text x="900" y="30" text-anchor="middle" font-size="16" fill="var(--knn)" stroke="none">
-                  1740
+                  3468
                 </text>
                 <line x1="900" y1="44" x2="900" y2="108" stroke-width="2" marker-end="url(#arr-knn)" />
               </g>
@@ -1232,9 +1232,16 @@
                 <div class="ph-panel-pick">
                   <svg viewBox="0 0 260 120" fill="none" stroke="var(--av)" stroke-width="3" role="img"
                     aria-label="Single average-size house">
-                    <use href="#hs" transform="translate(100,95) scale(1.44)" />
-                    <text x="100" y="20" text-anchor="middle" font-size="14" fill="var(--av)" stroke="none">
-                      AVG 1211 = Σ14530/12
+                    <use href="#hs" transform="translate(130,102) scale(1.05)" />
+                    <text x="130" y="14" text-anchor="middle" font-size="10" fill="var(--av)" stroke="none">
+                      =AVERAGE(1235,1300,1365,1520,1600,1680,
+                    </text>
+                    <text x="130" y="27" text-anchor="middle" font-size="10" fill="var(--av)" stroke="none">
+                      2090,2200,2310,3610,3800,3990)
+                    </text>
+                    <text x="130" y="47" text-anchor="middle" font-size="14" font-weight="700" fill="var(--av)"
+                      stroke="none">
+                      = 2225
                     </text>
                   </svg>
                 </div>
@@ -1250,9 +1257,16 @@
                 <div class="ph-panel-pick">
                   <svg viewBox="0 0 260 120" fill="none" stroke="var(--md)" stroke-width="3" role="img"
                     aria-label="Single middle-size house">
-                    <use href="#hs" transform="translate(100,95) scale(1.4)" />
-                    <text x="100" y="20" text-anchor="middle" font-size="14" fill="var(--md)" stroke="none">
-                      MED 1250 = mid(1170,1330)
+                    <use href="#hs" transform="translate(130,102) scale(1.05)" />
+                    <text x="130" y="14" text-anchor="middle" font-size="10" fill="var(--md)" stroke="none">
+                      =MEDIAN(1235,1300,1365,1520,1600,1680,
+                    </text>
+                    <text x="130" y="27" text-anchor="middle" font-size="10" fill="var(--md)" stroke="none">
+                      2090,2200,2310,3610,3800,3990)
+                    </text>
+                    <text x="130" y="47" text-anchor="middle" font-size="14" font-weight="700" fill="var(--md)"
+                      stroke="none">
+                      = 1885
                     </text>
                   </svg>
                 </div>
@@ -1268,41 +1282,50 @@
                 <div class="ph-panel-pick">
                   <svg viewBox="0 0 300 120" fill="none" stroke="var(--knn)" stroke-width="3" role="img"
                     aria-label="Five similar houses and the blank">
-                    <g transform="translate(35,95) scale(0.9)">
+                    <g transform="translate(35,112) scale(0.62)">
                       <use href="#hs" />
                     </g>
-                    <g transform="translate(92,95) scale(1.0)">
+                    <g transform="translate(92,112) scale(0.68)">
                       <use href="#hs" />
                     </g>
-                    <g transform="translate(150,95) scale(1.15)">
+                    <g transform="translate(150,112) scale(0.78)">
                       <use href="#hs" />
                     </g>
-                    <g transform="translate(208,95) scale(1.0)">
+                    <g transform="translate(208,112) scale(0.68)">
                       <use href="#hs" />
                     </g>
-                    <g transform="translate(265,95) scale(0.9)">
+                    <g transform="translate(265,112) scale(0.62)">
                       <use href="#hs" />
                     </g>
-                    <text x="150" y="20" text-anchor="middle" font-size="14" fill="var(--knn)" stroke="none">
-                      NN(5) &#8594; 1740 = w-avg(5)
+                    <text x="150" y="10" text-anchor="middle" font-size="9" fill="var(--knn)" stroke="none">
+                      =SUMPRODUCT({3800;3610;2310;2200;2090},
+                    </text>
+                    <text x="150" y="22" text-anchor="middle" font-size="9" fill="var(--knn)" stroke="none">
+                      {1/190;1/380;1/1680;1/1790;1/1900})
+                    </text>
+                    <text x="150" y="34" text-anchor="middle" font-size="9" fill="var(--knn)" stroke="none">
+                      /SUM({1/190;1/380;1/1680;1/1790;1/1900})
+                    </text>
+                    <text x="150" y="54" text-anchor="middle" font-size="14" font-weight="700" fill="var(--knn)"
+                      stroke="none">
+                      = 3468
                     </text>
                   </svg>
                 </div>
               </article>
               <article class="ph-panel ph-is-sum">
                 <div class="ph-panel-words">
-                  <h3>Summary: similar homes win</h3>
+                  <h3>Summary: which value to fill</h3>
                   <p>
-                    Average and middle value give every blank the same
-                    city-wide guess. Similar homes adapt to the house —
-                    price-moving fields
-                    <span data-metric="knn.range">14–17% closer</span> than
-                    averages.
+                    Average and middle give every blank one city-wide number.
+                    Similar homes answer per street — and on the fields that
+                    move price, that measures
+                    <span data-metric="knn.range">8–21% closer</span>.
                   </p>
                 </div>
                 <div class="ph-panel-pick">
                   <p class="ph-panel-nums">
-                    AVG 1211 &#183; MED 1250 &#183; NN(5) &#8594; 1740
+                    AVG 2225 &#183; MED 1885 &#183; NN(5) 3468
                   </p>
                 </div>
               </article>
@@ -1318,51 +1341,85 @@
       </section>
 
       <!-- S5 Winner. -->
-      <section aria-label="Why similar homes won">
+      <section aria-label="What the test actually showed">
         <header class="ph-head">
-          <h2>Why similar homes won</h2>
+          <h2>What the test actually showed</h2>
         </header>
         <div class="ph-body">
-          <div class="ph-cols">
+          <div class="ph-cols ph-is-stack">
             <article class="fragment">
-              <h3>Problem</h3>
+              <h3>How it was tested</h3>
               <p>
-                Averages ignore the house in front of us. A flat and a family
-                home get the same guess.
+                21,613 sales, 15% of every numeric field blanked at random,
+                zipcode held back. Mean, median and NN(5) distance-weighted
+                each refilled the blanks; error measured against the values we
+                hid. 17 fields, one seed.
               </p>
             </article>
             <article class="fragment">
-              <h3>Impact</h3>
-              <p>
-                Similar homes track the features that move price: size, grade,
-                age, bathrooms.
-              </p>
-            </article>
-            <article class="fragment">
-              <h3>Savings</h3>
-              <ul class="ph-bars">
-                <li>
-                  Upper floor area
-                  <span data-metric="knn.sqftAbove">17% closer</span><meter min="0" max="20" value="17">17 of 20</meter>
-                </li>
-                <li>
-                  Bathrooms <span data-metric="knn.bathrooms">16% closer</span><meter min="0" max="20" value="16">16 of
-                    20</meter>
-                </li>
-                <li>
-                  Floors <span data-metric="knn.floors">15% closer</span><meter min="0" max="20" value="15">15 of
-                    20</meter>
-                </li>
-                <li>
-                  Grade <span data-metric="knn.grade">14% closer</span><meter min="0" max="20" value="14">14 of
-                    20</meter>
-                </li>
-              </ul>
+              <h3>Accuracy by field</h3>
+              <table class="ph-table">
+                <thead>
+                  <tr>
+                    <th scope="col">Field</th>
+                    <th scope="col">Most accurate</th>
+                    <th scope="col">KNN edge</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">Grade</th>
+                    <td>KNN</td>
+                    <td>21%</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Bathrooms</th>
+                    <td>KNN</td>
+                    <td>13%</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Floors</th>
+                    <td>KNN</td>
+                    <td>13%</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Year built</th>
+                    <td>KNN</td>
+                    <td>11%</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Living area, nearby homes</th>
+                    <td>KNN</td>
+                    <td>9%</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Living area</th>
+                    <td>KNN</td>
+                    <td>8%</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Longitude</th>
+                    <td>KNN</td>
+                    <td>2%</td>
+                  </tr>
+                  <tr class="ph-muted">
+                    <th scope="row">Ten other fields</th>
+                    <td>Mean or median</td>
+                    <td>up to 22% ahead</td>
+                  </tr>
+                  <tr class="ph-muted">
+                    <th scope="row">Average error, all 17 fields</th>
+                    <td>Median</td>
+                    <td>KNN last</td>
+                  </tr>
+                </tbody>
+              </table>
             </article>
           </div>
           <p class="ph-foot fragment">
-            Caveat: the headline average hides this — two plot-size fields
-            with wild outliers swamp it.
+            Read honestly: KNN wins the size and grade fields it was chosen
+            for, and loses overall. It ships because those are the fields that
+            move price — not because it won the experiment.
           </p>
         </div>
       </section>
@@ -1769,11 +1826,11 @@
       nnr: { recovered: "10–20%" },
       knn: {
         k: "5",
-        range: "14–17% closer",
-        sqftAbove: "17% closer",
-        bathrooms: "16% closer",
-        floors: "15% closer",
-        grade: "14% closer",
+        range: "8–21% closer",
+        sqftAbove: "9% closer",
+        bathrooms: "13% closer",
+        floors: "13% closer",
+        grade: "21% closer",
       },
     };
 
