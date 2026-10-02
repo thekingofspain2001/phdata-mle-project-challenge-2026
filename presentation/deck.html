@@ -965,20 +965,30 @@
               <h3>Performance</h3>
               <div class="ph-cols">
                 <article>
-                  <h4>Reload per request</h4>
+                  <h4>Cost per call</h4>
                   <p>
-                    Model, maps and comparables come off disk on every call.
-                    <span data-metric="perf.v1p50">56 ms</span> typical,
-                    <span data-metric="perf.v1p95">79 ms</span> slow tail.
+                    Loading artifacts cost
+                    <span data-metric="perf.reload">6 ms</span>. A stray debug
+                    print cost <span data-metric="perf.logging">28 ms</span> —
+                    the real drag.
                   </p>
                 </article>
                 <article>
-                  <h4>Load once at startup</h4>
+                  <h4>Blocking</h4>
                   <p>
-                    Artifacts stay in memory for the life of the process. Same
-                    answers,
-                    <span data-metric="perf.v2p50">9 ms</span> typical,
-                    <span data-metric="perf.v2p95">13 ms</span> slow tail.
+                    Moving off the event loop gave
+                    <span data-metric="perf.blocking">no gain</span> on a single
+                    request. It buys headroom, not speed.
+                  </p>
+                </article>
+                <article>
+                  <h4>Overall</h4>
+                  <p>
+                    Typical call
+                    <span data-metric="perf.v1p50">36 ms</span> to
+                    <span data-metric="perf.v2p50">9 ms</span>;
+                    <span data-metric="perf.v1rps">26</span> to
+                    <span data-metric="perf.v2rps">102</span> requests a second.
                   </p>
                 </article>
               </div>
@@ -1430,38 +1440,80 @@
           <h2>Faster answers</h2>
         </header>
         <div class="ph-body">
-          <div class="ph-cols">
+          <div class="ph-cols ph-is-stack">
             <article class="fragment">
-              <h3>Before</h3>
-              <p>
-                Every request reloaded the model, the maps and the comparables
-                from disk. The handler was <code>async</code>, so that work ran
-                on the event loop and blocked every other request behind it.
-              </p>
+              <h3>What actually changed</h3>
+              <div class="ph-cols">
+                <article>
+                  <h4>Load once at startup</h4>
+                  <p>
+                    Model, features and demographics load into memory when the
+                    process starts. No file I/O per request. The reload itself
+                    cost <span data-metric="perf.reload">6 ms</span> a call.
+                  </p>
+                </article>
+                <article>
+                  <h4>Dropped the debug print</h4>
+                  <p>
+                    v1 did <code>print(input_data)</code> on every call. That
+                    alone was <span data-metric="perf.logging">28 ms</span> —
+                    more than everything else combined.
+                  </p>
+                </article>
+                <article>
+                  <h4>async &#8594; sync handler</h4>
+                  <p>
+                    Plain <code>def</code> runs in the threadpool. Measured on
+                    one request: <span data-metric="perf.blocking">no gain</span>.
+                    It stops the loop stalling; it does not add throughput.
+                  </p>
+                </article>
+              </div>
             </article>
             <article class="fragment">
-              <h3>After</h3>
-              <p>
-                Artifacts load once at startup and stay in memory — no file
-                I/O per request. The handler is now plain <code>def</code>,
-                which FastAPI runs in its worker threadpool instead of on the
-                event loop, so one slow prediction no longer stalls the rest.
-              </p>
-            </article>
-            <article class="fragment">
-              <h3>Measured</h3>
-              <p>
-                Over the 100 unseen examples: typical
-                <span data-metric="perf.v1p50">36 ms</span> down to
-                <span data-metric="perf.v2p50">9 ms</span>. Slow tail
-                <span data-metric="perf.v1p95">48 ms</span> down to
-                <span data-metric="perf.v2p95">14 ms</span>.
-              </p>
+              <h3>Measured, 100 unseen examples</h3>
+              <table class="ph-table">
+                <thead>
+                  <tr>
+                    <th scope="col">Test</th>
+                    <th scope="col">/predict</th>
+                    <th scope="col">/predict/v2</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">Serial p50</th>
+                    <td>36 ms</td>
+                    <td>9 ms</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Serial p95</th>
+                    <td>48 ms</td>
+                    <td>12 ms</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Serial throughput</th>
+                    <td>26 rps</td>
+                    <td>102 rps</td>
+                  </tr>
+                  <tr class="ph-muted">
+                    <th scope="row">8 callers, p50</th>
+                    <td>443 ms</td>
+                    <td>96 ms</td>
+                  </tr>
+                  <tr class="ph-muted">
+                    <th scope="row">8 callers, throughput</th>
+                    <td>18 rps</td>
+                    <td>80 rps</td>
+                  </tr>
+                </tbody>
+              </table>
             </article>
           </div>
           <p class="ph-foot fragment">
-            Serial, single client, one machine. Under 8 concurrent callers both
-            slow down: the work is CPU-bound, so threads do not add throughput.
+            Median of 3 runs, 100 rows, single machine. Concurrency makes both
+            endpoints worse — prediction is CPU-bound, so threads only spread
+            the same work across waiting callers.
           </p>
         </div>
       </section>
@@ -1822,7 +1874,17 @@
   <script>
     /* Single source for every number on the slides. Edit here, all renders update. */
     const DECK_METRICS = {
-      perf: { v1p50: "36 ms", v1p95: "48 ms", v2p50: "9 ms", v2p95: "14 ms" },
+      perf: {
+        v1p50: "36 ms",
+        v1p95: "48 ms",
+        v2p50: "9 ms",
+        v2p95: "12 ms",
+        v1rps: "26",
+        v2rps: "102",
+        reload: "6 ms",
+        logging: "28 ms",
+        blocking: "no gain",
+      },
       nnr: { recovered: "10–20%" },
       knn: {
         k: "5",
