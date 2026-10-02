@@ -34,6 +34,7 @@
       --fs-brand: 16px;
       --fs-h1: 52px;
       --fs-h2: 29px;
+      --fs-sub: 26px;
       --fs-h3: 21px;
       --fs-lead: 22px;
       --fs-body: 18px;
@@ -492,10 +493,10 @@
 
     /* Shared sub-slide title: one step below the slide title, accent-colored
          per context. Right-aligned under the title. */
-    .ph-subtitle {
+    .reveal .ph-subtitle {
       margin: 0;
       text-align: right;
-      font-size: var(--fs-h3);
+      font-size: var(--fs-sub);
       font-weight: 400;
       line-height: 1.25;
       color: var(--ph-mint);
@@ -508,9 +509,9 @@
          fragments, CSS reacts to reveal's .visible — no JS staging. */
     .ph-subs {
       display: grid;
-      margin-top: var(--sp-xs);
+      margin-top: calc(var(--sp-xs) * 0.5);
       margin-bottom: 0;
-      min-height: calc(var(--fs-h3) * 1.3);
+      min-height: calc(var(--fs-sub) * 1.3);
     }
 
     .ph-subs>* {
@@ -523,21 +524,13 @@
 
     section[data-s4]:has(.ph-s4-go:nth-of-type(1).visible):not(:has(.ph-s4-go:nth-of-type(2).visible)) .ph-s4-sub.ph-is-av,
     section[data-s4]:has(.ph-s4-go:nth-of-type(2).visible):not(:has(.ph-s4-go:nth-of-type(3).visible)) .ph-s4-sub.ph-is-md,
-    section[data-s4]:has(.ph-s4-go:nth-of-type(3).visible):not(:has(.ph-s4-go:nth-of-type(4).visible)) .ph-s4-sub.ph-is-knn {
+    section[data-s4]:has(.ph-s4-go:nth-of-type(3).visible):not(:has(.ph-s4-go:nth-of-type(4).visible)) .ph-s4-sub.ph-is-knn,
+    section[data-s4]:has(.ph-s4-go:nth-of-type(4).visible) .ph-s4-sub.ph-is-sum {
       display: block;
     }
 
-    .ph-is-av {
-      color: var(--av);
-    }
-
-    .ph-is-md {
-      color: var(--md);
-    }
-
-    .ph-is-knn {
-      color: var(--knn);
-    }
+    /* Subtitle color is set once on .reveal .ph-subtitle; .ph-is-* only
+       names the stage. Panels keep their own per-approach accents. */
 
     .ph-stage-hint {
       color: var(--ph-ink-muted);
@@ -563,10 +556,11 @@
         transform var(--ph-t-slide) var(--ph-ease);
     }
 
-    /* Per-stage eq houses + input boxes; summary shows all three, winners big. */
+    /* Per-stage eq houses + input boxes. KNN stands alone at full size;
+       the summary shows all three at full size too. */
     section[data-s4]:has(.ph-s4-go:nth-of-type(1).visible):not(:has(.ph-s4-go:nth-of-type(2).visible)) #mk-avg,
     section[data-s4]:has(.ph-s4-go:nth-of-type(2).visible):not(:has(.ph-s4-go:nth-of-type(3).visible)) #mk-med,
-    section[data-s4]:has(.ph-s4-go:nth-of-type(3).visible):not(:has(.ph-s4-go:nth-of-type(4).visible)) #mk-knn,
+    section[data-s4]:has(.ph-s4-go:nth-of-type(3).visible) #mk-knn,
     section[data-s4]:has(.ph-s4-go:nth-of-type(4).visible) #mk-avg,
     section[data-s4]:has(.ph-s4-go:nth-of-type(4).visible) #mk-med,
     section[data-s4]:has(.ph-s4-go:nth-of-type(4).visible) #mk-knn {
@@ -575,18 +569,12 @@
 
     section[data-s4]:has(.ph-s4-go:nth-of-type(1).visible):not(:has(.ph-s4-go:nth-of-type(2).visible)) #bx-avg,
     section[data-s4]:has(.ph-s4-go:nth-of-type(2).visible):not(:has(.ph-s4-go:nth-of-type(3).visible)) #bx-med,
-    section[data-s4]:has(.ph-s4-go:nth-of-type(3).visible):not(:has(.ph-s4-go:nth-of-type(4).visible)) #bx-knn,
-    section[data-s4]:has(.ph-s4-go:nth-of-type(4).visible) #bx-knn {
+    section[data-s4]:has(.ph-s4-go:nth-of-type(3).visible) #bx-knn {
       opacity: 1;
     }
 
-    section[data-s4]:has(.ph-s4-go:nth-of-type(4).visible) #mk-avg,
-    section[data-s4]:has(.ph-s4-go:nth-of-type(4).visible) #mk-med {
-      transform: scale(0.72);
-    }
-
-    section[data-s4]:has(.ph-s4-go:nth-of-type(4).visible) #mk-knn {
-      transform: scale(1.25);
+    section[data-s4]:has(.ph-s4-go:nth-of-type(3).visible) #mk-knn {
+      transform: translateY(22px) scale(1.35);
     }
 
     .ph-stage-bottom {
@@ -837,6 +825,84 @@
       text-decoration: none;
     }
 
+    /* S8 chip 03: Swagger UI's own model view, rebuilt in the deck's markup.
+       Mirrors swagger-ui's json-schema-2020-12 panels: light panel on the dark
+       slide, monospace field names, mint types, red required asterisk. */
+    .ph-sw {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--gap-md);
+      align-items: start;
+    }
+
+    .ph-sw-panel {
+      background-color: #ffffff;
+      color: #3b4151;
+      border-radius: 4px;
+      padding: 10px 12px;
+      font-size: var(--fs-caption);
+      line-height: 1.5;
+      text-align: left;
+    }
+
+    .ph-sw-title {
+      font-size: var(--fs-body);
+      font-weight: 700;
+      color: #3b4151;
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: var(--sp-xs);
+    }
+
+    .ph-sw-desc {
+      color: #6b6b7b;
+      font-size: var(--fs-caption);
+      margin: 2px 0 var(--sp-xs);
+      border-bottom: 1px solid #ebebeb;
+      padding-bottom: var(--sp-xs);
+    }
+
+    .ph-sw-row {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+      font-family: "SFMono-Regular", Consolas, monospace;
+      padding: 1px 0 1px 8px;
+      border-left: 1px dotted #c8c8d4;
+    }
+
+    .ph-sw-field {
+      background-color: #f7f7f9;
+      border-radius: 3px;
+      padding: 0 4px;
+      font-weight: 600;
+    }
+
+    .ph-sw-req {
+      color: #eb5757;
+      font-weight: 700;
+    }
+
+    .ph-sw-type {
+      color: #55a793;
+      font-weight: 600;
+    }
+
+    .ph-sw-badge {
+      background-color: #c60;
+      color: #ffffff;
+      border-radius: 3px;
+      padding: 0 5px;
+      font-weight: 600;
+    }
+
+    /* .ph-cols p paints body copy in muted light ink, which vanishes on the
+       light Swagger panels; put the dark ink back. */
+    .ph-sw-panel p {
+      color: #3b4151;
+    }
+
     .reveal .slide-number a {
       text-decoration: none;
     }
@@ -897,11 +963,59 @@
             </article>
             <article>
               <h3>Performance</h3>
-              <div></div>
+              <div class="ph-cols">
+                <article>
+                  <h4>Reload per request</h4>
+                  <p>
+                    Model, maps and comparables come off disk on every call.
+                    <span data-metric="perf.v1p50">56 ms</span> typical,
+                    <span data-metric="perf.v1p95">79 ms</span> slow tail.
+                  </p>
+                </article>
+                <article>
+                  <h4>Load once at startup</h4>
+                  <p>
+                    Artifacts stay in memory for the life of the process. Same
+                    answers,
+                    <span data-metric="perf.v2p50">9 ms</span> typical,
+                    <span data-metric="perf.v2p95">13 ms</span> slow tail.
+                  </p>
+                </article>
+              </div>
             </article>
             <article>
               <h3>Modernization</h3>
-              <div></div>
+              <div class="ph-cols">
+                <article>
+                  <h4>Runtime</h4>
+                  <p>
+                    Python 3.10 &#8594; 3.14, FastAPI 0.85 &#8594; 0.141,
+                    pydantic 1.10 &#8594; 2.13, pip &#8594; uv.
+                  </p>
+                </article>
+                <article>
+                  <h4>Type hints</h4>
+                  <p>
+                    Untyped <code>predict</code> becomes a typed
+                    <code>predict_v2</code> returning
+                    <code>PredictionResponse</code>.
+                  </p>
+                </article>
+                <article>
+                  <h4>Validation</h4>
+                  <p>
+                    Fields optional and nullable, zipcode pattern-checked: one
+                    required field instead of eight.
+                  </p>
+                </article>
+                <article>
+                  <h4>Swagger</h4>
+                  <p>
+                    Named response models, worked examples, and
+                    <code>ErrorDetail</code> on 404 and 500.
+                  </p>
+                </article>
+              </div>
             </article>
           </div>
         </div>
@@ -948,6 +1062,7 @@
             <p class="ph-subtitle ph-s4-sub ph-is-av">Average Value</p>
             <p class="ph-subtitle ph-s4-sub ph-is-md">Mean value</p>
             <p class="ph-subtitle ph-s4-sub ph-is-knn">Nearest Neighbor</p>
+            <p class="ph-subtitle ph-s4-sub ph-is-sum">Summary: similar homes win</p>
           </div>
         </header>
         <div class="ph-body ph-houses">
@@ -1068,7 +1183,7 @@
                   Avg
                 </text>
                 <text x="380" y="30" text-anchor="middle" font-size="16" fill="var(--av)" stroke="none">
-                  1211 sq ft
+                  1211
                 </text>
                 <line x1="380" y1="44" x2="380" y2="108" stroke-width="2" marker-end="url(#arr-av)" />
               </g>
@@ -1081,7 +1196,7 @@
                   Med
                 </text>
                 <text x="455" y="30" text-anchor="middle" font-size="16" fill="var(--md)" stroke="none">
-                  1250 sq ft
+                  1250
                 </text>
                 <line x1="455" y1="44" x2="455" y2="108" stroke-width="2" marker-end="url(#arr-md)" />
               </g>
@@ -1091,10 +1206,10 @@
                   <use href="#hs" />
                 </g>
                 <text x="900" y="-66" text-anchor="middle" font-size="20" fill="var(--knn)" stroke="none">
-                  5-NN
+                  NN(5)
                 </text>
                 <text x="900" y="30" text-anchor="middle" font-size="16" fill="var(--knn)" stroke="none">
-                  1740 sq ft
+                  1740
                 </text>
                 <line x1="900" y1="44" x2="900" y2="108" stroke-width="2" marker-end="url(#arr-knn)" />
               </g>
@@ -1169,7 +1284,7 @@
                       <use href="#hs" />
                     </g>
                     <text x="150" y="20" text-anchor="middle" font-size="14" fill="var(--knn)" stroke="none">
-                      5-NN → 1740 = w-avg(5)
+                      NN(5) &#8594; 1740 = w-avg(5)
                     </text>
                   </svg>
                 </div>
@@ -1180,12 +1295,14 @@
                   <p>
                     Average and middle value give every blank the same
                     city-wide guess. Similar homes adapt to the house —
-                    price-moving fields [knn.range] than averages.
+                    price-moving fields
+                    <span data-metric="knn.range">14–17% closer</span> than
+                    averages.
                   </p>
                 </div>
                 <div class="ph-panel-pick">
                   <p class="ph-panel-nums">
-                    AVG 1211 · MED 1250 · 5-NN → 1740
+                    AVG 1211 &#183; MED 1250 &#183; NN(5) &#8594; 1740
                   </p>
                 </div>
               </article>
@@ -1258,33 +1375,36 @@
         <div class="ph-body">
           <div class="ph-cols">
             <article class="fragment">
-              <h3>Problem</h3>
+              <h3>Before</h3>
               <p>
-                Every request reloads the model, the maps, and the comparables
-                from disk. Under load, that queues up.
+                Every request reloaded the model, the maps and the comparables
+                from disk. The handler was <code>async</code>, so that work ran
+                on the event loop and blocked every other request behind it.
               </p>
             </article>
             <article class="fragment">
-              <h3>Impact</h3>
+              <h3>After</h3>
               <p>
-                Agents wait on every valuation. Peak traffic makes every
-                answer slower.
+                Artifacts load once at startup and stay in memory — no file
+                I/O per request. The handler is now plain <code>def</code>,
+                which FastAPI runs in its worker threadpool instead of on the
+                event loop, so one slow prediction no longer stalls the rest.
               </p>
             </article>
             <article class="fragment">
-              <h3>Savings</h3>
+              <h3>Measured</h3>
               <p>
-                Load once when the service wakes, serve from memory. Typical
-                <span data-metric="perf.v1p50">56 ms</span> down to
+                Over the 100 unseen examples: typical
+                <span data-metric="perf.v1p50">36 ms</span> down to
                 <span data-metric="perf.v2p50">9 ms</span>. Slow tail
-                <span data-metric="perf.v1p95">79 ms</span> down to
-                <span data-metric="perf.v2p95">13 ms</span>.
+                <span data-metric="perf.v1p95">48 ms</span> down to
+                <span data-metric="perf.v2p95">14 ms</span>.
               </p>
             </article>
           </div>
           <p class="ph-foot fragment">
-            Local harness, 30 repeated calls, same machine — not a production
-            promise.
+            Serial, single client, one machine. Under 8 concurrent callers both
+            slow down: the work is CPU-bound, so threads do not add throughput.
           </p>
         </div>
       </section>
@@ -1323,19 +1443,19 @@
           <div class="ph-s8">
             <ol class="ph-scr ph-s8-chips">
               <li class="ph-s8-chip fragment" data-fragment-index="0">
-                <span class="ph-num">01</span>
+                <span class="ph-num">1</span>
                 <span>Runtime</span>
               </li>
               <li class="ph-s8-chip fragment" data-fragment-index="1">
-                <span class="ph-num">02</span>
+                <span class="ph-num">2</span>
                 <span>Type hints</span>
               </li>
               <li class="ph-s8-chip fragment" data-fragment-index="2">
-                <span class="ph-num">03</span>
+                <span class="ph-num">3</span>
                 <span>Input validation</span>
               </li>
               <li class="ph-s8-chip fragment" data-fragment-index="3">
-                <span class="ph-num">04</span>
+                <span class="ph-num">4</span>
                 <span>Swagger schema</span>
               </li>
             </ol>
@@ -1436,6 +1556,11 @@
               </article>
               <article class="fragment ph-s8-pane" data-fragment-index="1">
                 <h3>Type hints</h3>
+                <p>
+                  Hints state what each argument and the reply must be. The
+                  editor and type checker flag a wrong call before it runs, and
+                  FastAPI reads them to build the OpenAPI schema.
+                </p>
                 <h4>Was</h4>
                 <pre class="ph-code"><code class="language-python">def predict(home_features):</code></pre>
                 <h4>Now</h4>
@@ -1443,37 +1568,141 @@
     home_features: HomeFeaturesV2,
     request: Request,
 ) -&gt; PredictionResponse:</code></pre>
-
-
-               
               </article>
               <article class="fragment ph-s8-pane" data-fragment-index="2">
                 <h3>Input validation</h3>
-                <h4>Was</h4>
-                <pre class="ph-code"><code class="language-python">class HomeFeatures:
-    bedrooms: int
-    bathrooms: float
-    sqft_living: float
-    ...
-    zipcode: str</code></pre>
-                <h4>Now</h4>
-                <pre class="ph-code"><code class="language-python">class HomeFeaturesV2:
-    bedrooms: int | None = None
-    bathrooms: float | None = None
-    sqft_living: float | None = None
-    ...
-    zipcode: str = Field(pattern=r"^\d{5}$")</code></pre>
+                <div class="ph-sw">
+                  <div class="ph-sw-panel">
+                    <p class="ph-sw-title">
+                      <span>HomeFeatures</span>
+                      <span class="ph-sw-type">object</span>
+                    </p>
+                    <p class="ph-sw-desc">Input features for home price prediction.</p>
+                    <div class="ph-sw-row">
+                      <span class="ph-sw-field">bedrooms</span>
+                      <span class="ph-sw-req">*</span>
+                      <span class="ph-sw-type">integer</span>
+                    </div>
+                    <div class="ph-sw-row">
+                      <span class="ph-sw-field">bathrooms</span>
+                      <span class="ph-sw-req">*</span>
+                      <span class="ph-sw-type">number</span>
+                    </div>
+                    <div class="ph-sw-row">
+                      <span class="ph-sw-field">sqft_living</span>
+                      <span class="ph-sw-req">*</span>
+                      <span class="ph-sw-type">number</span>
+                    </div>
+                    <div class="ph-sw-row">
+                      <span class="ph-sw-field">sqft_lot</span>
+                      <span class="ph-sw-req">*</span>
+                      <span class="ph-sw-type">number</span>
+                    </div>
+                    <div class="ph-sw-row">
+                      <span class="ph-sw-field">floors</span>
+                      <span class="ph-sw-req">*</span>
+                      <span class="ph-sw-type">number</span>
+                    </div>
+                    <div class="ph-sw-row">
+                      <span class="ph-sw-field">sqft_above</span>
+                      <span class="ph-sw-req">*</span>
+                      <span class="ph-sw-type">number</span>
+                    </div>
+                    <div class="ph-sw-row">
+                      <span class="ph-sw-field">sqft_basement</span>
+                      <span class="ph-sw-req">*</span>
+                      <span class="ph-sw-type">number</span>
+                    </div>
+                    <div class="ph-sw-row">
+                      <span class="ph-sw-field">zipcode</span>
+                      <span class="ph-sw-req">*</span>
+                      <span class="ph-sw-type">string</span>
+                    </div>
+                  </div>
+                  <div class="ph-sw-panel">
+                    <p class="ph-sw-title">
+                      <span>HomeFeaturesV2</span>
+                      <span class="ph-sw-type">object</span>
+                    </p>
+                    <p class="ph-sw-desc">
+                      Input features for home price prediction v2; non-zipcode
+                      fields nullable.
+                    </p>
+                    <div class="ph-sw-row">
+                      <span class="ph-sw-field">bedrooms</span>
+                      <span class="ph-sw-type">(integer | null)</span>
+                    </div>
+                    <div class="ph-sw-row">
+                      <span class="ph-sw-field">bathrooms</span>
+                      <span class="ph-sw-type">(number | null)</span>
+                    </div>
+                    <div class="ph-sw-row">
+                      <span class="ph-sw-field">sqft_living</span>
+                      <span class="ph-sw-type">(number | null)</span>
+                    </div>
+                    <div class="ph-sw-row">
+                      <span class="ph-sw-field">sqft_lot</span>
+                      <span class="ph-sw-type">(number | null)</span>
+                    </div>
+                    <div class="ph-sw-row">
+                      <span class="ph-sw-field">floors</span>
+                      <span class="ph-sw-type">(number | null)</span>
+                    </div>
+                    <div class="ph-sw-row">
+                      <span class="ph-sw-field">sqft_above</span>
+                      <span class="ph-sw-type">(number | null)</span>
+                    </div>
+                    <div class="ph-sw-row">
+                      <span class="ph-sw-field">sqft_basement</span>
+                      <span class="ph-sw-type">(number | null)</span>
+                    </div>
+                    <div class="ph-sw-row">
+                      <span class="ph-sw-field">zipcode</span>
+                      <span class="ph-sw-req">*</span>
+                      <span class="ph-sw-type">string</span>
+                      <span class="ph-sw-badge">matches ^\d{5}$</span>
+                    </div>
+                  </div>
+                </div>
+                <p>
+                  Same eight fields. Swagger now demands one instead of eight,
+                  and every optional field still carries its bounds check.
+                </p>
               </article>
               <article class="fragment ph-s8-pane" data-fragment-index="3">
                 <h3>Swagger schema</h3>
-                <h4>Was</h4>
-                <p>
-                  v1 <code>/predict</code>: generic object, no error model
-                  stated in the docs.
-                </p>
-                <h4>Now</h4>
+                <table class="ph-table">
+                  <thead>
+                    <tr>
+                      <th scope="col">Response</th>
+                      <th scope="col">Was — /predict</th>
+                      <th scope="col">Now — /predict/v2</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <th scope="row">200 schema</th>
+                      <td>unnamed object, any number keys</td>
+                      <td>named model <code>PredictionResponse</code></td>
+                    </tr>
+                    <tr>
+                      <th scope="row">Declared fields</th>
+                      <td class="ph-muted">none</td>
+                      <td><code>predicted_price</code>: number, required</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">Example</th>
+                      <td class="ph-muted">none</td>
+                      <td>394708.0</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">Errors</th>
+                      <td>422</td>
+                      <td>404, 500 &#8594; <code>ErrorDetail</code></td>
+                    </tr>
+                  </tbody>
+                </table>
                 <pre class="ph-code"><code>{"predicted_price": 394708.0}</code></pre>
-                <p>404/500 &#8594; <code>ErrorDetail</code> as returned.</p>
               </article>
             </div>
           </div>
@@ -1536,7 +1765,7 @@
   <script>
     /* Single source for every number on the slides. Edit here, all renders update. */
     const DECK_METRICS = {
-      perf: { v1p50: "56 ms", v1p95: "79 ms", v2p50: "9 ms", v2p95: "13 ms" },
+      perf: { v1p50: "36 ms", v1p95: "48 ms", v2p50: "9 ms", v2p95: "14 ms" },
       nnr: { recovered: "10–20%" },
       knn: {
         k: "5",

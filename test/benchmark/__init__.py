@@ -1,0 +1,1 @@
+"""Benchmark harness: timing, not assertions."""
