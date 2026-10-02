@@ -468,6 +468,7 @@
     }
 
     .ph-houses-top {
+      position: relative;
       flex: 0 0 50%;
       min-height: 0;
       display: flex;
@@ -476,21 +477,14 @@
       transition: flex-basis var(--ph-t-slide) var(--ph-ease);
     }
 
-    section[data-s4]:not(:has(.ph-s4-go:nth-of-type(1).visible)) .ph-houses-top {
-      flex: 1 1 auto;
-      justify-content: center;
-    }
-
+    /* Load state matches the other stages: one flex basis and one max-height
+       everywhere, so the row no longer re-centres before fragment 1. */
     #houses-svg {
       width: 100%;
       height: 100%;
       flex: 1 1 auto;
       min-height: 0;
       max-height: 380px;
-    }
-
-    section[data-s4]:not(:has(.ph-s4-go:nth-of-type(1).visible)) #houses-svg {
-      max-height: 540px;
     }
 
     /* Shared sub-slide title: one step below the slide title, accent-colored
@@ -537,7 +531,13 @@
     /* Subtitle color is set once on .reveal .ph-subtitle; .ph-is-* only
        names the stage. Panels keep their own per-approach accents. */
 
+    /* Positioned outside the row's box: in flow the hint added ~19px that the
+       50% basis absorbed, nudging the houses down on load only. */
     .ph-stage-hint {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
       color: var(--ph-ink-muted);
       font-size: var(--fs-caption);
       margin: 0;
@@ -1190,43 +1190,45 @@
               <rect id="bx-knn" class="bx" x="584" y="116" width="611" height="132" fill="none" stroke="var(--knn)"
                 stroke-width="2" stroke-dasharray="8 5" />
               <!-- Average marker: house lifted clear; equal text gaps; down arrow to box -->
-              <g id="mk-avg" class="mk" stroke="var(--av)">
-                <g transform="translate(380,10) scale(1.44)">
+              <!-- color: #hs strokes with currentColor, which follows the CSS
+                   color property, not stroke. stroke alone left every house grey. -->
+              <g id="mk-avg" class="mk" color="var(--av)" stroke="var(--av)">
+                <g transform="translate(634,10) scale(1.264)">
                   <use href="#hs" />
                 </g>
-                <text x="380" y="-66" text-anchor="middle" font-size="20" fill="var(--av)" stroke="none">
+                <text x="634" y="-66" text-anchor="middle" font-size="20" fill="var(--av)" stroke="none">
                   Avg
                 </text>
-                <text x="380" y="30" text-anchor="middle" font-size="16" fill="var(--av)" stroke="none">
+                <text x="634" y="30" text-anchor="middle" font-size="16" fill="var(--av)" stroke="none">
                   2225
                 </text>
-                <line x1="380" y1="44" x2="380" y2="108" stroke-width="2" marker-end="url(#arr-av)" />
+                <line x1="634" y1="44" x2="634" y2="108" stroke-width="2" marker-end="url(#arr-av)" />
               </g>
               <!-- Median marker -->
-              <g id="mk-med" class="mk" stroke="var(--md)">
-                <g transform="translate(455,10) scale(1.44)">
+              <g id="mk-med" class="mk" color="var(--md)" stroke="var(--md)">
+                <g transform="translate(452,10) scale(1.119)">
                   <use href="#hs" />
                 </g>
-                <text x="455" y="-66" text-anchor="middle" font-size="20" fill="var(--md)" stroke="none">
+                <text x="452" y="-66" text-anchor="middle" font-size="20" fill="var(--md)" stroke="none">
                   Med
                 </text>
-                <text x="455" y="30" text-anchor="middle" font-size="16" fill="var(--md)" stroke="none">
+                <text x="452" y="30" text-anchor="middle" font-size="16" fill="var(--md)" stroke="none">
                   1885
                 </text>
-                <line x1="455" y1="44" x2="455" y2="108" stroke-width="2" marker-end="url(#arr-md)" />
+                <line x1="452" y1="44" x2="452" y2="108" stroke-width="2" marker-end="url(#arr-md)" />
               </g>
               <!-- KNN marker cluster -->
-              <g id="mk-knn" class="mk" stroke="var(--knn)">
-                <g transform="translate(900,10) scale(1.44)">
+              <g id="mk-knn" class="mk" color="var(--knn)" stroke="var(--knn)">
+                <g transform="translate(952,10) scale(1.465)">
                   <use href="#hs" />
                 </g>
-                <text x="900" y="-66" text-anchor="middle" font-size="20" fill="var(--knn)" stroke="none">
+                <text x="952" y="-66" text-anchor="middle" font-size="20" fill="var(--knn)" stroke="none">
                   NN(5)
                 </text>
-                <text x="900" y="30" text-anchor="middle" font-size="16" fill="var(--knn)" stroke="none">
+                <text x="952" y="30" text-anchor="middle" font-size="16" fill="var(--knn)" stroke="none">
                   3468
                 </text>
-                <line x1="900" y1="44" x2="900" y2="108" stroke-width="2" marker-end="url(#arr-knn)" />
+                <line x1="952" y1="44" x2="952" y2="108" stroke-width="2" marker-end="url(#arr-knn)" />
               </g>
               <p class="ph-stage-hint">
                 Twelve homes, four groups of three. Each group runs 25% bigger
@@ -1245,8 +1247,8 @@
                   </p>
                 </div>
                 <div class="ph-panel-pick">
-                  <svg viewBox="0 0 260 120" fill="none" stroke="var(--av)" stroke-width="3" role="img"
-                    aria-label="Single average-size house">
+                  <svg viewBox="0 0 260 120" fill="none" color="var(--av)" stroke="var(--av)" stroke-width="3"
+                    role="img" aria-label="Single average-size house">
                     <use href="#hs" transform="translate(130,102) scale(1.05)" />
                     <text x="130" y="14" text-anchor="middle" font-size="10" fill="var(--av)" stroke="none">
                       =AVERAGE(1235,1300,1365,1520,1600,1680,
@@ -1270,8 +1272,8 @@
                   </p>
                 </div>
                 <div class="ph-panel-pick">
-                  <svg viewBox="0 0 260 120" fill="none" stroke="var(--md)" stroke-width="3" role="img"
-                    aria-label="Single middle-size house">
+                  <svg viewBox="0 0 260 120" fill="none" color="var(--md)" stroke="var(--md)" stroke-width="3"
+                    role="img" aria-label="Single middle-size house">
                     <use href="#hs" transform="translate(130,102) scale(1.05)" />
                     <text x="130" y="14" text-anchor="middle" font-size="10" fill="var(--md)" stroke="none">
                       =MEDIAN(1235,1300,1365,1520,1600,1680,
@@ -1295,8 +1297,8 @@
                   </p>
                 </div>
                 <div class="ph-panel-pick">
-                  <svg viewBox="0 0 300 120" fill="none" stroke="var(--knn)" stroke-width="3" role="img"
-                    aria-label="Five similar houses and the blank">
+                  <svg viewBox="0 0 300 120" fill="none" color="var(--knn)" stroke="var(--knn)" stroke-width="3"
+                    role="img" aria-label="Five similar houses and the blank">
                     <g transform="translate(35,112) scale(0.62)">
                       <use href="#hs" />
                     </g>
