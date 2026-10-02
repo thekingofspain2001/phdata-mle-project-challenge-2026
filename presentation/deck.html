@@ -520,15 +520,18 @@
       grid-area: 1 / 1;
     }
 
+    /* All four subs stack in one grid cell; the active one fades up. display
+       swapped with no transition, so the stage change snapped. */
     .ph-s4-sub {
-      display: none;
+      opacity: 0;
+      transition: opacity var(--ph-t-slide) var(--ph-ease);
     }
 
     section[data-s4]:has(.ph-s4-go:nth-of-type(1).visible):not(:has(.ph-s4-go:nth-of-type(2).visible)) .ph-s4-sub.ph-is-av,
     section[data-s4]:has(.ph-s4-go:nth-of-type(2).visible):not(:has(.ph-s4-go:nth-of-type(3).visible)) .ph-s4-sub.ph-is-md,
     section[data-s4]:has(.ph-s4-go:nth-of-type(3).visible):not(:has(.ph-s4-go:nth-of-type(4).visible)) .ph-s4-sub.ph-is-knn,
     section[data-s4]:has(.ph-s4-go:nth-of-type(4).visible) .ph-s4-sub.ph-is-sum {
-      display: block;
+      opacity: 1;
     }
 
     /* Subtitle color is set once on .reveal .ph-subtitle; .ph-is-* only
