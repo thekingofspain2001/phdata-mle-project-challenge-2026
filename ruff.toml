@@ -17,4 +17,5 @@ max-complexity = 10
 [lint.per-file-ignores]
 "test/**/*.py" = ["S101", "TC002"] # TC002: test typing imports are runtime-loaded
 "**/*.ipynb" = ["T201"] # notebooks legitimately print() cell output
+"src/api/endpoints.py" = ["ALL"] # deliberate v1 restore (e9ef514): untyped, prints, CWD-relative paths
 
