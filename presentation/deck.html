@@ -1365,10 +1365,11 @@
             <article class="fragment">
               <h3>How it was tested</h3>
               <p>
-                21,613 sales, 15% of every numeric field blanked at random,
-                zipcode held back. Mean, median and NN(5) distance-weighted
-                each refilled the blanks; error measured against the values we
-                hid. 17 fields, one seed.
+                21,613 sales, 15% of every numeric field blanked at random.
+                Mean, median and NN(5) distance-weighted each refilled the
+                blanks; error measured against the values we hid. The seven
+                nullable fields the prediction API accepts, zipcode excluded
+                because it is required and never imputed.
               </p>
             </article>
             <article class="fragment">
@@ -1378,63 +1379,58 @@
                   <tr>
                     <th scope="col">Field</th>
                     <th scope="col">Most accurate</th>
-                    <th scope="col">KNN edge</th>
-                  </tr>
+                    <th scope="col">Margin</th>
                 </thead>
                 <tbody>
                   <tr>
-                    <th scope="row">Grade</th>
-                    <td>KNN</td>
-                    <td>21%</td>
-                  </tr>
-                  <tr>
                     <th scope="row">Bathrooms</th>
                     <td>KNN</td>
-                    <td>13%</td>
+                    <td>13% ahead</td>
                   </tr>
                   <tr>
                     <th scope="row">Floors</th>
                     <td>KNN</td>
-                    <td>13%</td>
-                  </tr>
-                  <tr>
-                    <th scope="row">Year built</th>
-                    <td>KNN</td>
-                    <td>11%</td>
-                  </tr>
-                  <tr>
-                    <th scope="row">Living area, nearby homes</th>
-                    <td>KNN</td>
-                    <td>9%</td>
+                    <td>13% ahead</td>
                   </tr>
                   <tr>
                     <th scope="row">Living area</th>
                     <td>KNN</td>
-                    <td>8%</td>
+                    <td>8% ahead</td>
                   </tr>
                   <tr>
-                    <th scope="row">Longitude</th>
-                    <td>KNN</td>
-                    <td>2%</td>
+                    <th scope="row">Bedrooms</th>
+                    <td>Mean</td>
+                    <td>6% ahead</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Basement area</th>
+                    <td>Mean</td>
+                    <td>2% ahead</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Above-grade area</th>
+                    <td>Mean</td>
+                    <td>2% ahead</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Plot size</th>
+                    <td>Mean</td>
+                    <td>2% ahead</td>
                   </tr>
                   <tr class="ph-muted">
-                    <th scope="row">Ten other fields</th>
-                    <td>Mean or median</td>
-                    <td>up to 22% ahead</td>
-                  </tr>
-                  <tr class="ph-muted">
-                    <th scope="row">Average error, all 17 fields</th>
-                    <td>Median</td>
-                    <td>KNN last</td>
+                    <th scope="row">Across all seven</th>
+                    <td>KNN on 3 of 7</td>
+                    <td>&#8212;</td>
                   </tr>
                 </tbody>
               </table>
             </article>
           </div>
           <p class="ph-foot fragment">
-            Read honestly: KNN wins the size and grade fields it was chosen
-            for, and loses overall. It ships because those are the fields that
-            move price — not because it won the experiment.
+            Read honestly: KNN wins bathrooms, floors and living area, and
+            loses on bedrooms and the three area fields. It ships because the
+            three it wins are the ones that move price &#8212; not because it
+            won the experiment.
           </p>
         </div>
       </section>
