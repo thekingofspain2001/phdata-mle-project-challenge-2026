@@ -34,7 +34,7 @@ def health_check() -> dict[str, str]:
 
 
 @router.post("/predict")
-def predict(
+async def predict(
     home_features: Annotated[HomeFeatures, Body(openapi_examples=listing_examples())],
 ) -> dict[str, float]:
     """Predict a home sale price from listing and demographic features."""

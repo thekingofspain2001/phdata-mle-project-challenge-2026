@@ -32,7 +32,14 @@ EXAMPLES_CSV = REPO_ROOT / "src" / "data" / "future_unseen_examples.csv"
 sys.path.insert(0, str(Path(__file__).resolve().parent))  # so endpoints_v1_variants imports
 HOST = "127.0.0.1"
 PORT = 8936
-ENDPOINTS = ("/predict", "/predict-noprint", "/predict-cached", "/predict/v2")
+ENDPOINTS = (
+    "/predict",
+    "/predict-original",
+    "/predict-sync",
+    "/predict-cached",
+    "/predict-noprint",
+    "/predict/v2",
+)
 
 type Scalar = str | int | float
 type Payload = dict[str, Scalar]
