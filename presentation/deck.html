@@ -469,22 +469,53 @@
       flex: 1 1 auto;
       min-height: 0;
       display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(0, 2.1fr);
+      grid-template-columns: minmax(0, 0.62fr) minmax(0, 2.38fr);
       gap: var(--gap-md);
     }
 
     .ph-s8-chips {
       flex-wrap: nowrap;
       flex-direction: column;
+      justify-content: flex-start;
+      align-content: flex-start;
       gap: var(--sp-xs);
     }
 
+    /* Chips size to their content and stack from the top. At flex:1 1 0 each
+       chip took a quarter of the body height and centred its label, so chip 1
+       sat far below the line a normal body item starts on. */
     .ph-s8-chips .ph-s8-chip {
-      flex: 1 1 0;
+      flex: 0 0 auto;
       display: flex;
       align-items: center;
+      justify-content: center;
       gap: var(--gap-sm);
       padding-right: var(--gap-sm);
+    }
+
+    /* Narrower column, so the label carries more weight: bigger type, allowed
+       to wrap, centred against the fixed-width number. */
+    .ph-s8-chips .ph-s8-chip .ph-num {
+      font-size: var(--fs-lead);
+      flex: 0 0 auto;
+    }
+
+    .ph-s8-chips .ph-s8-chip > span:last-child {
+      font-size: var(--fs-h3);
+      line-height: 1.15;
+      text-align: center;
+      overflow-wrap: break-word;
+      hyphens: auto;
+    }
+
+    /* Was/To read as the two sides of a change, so they take the slide's
+       approach accents rather than the neutral heading colour. */
+    .ph-shot:first-child h4 {
+      color: var(--av);
+    }
+
+    .ph-shot:last-child h4 {
+      color: var(--knn);
     }
 
     /* Chips stay listed through every step; current one reads as selected. */
