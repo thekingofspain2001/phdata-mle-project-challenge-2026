@@ -430,6 +430,25 @@
       text-align: right;
     }
 
+    /* S6 value table carries the headline figures, so it steps up from body
+       type rather than sitting at the deck's reading size. */
+    .ph-table.ph-figures-lg {
+      font-size: var(--fs-lead);
+    }
+
+    .ph-table.ph-figures-lg th,
+    .ph-table.ph-figures-lg td {
+      padding: 4px 10px 4px 0;
+    }
+
+    /* Single-line method note. Needs .reveal in the selector: bare .ph-foot
+       scores 0,1,0 and loses to `.reveal p` at 0,1,1, so every footer in the
+       deck renders at body size despite declaring caption. */
+    .reveal .ph-foot-sm {
+      font-size: var(--fs-caption);
+      margin-top: 0;
+    }
+
     /* Segment callouts: name over value, leader line back to the arc. */
     .ph-seg-name {
       font-size: var(--fs-body);
@@ -1655,50 +1674,50 @@
           <div class="ph-cols fragment">
             <article>
               <figure class="ph-donut">
-              <svg viewBox="-20 0 440 250" role="img"
+              <svg viewBox="-74 12 536 228" role="img"
                 aria-label="Original route: 20.1 ms per call, split 12.3 ms debug code at 61%, 1.4 ms artifact loading at 7%, 6.4 ms calculation at 32%">
-                <circle cx="180" cy="120" r="94" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="28" />
-                <circle cx="180" cy="120" r="94" fill="none" stroke="var(--av)" stroke-width="28"
-                  stroke-dasharray="361 229" stroke-dashoffset="0" transform="rotate(-90 180 120)" />
-                <circle cx="180" cy="120" r="94" fill="none" stroke="var(--md)" stroke-width="28"
-                  stroke-dasharray="42 548" stroke-dashoffset="-361" transform="rotate(-90 180 120)" />
-                <circle cx="180" cy="120" r="94" fill="none" stroke="var(--knn)" stroke-width="28"
-                  stroke-dasharray="187 403" stroke-dashoffset="-403" transform="rotate(-90 180 120)" />
+                <circle cx="180" cy="125" r="108" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="28" />
+                <circle cx="180" cy="125" r="108" fill="none" stroke="var(--av)" stroke-width="28"
+                  stroke-dasharray="415 263" stroke-dashoffset="0" transform="rotate(-90 180 125)" />
+                <circle cx="180" cy="125" r="108" fill="none" stroke="var(--md)" stroke-width="28"
+                  stroke-dasharray="47 631" stroke-dashoffset="-415" transform="rotate(-90 180 125)" />
+                <circle cx="180" cy="125" r="108" fill="none" stroke="var(--knn)" stroke-width="28"
+                  stroke-dasharray="216 462" stroke-dashoffset="-462" transform="rotate(-90 180 125)" />
                 <g class="ph-seg">
-                  <line x1="281" y1="157" x2="288" y2="160" stroke="var(--av)" stroke-width="1.5" />
-                  <text class="ph-seg-name" x="292" y="157" fill="var(--av)">Debug code</text>
-                  <text class="ph-seg-val" x="292" y="171" fill="var(--av)">12.3 ms &#183; 61%</text>
+                  <line x1="294" y1="167" x2="342" y2="185" stroke="var(--av)" stroke-width="1.5" />
+                  <text class="ph-seg-name" x="342" y="184" fill="var(--av)">Debug code</text>
+                  <text class="ph-seg-val" x="342" y="198" fill="var(--av)">12.3 ms &#183; 61%</text>
                 </g>
                 <g class="ph-seg">
-                  <line x1="101" y1="185" x2="95" y2="190" stroke="var(--md)" stroke-width="1.5" />
-                  <text class="ph-seg-name" x="91" y="190" text-anchor="end" fill="var(--md)">Load</text>
-                  <text class="ph-seg-val" x="91" y="204" text-anchor="end" fill="var(--md)">1.4 ms &#183; 7%</text>
+                  <line x1="83" y1="199" x2="42" y2="229" stroke="var(--md)" stroke-width="1.5" />
+                  <text class="ph-seg-name" x="42" y="230" text-anchor="end" fill="var(--md)">Load</text>
+                  <text class="ph-seg-val" x="42" y="244" text-anchor="end" fill="var(--md)">1.4 ms &#183; 7%</text>
                 </g>
                 <g class="ph-seg">
-                  <line x1="96" y1="62" x2="90" y2="58" stroke="var(--knn)" stroke-width="1.5" />
-                  <text class="ph-seg-name" x="86" y="54" text-anchor="end" fill="var(--knn)">Calculation</text>
-                  <text class="ph-seg-val" x="86" y="68" text-anchor="end" fill="var(--knn)">6.4 ms &#183; 32%</text>
+                  <line x1="77" y1="59" x2="34" y2="32" stroke="var(--knn)" stroke-width="1.5" />
+                  <text class="ph-seg-name" x="34" y="32" text-anchor="end" fill="var(--knn)">Calculation</text>
+                  <text class="ph-seg-val" x="34" y="46" text-anchor="end" fill="var(--knn)">6.4 ms &#183; 32%</text>
                 </g>
-                <text class="ph-donut-total" x="180" y="118" text-anchor="middle">20.1</text>
-                <text class="ph-donut-unit" x="180" y="140" text-anchor="middle">ms / call</text>
+                <text class="ph-donut-total" x="180" y="123" text-anchor="middle">20.1</text>
+                <text class="ph-donut-unit" x="180" y="145" text-anchor="middle">ms / call</text>
               </svg>
               <figcaption>Original &#8212; reload + print on every call</figcaption>
             </figure>
             </article>
             <article>
               <figure class="ph-donut ph-donut--v2">
-              <svg viewBox="-20 0 440 250" role="img"
+              <svg viewBox="-74 12 536 228" role="img"
                 aria-label="V2 route: 13.1 ms per call, all of it calculation">
-                <circle cx="180" cy="120" r="76" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="28" />
-                <circle cx="180" cy="120" r="76" fill="none" stroke="var(--knn)" stroke-width="28"
-                  stroke-dasharray="477 0" stroke-dashoffset="0" transform="rotate(-90 180 120)" />
+                <circle cx="180" cy="125" r="87" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="28" />
+                <circle cx="180" cy="125" r="87" fill="none" stroke="var(--knn)" stroke-width="28"
+                  stroke-dasharray="547 0" stroke-dashoffset="0" transform="rotate(-90 180 125)" />
                 <g class="ph-seg">
-                  <line x1="262" y1="88" x2="268" y2="85" stroke="var(--knn)" stroke-width="1.5" />
-                  <text class="ph-seg-name" x="272" y="82" fill="var(--knn)">Calculation</text>
-                  <text class="ph-seg-val" x="272" y="96" fill="var(--knn)">13.1 ms &#183; 100%</text>
+                  <line x1="263" y1="67" x2="305" y2="38" stroke="var(--knn)" stroke-width="1.5" />
+                  <text class="ph-seg-name" x="305" y="37" fill="var(--knn)">Calculation</text>
+                  <text class="ph-seg-val" x="305" y="51" fill="var(--knn)">13.1 ms &#183; 100%</text>
                 </g>
-                <text class="ph-donut-total" x="180" y="118" text-anchor="middle">13.1</text>
-                <text class="ph-donut-unit" x="180" y="140" text-anchor="middle">ms / call</text>
+                <text class="ph-donut-total" x="180" y="123" text-anchor="middle">13.1</text>
+                <text class="ph-donut-unit" x="180" y="145" text-anchor="middle">ms / call</text>
               </svg>
               <figcaption>V2 &#8212; <span data-metric="cost.deltaVsDefault">65%</span> of the original&#8217;s time</figcaption>
             </figure>
@@ -1707,7 +1726,7 @@
           <div class="ph-cols fragment">
             <article>
               <h3>The values behind the rings</h3>
-              <table class="ph-table ph-figures">
+              <table class="ph-table ph-figures ph-figures-lg">
             <thead>
               <tr>
                 <th scope="col">Where the time goes</th>
@@ -1757,15 +1776,9 @@
               </table>
             </article>
           </div>
-          <p class="ph-foot fragment">
-            Ring area is proportional to mean call time, so the original ring is
-            the larger one. Every figure is a median of 3 runs of 1000 calls over
-            the 201 request examples published on <code>/docs</code>, driven one
-            at a time against the real app under uvicorn. Costs were priced by
-            subtraction against copies of the original that change one thing at
-            a time &#8212; print removed, artifacts pre-loaded &#8212; so each
-            segment is a measured delta, not an estimate. Single machine, one
-            worker, one core.
+          <p class="ph-foot ph-foot-sm fragment">
+            Median of 3 runs &#215; 1000 calls, one at a time, over the 201 examples
+            published on <code>/docs</code>; costs priced by subtraction.
           </p>
         </div>
       </section>
