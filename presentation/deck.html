@@ -449,15 +449,28 @@
       margin-top: 0;
     }
 
-    /* Segment callouts: name over value, leader line back to the arc. */
+    /* Segment callouts: name over value, leader line back to the arc. Names
+       take the segment colour; the figures stay neutral so the number is read
+       as a measurement, not as part of the coloured shape. */
     .ph-seg-name {
-      font-size: var(--fs-body);
+      font-size: var(--fs-lead);
       font-weight: 600;
     }
 
     .ph-seg-val {
+      fill: var(--ph-ink-muted);
       font-family: "SFMono-Regular", Consolas, monospace;
-      font-size: var(--fs-caption);
+      font-size: var(--fs-body);
+    }
+
+    /* S6 carries a data-dense panel over the deck's background motif, so its
+       cards blur harder and fill more opaquely than the shared 2px/0.72 used
+       elsewhere - at the default the pattern reads straight through the rings
+       and the figures. Scoped so no other slide shifts. */
+    #s6-performance .ph-cols article {
+      background-color: rgba(12, 20, 46, 0.93);
+      -webkit-backdrop-filter: blur(14px);
+      backdrop-filter: blur(14px);
     }
 
     .ph-donut-total {
@@ -785,9 +798,9 @@
       opacity: 1;
     }
 
-    section[data-s4]:has(.ph-s4-go:nth-of-type(3).visible) #mk-knn {
-      transform: translateY(22px) scale(1.35);
-    }
+    /* No extra scale or offset on the KNN marker: its base transform already
+       encodes 3468, and the other two markers carry no transform either, so any
+       override would break both the value sizing and the shared baseline. */
 
     .ph-stage-bottom {
       flex: 0 0 0;
@@ -1452,7 +1465,7 @@
                 <text x="952" y="30" text-anchor="middle" font-size="16" fill="var(--knn)" stroke="none">
                   3468
                 </text>
-                <line x1="952" y1="44" x2="952" y2="108" stroke-width="2" marker-end="url(#arr-knn)" />
+                <line x1="952" y1="44" x2="952" y2="116" stroke-width="2" marker-end="url(#arr-knn)" />
               </g>
               <p class="ph-stage-hint">
                 Twelve homes, four groups of three. Each group runs 25% bigger
@@ -1670,50 +1683,50 @@
           <div class="ph-cols fragment">
             <article>
               <figure class="ph-donut">
-              <svg viewBox="-74 12 536 228" role="img"
+              <svg viewBox="-150 16 656 296" role="img"
                 aria-label="Original route: 20.1 ms per call, split 12.3 ms debug code at 61%, 1.4 ms artifact loading at 7%, 6.4 ms calculation at 32%">
-                <circle cx="180" cy="125" r="108" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="28" />
-                <circle cx="180" cy="125" r="108" fill="none" stroke="var(--av)" stroke-width="28"
-                  stroke-dasharray="415 263" stroke-dashoffset="0" transform="rotate(-90 180 125)" />
-                <circle cx="180" cy="125" r="108" fill="none" stroke="var(--md)" stroke-width="28"
-                  stroke-dasharray="47 631" stroke-dashoffset="-415" transform="rotate(-90 180 125)" />
-                <circle cx="180" cy="125" r="108" fill="none" stroke="var(--knn)" stroke-width="28"
-                  stroke-dasharray="216 462" stroke-dashoffset="-462" transform="rotate(-90 180 125)" />
+                <circle cx="180" cy="160" r="120" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="30" />
+                <circle cx="180" cy="160" r="120" fill="none" stroke="var(--av)" stroke-width="30"
+                  stroke-dasharray="461 293" stroke-dashoffset="0" transform="rotate(-90 180 160)" />
+                <circle cx="180" cy="160" r="120" fill="none" stroke="var(--md)" stroke-width="30"
+                  stroke-dasharray="52 702" stroke-dashoffset="-461" transform="rotate(-90 180 160)" />
+                <circle cx="180" cy="160" r="120" fill="none" stroke="var(--knn)" stroke-width="30"
+                  stroke-dasharray="240 514" stroke-dashoffset="-513" transform="rotate(-90 180 160)" />
                 <g class="ph-seg">
-                  <line x1="294" y1="167" x2="342" y2="185" stroke="var(--av)" stroke-width="1.5" />
-                  <text class="ph-seg-name" x="342" y="184" fill="var(--av)">Debug code</text>
-                  <text class="ph-seg-val" x="342" y="198" fill="var(--av)">12.3 ms &#183; 61%</text>
+                  <line x1="277" y1="206" x2="319" y2="222" stroke="rgba(255,255,255,0.28)" stroke-width="1.5" />
+                  <text class="ph-seg-name" x="325" y="219" fill="var(--av)">Debug code</text>
+                  <text class="ph-seg-val" x="325" y="241">12.3 ms &#183; 61%</text>
                 </g>
                 <g class="ph-seg">
-                  <line x1="83" y1="199" x2="42" y2="229" stroke="var(--md)" stroke-width="1.5" />
-                  <text class="ph-seg-name" x="42" y="230" text-anchor="end" fill="var(--md)">Load</text>
-                  <text class="ph-seg-val" x="42" y="244" text-anchor="end" fill="var(--md)">1.4 ms &#183; 7%</text>
+                  <line x1="42" y1="241" x2="-6" y2="272" stroke="rgba(255,255,255,0.28)" stroke-width="1.5" />
+                  <text class="ph-seg-name" x="-12" y="274" text-anchor="end" fill="var(--md)">Load</text>
+                  <text class="ph-seg-val" x="-12" y="296" text-anchor="end">1.4 ms &#183; 7%</text>
                 </g>
                 <g class="ph-seg">
-                  <line x1="77" y1="59" x2="34" y2="32" stroke="var(--knn)" stroke-width="1.5" />
-                  <text class="ph-seg-name" x="34" y="32" text-anchor="end" fill="var(--knn)">Calculation</text>
-                  <text class="ph-seg-val" x="34" y="46" text-anchor="end" fill="var(--knn)">6.4 ms &#183; 32%</text>
+                  <line x1="36" y1="87" x2="-6" y2="62" stroke="rgba(255,255,255,0.28)" stroke-width="1.5" />
+                  <text class="ph-seg-name" x="-12" y="58" text-anchor="end" fill="var(--knn)">Calculation</text>
+                  <text class="ph-seg-val" x="-12" y="80" text-anchor="end">6.4 ms &#183; 32%</text>
                 </g>
-                <text class="ph-donut-total" x="180" y="123" text-anchor="middle">20.1</text>
-                <text class="ph-donut-unit" x="180" y="145" text-anchor="middle">ms / call</text>
+                <text class="ph-donut-total" x="180" y="158" text-anchor="middle">20.1</text>
+                <text class="ph-donut-unit" x="180" y="182" text-anchor="middle">ms / call</text>
               </svg>
               <figcaption>Original &#8212; reload + print on every call</figcaption>
             </figure>
             </article>
             <article>
               <figure class="ph-donut ph-donut--v2">
-              <svg viewBox="-74 12 536 228" role="img"
+              <svg viewBox="-150 16 656 296" role="img"
                 aria-label="V2 route: 13.1 ms per call, all of it calculation">
-                <circle cx="180" cy="125" r="87" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="28" />
-                <circle cx="180" cy="125" r="87" fill="none" stroke="var(--knn)" stroke-width="28"
-                  stroke-dasharray="547 0" stroke-dashoffset="0" transform="rotate(-90 180 125)" />
+                <circle cx="180" cy="160" r="96.7" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="30" />
+                <circle cx="180" cy="160" r="96.7" fill="none" stroke="var(--knn)" stroke-width="30"
+                  stroke-dasharray="607 0" stroke-dashoffset="0" transform="rotate(-90 180 160)" />
                 <g class="ph-seg">
-                  <line x1="263" y1="67" x2="305" y2="38" stroke="var(--knn)" stroke-width="1.5" />
-                  <text class="ph-seg-name" x="305" y="37" fill="var(--knn)">Calculation</text>
-                  <text class="ph-seg-val" x="305" y="51" fill="var(--knn)">13.1 ms &#183; 100%</text>
+                  <line x1="242" y1="96" x2="283" y2="71" stroke="rgba(255,255,255,0.28)" stroke-width="1.5" />
+                  <text class="ph-seg-name" x="289" y="68" fill="var(--knn)">Calculation</text>
+                  <text class="ph-seg-val" x="289" y="90">13.1 ms &#183; 100%</text>
                 </g>
-                <text class="ph-donut-total" x="180" y="123" text-anchor="middle">13.1</text>
-                <text class="ph-donut-unit" x="180" y="145" text-anchor="middle">ms / call</text>
+                <text class="ph-donut-total" x="180" y="158" text-anchor="middle">13.1</text>
+                <text class="ph-donut-unit" x="180" y="182" text-anchor="middle">ms / call</text>
               </svg>
               <figcaption>V2 &#8212; <span data-metric="cost.deltaVsDefault">65%</span> of the original&#8217;s time</figcaption>
             </figure>
