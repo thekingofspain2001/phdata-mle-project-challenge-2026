@@ -539,6 +539,14 @@
       font-size: 13px;
     }
 
+    /* Which payload a ring was measured against. A caption rather than another
+       leader line: it names its ring, costs nothing, and keeps the two
+       callouts clear of it. */
+    .ph-chart-when {
+      fill: var(--ph-ink-muted);
+      font-size: var(--fs-body);
+    }
+
     /* Header keeps the title treatment (mint), at item size, just bolder. */
     .ph-table thead th {
       color: var(--ph-mint);
@@ -1781,7 +1789,7 @@
         <div class="ph-body">
           <div class="ph-cols">
             <article class="ph-chart-card">
-              <h3 class="ph-chart-title">From &#183; original route</h3>
+              <h3 class="ph-chart-title">From</h3>
               <div class="ph-chart">
               <svg viewBox="-146 -10 495 340" role="img"
                 aria-label="Original route: 15.2 ms per call, split 9.7 ms debug code at 64%, 1.2 ms artifact loading at 8%, 4.3 ms calculation at 28%">
@@ -1813,45 +1821,33 @@
               </div>
             </article>
             <article class="ph-chart-card">
-              <h3 class="ph-chart-title">To &#183; no nulls</h3>
+              <h3 class="ph-chart-title">To</h3>
               <div class="ph-chart">
-              <svg viewBox="-121 -10 383 340" role="img"
-                aria-label="V2 route with every field present: 9.4 ms per call, all of it calculation">
-                <circle cx="180" cy="160" r="74.4" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="30" />
-                <circle cx="180" cy="160" r="74.4" fill="none" stroke="var(--knn)" stroke-width="30"
-                  stroke-dasharray="467 0" stroke-dashoffset="0" transform="rotate(-90 180 160)" />
+              <svg viewBox="-8 -10 586 340" role="img"
+                aria-label="V2 route, two payload shapes side by side at one scale. Complete data: 9.4 ms per call, all calculation. All seven nullable fields null: 14.6 ms per call, 65% calculation and 35% imputation. Calculation costs the same 9.4 ms either way; imputation adds 5.1 ms.">
+                <circle cx="95" cy="160" r="74.4" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="30" />
+                <circle cx="95" cy="160" r="74.4" fill="none" stroke="var(--knn)" stroke-width="30"
+                  stroke-dasharray="467 0" stroke-dashoffset="0" transform="rotate(-90 95 160)" />
+                <text class="ph-donut-total" x="95" y="158" text-anchor="middle">9.4</text>
+                <text class="ph-donut-unit" x="95" y="182" text-anchor="middle">ms / call</text>
+                <circle cx="440" cy="160" r="114.7" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="30" />
+                <circle cx="440" cy="160" r="114.7" fill="none" stroke="var(--knn)" stroke-width="30"
+                  stroke-dasharray="467 253" stroke-dashoffset="0" transform="rotate(270 440 160)" />
+                <circle cx="440" cy="160" r="114.7" fill="none" stroke="var(--imp)" stroke-width="30"
+                  stroke-dasharray="253 467" stroke-dashoffset="-467" transform="rotate(270 440 160)" />
+                <text class="ph-donut-total" x="440" y="158" text-anchor="middle">14.6</text>
+                <text class="ph-donut-unit" x="440" y="182" text-anchor="middle">ms / call</text>
                 <g class="ph-seg">
-                  <line x1="108" y1="88" x2="77" y2="57" stroke="rgba(255,255,255,0.28)" stroke-width="4.5" />
-                  <text class="ph-seg-name" x="72" y="53" text-anchor="end" fill="var(--knn)">Calculation</text>
-                  <text class="ph-seg-val" x="72" y="79" text-anchor="end">9.4 ms &#183; 100%</text>
-                </g>
-                <text class="ph-donut-total" x="180" y="158" text-anchor="middle">9.4</text>
-                <text class="ph-donut-unit" x="180" y="182" text-anchor="middle">ms / call</text>
-              </svg>
-              </div>
-            </article>
-            <article class="ph-chart-card">
-              <h3 class="ph-chart-title">To &#183; all seven null</h3>
-              <div class="ph-chart">
-              <svg viewBox="-95 -10 398 340" role="img"
-                aria-label="V2 route with all seven nullable fields null: 14.6 ms per call, 65% base calculation and 35% imputation cost">
-                <circle cx="180" cy="160" r="114.7" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="30" />
-                <circle cx="180" cy="160" r="114.7" fill="none" stroke="var(--knn)" stroke-width="30"
-                  stroke-dasharray="467 253" stroke-dashoffset="0" transform="rotate(270 180 160)" />
-                <circle cx="180" cy="160" r="114.7" fill="none" stroke="var(--imp)" stroke-width="30"
-                  stroke-dasharray="253 467" stroke-dashoffset="-467" transform="rotate(270 180 160)" />
-                <g class="ph-seg">
-                  <line x1="80" y1="60" x2="49" y2="29" stroke="rgba(255,255,255,0.28)" stroke-width="4.5" />
-                  <text class="ph-seg-name" x="43" y="25" text-anchor="end" fill="var(--knn)">Calculation</text>
-                  <text class="ph-seg-val" x="43" y="51" text-anchor="end">9.4 ms &#183; 65%</text>
+                  <line x1="187" y1="50" x2="172" y2="115" stroke="rgba(255,255,255,0.28)" stroke-width="4.5" />
+                  <line x1="307" y1="50" x2="328" y2="95" stroke="rgba(255,255,255,0.28)" stroke-width="4.5" />
+                  <text class="ph-seg-name" x="247" y="18" text-anchor="middle" fill="var(--knn)">Calculation</text>
+                  <text class="ph-seg-val" x="247" y="42" text-anchor="middle">9.4 ms &#183; either payload</text>
                 </g>
                 <g class="ph-seg">
-                  <line x1="80" y1="260" x2="49" y2="291" stroke="rgba(255,255,255,0.28)" stroke-width="4.5" />
-                  <text class="ph-seg-name" x="43" y="287" text-anchor="end" fill="var(--imp)">Imputation</text>
-                  <text class="ph-seg-val" x="43" y="313" text-anchor="end">5.1 ms &#183; 35%</text>
+                  <line x1="247" y1="276" x2="348" y2="248" stroke="rgba(255,255,255,0.28)" stroke-width="4.5" />
+                  <text class="ph-seg-name" x="247" y="298" text-anchor="middle" fill="var(--imp)">Imputation</text>
+                  <text class="ph-seg-val" x="247" y="320" text-anchor="middle">5.1 ms &#183; +35%</text>
                 </g>
-                <text class="ph-donut-total" x="180" y="158" text-anchor="middle">14.6</text>
-                <text class="ph-donut-unit" x="180" y="182" text-anchor="middle">ms / call</text>
               </svg>
               </div>
             </article>
