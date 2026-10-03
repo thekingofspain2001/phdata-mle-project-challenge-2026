@@ -449,6 +449,13 @@
       margin-top: 0;
     }
 
+    /* Absent value: a muted dot rather than a dash, so an empty cell reads as
+       "not applicable here" and not as a minus sign. */
+    .ph-table .ph-na {
+      color: var(--ph-ink-muted);
+      opacity: 0.45;
+    }
+
     /* Segment callouts: name over value, leader line back to the arc. Names
        take the segment colour; the figures stay neutral so the number is read
        as a measurement, not as part of the coloured shape. */
@@ -1801,13 +1808,13 @@
           </div>
           <div class="ph-cols">
             <article>
-              <h3>The values behind the rings</h3>
+              <h3>Metrics</h3>
               <table class="ph-table ph-figures ph-figures-lg">
             <thead>
               <tr>
-                <th scope="col">Where the time goes</th>
-                <th scope="col">Original</th>
-                <th scope="col">V2</th>
+                <th scope="col">Stage</th>
+                <th scope="col">From</th>
+                <th scope="col">To</th>
                 <th scope="col">Delta</th>
               </tr>
             </thead>
@@ -1815,13 +1822,13 @@
               <tr class="ph-kpi-av">
                 <th scope="row">Debug code</th>
                 <td><span data-metric="cost.dev">12.3 ms</span></td>
-                <td>&#8212;</td>
+                <td><span class="ph-na">&#183;</span></td>
                 <td><span data-metric="cost.devDelta">&#8722;12.3 ms</span></td>
               </tr>
               <tr class="ph-kpi-md">
                 <th scope="row">Artifact loading</th>
                 <td><span data-metric="cost.load">1.4 ms</span></td>
-                <td>&#8212;</td>
+                <td><span class="ph-na">&#183;</span></td>
                 <td><span data-metric="cost.loadDelta">&#8722;1.4 ms</span></td>
               </tr>
               <tr class="ph-kpi-knn">
@@ -1831,21 +1838,15 @@
                 <td><span data-metric="cost.calcDelta">+6.7 ms</span></td>
               </tr>
               <tr>
-                <th scope="row">Sum of the above</th>
-                <td>12.3 + 1.4 + 6.4 = 20.1</td>
-                <td>13.1</td>
-                <td>&#8722;7.0 ms</td>
-              </tr>
-              <tr>
-                <th scope="row">Mean per call</th>
+                <th scope="row">Total time</th>
                 <td><span data-metric="cost.totalOrig">20.1 ms</span></td>
                 <td><span data-metric="cost.totalV2">13.1 ms</span></td>
                 <td><span data-metric="cost.totalDelta">&#8722;7.0 ms</span></td>
               </tr>
               <tr class="ph-muted">
                 <th scope="row">Improvement</th>
-                <td>&#8212;</td>
-                <td>&#8212;</td>
+                <td><span class="ph-na">&#183;</span></td>
+                <td><span class="ph-na">&#183;</span></td>
                 <td><span data-metric="cost.improvement">35% faster</span></td>
               </tr>
             </tbody>
