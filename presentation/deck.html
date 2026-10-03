@@ -187,7 +187,7 @@
       font-weight: 400;
       font-size: var(--fs-h2);
       line-height: 1.25;
-      color: var(--ph-mint);
+      color: var(--ph-accent);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -756,7 +756,7 @@
       font-size: var(--fs-sub);
       font-weight: 400;
       line-height: 1.25;
-      color: var(--ph-mint);
+      color: var(--ph-accent);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -777,6 +777,25 @@
 
     /* All four subs stack in one grid cell; the active one fades up. display
        swapped with no transition, so the stage change snapped. */
+
+    /* Each S4 subtitle wears the colour of the equation it names, the same
+       token its marker, dashed box and panel border already use, so the
+       stage label and the thing it describes are one colour. */
+    .ph-s4-sub.ph-is-av {
+      color: var(--av);
+    }
+
+    .ph-s4-sub.ph-is-md {
+      color: var(--md);
+    }
+
+    .ph-s4-sub.ph-is-knn {
+      color: var(--knn);
+    }
+
+    .ph-s4-sub.ph-is-sum {
+      color: var(--ph-accent);
+    }
     .ph-s4-sub {
       opacity: 0;
       transition: opacity var(--ph-t-slide) var(--ph-ease);
@@ -1717,9 +1736,9 @@
       </section>
 
       <!-- S6 Caching. -->
-      <section id="s6-performance" aria-label="From and to">
+      <section id="s6-performance" aria-label="Performance">
         <header class="ph-head">
-          <h2>From and to</h2>
+          <h2>Performance</h2>
         </header>
         <div class="ph-body">
           <div class="ph-cols">
@@ -1758,7 +1777,7 @@
               </div>
             </article>
             <article class="ph-chart-card">
-              <h3 class="ph-chart-title">To &#8212; <span data-metric="cost.deltaVsDefault">65%</span> of the original</h3>
+              <h3 class="ph-chart-title"><span data-metric="cost.deltaVsDefault">65%</span> of the original</h3>
               <div class="ph-chart">
                 <div class="ph-chart-inner">
               <svg viewBox="-150 16 656 296" role="img"
