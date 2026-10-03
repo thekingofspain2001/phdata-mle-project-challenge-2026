@@ -624,22 +624,24 @@
     }
 
     /* .ph-shots layout lives below, with the rest of the S8 input block. */
-    /* Runtime table: centred in the pane, rows spread over the vertical slack. */
+    /* Runtime table: 17 rows in one pane, so it runs full width and trades row
+       padding for height. It steps up a size from body type to stay readable
+       at that density, and the box title is dropped since the column heads
+       already say what the table is. */
     .ph-s8-panes .ph-table {
-      width: auto;
-      margin-inline: auto;
+      width: 100%;
+      font-size: var(--fs-lead);
     }
 
     .ph-s8-panes .ph-table th,
     .ph-s8-panes .ph-table td {
-      padding: var(--sp-xs) var(--gap-sm) var(--sp-xs) 0;
+      padding: 3px var(--gap-sm) 3px 0;
     }
 
-    /* Keep the table centred, but give the value columns room so it uses
-       the horizontal space instead of hugging the middle. */
     .ph-s8-panes .ph-table thead th:not(:first-child),
     .ph-s8-panes .ph-table tbody td {
-      min-width: 12ch;
+      min-width: 0;
+      width: 26%;
     }
 
     /* Was/To side by side. Stacked, the taller To panel (419x750) ran past the
@@ -1888,7 +1890,6 @@
             </ol>
             <div class="ph-cols ph-s8-panes">
               <article class="fragment ph-s8-pane" data-fragment-index="0">
-                <h3>Runtime</h3>
                 <table class="ph-table">
                   <thead>
                     <tr>
