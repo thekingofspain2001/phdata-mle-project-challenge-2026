@@ -1,0 +1,40 @@
+# benchmake tests=5 runs=5 calls=1000 concurrency=1
+# payload_source=/docs request examples, cycled unfiltered; means include 422s and one 500
+# python=3.14.7 platform=Linux-6.18.40.1-microsoft-standard-WSL2-x86_64-with-glibc2.44
+# generated=2026-10-03T05:35:56+00:00
+#
+# per-run means
+test,endpoint,run,mean_call_ms
+v1-original,/predict-original,1,15.5731
+v1-original,/predict-original,2,15.0374
+v1-original,/predict-original,3,15.2330
+v1-original,/predict-original,4,15.1050
+v1-original,/predict-original,5,15.5336
+v1-cached,/predict-cached,1,14.8872
+v1-cached,/predict-cached,2,13.7348
+v1-cached,/predict-cached,3,13.6673
+v1-cached,/predict-cached,4,14.4248
+v1-cached,/predict-cached,5,14.0074
+v1-noprint,/predict-noprint,1,5.6144
+v1-noprint,/predict-noprint,2,5.5147
+v1-noprint,/predict-noprint,3,5.5075
+v1-noprint,/predict-noprint,4,5.4578
+v1-noprint,/predict-noprint,5,5.4773
+v2-no-nulls,/predict/v2,1,9.5770
+v2-no-nulls,/predict/v2,2,9.4273
+v2-no-nulls,/predict/v2,3,9.4383
+v2-no-nulls,/predict/v2,4,9.6523
+v2-no-nulls,/predict/v2,5,9.3368
+v2-moving-null,/predict/v2,1,12.1431
+v2-moving-null,/predict/v2,2,12.5088
+v2-moving-null,/predict/v2,3,12.1390
+v2-moving-null,/predict/v2,4,12.2839
+v2-moving-null,/predict/v2,5,12.2175
+#
+# per-test median of RUNS, the figure the deck quotes
+test,endpoint,runs,median_call_ms
+v1-original,/predict-original,5,15.2330
+v1-cached,/predict-cached,5,14.0074
+v1-noprint,/predict-noprint,5,5.5075
+v2-no-nulls,/predict/v2,5,9.4383
+v2-moving-null,/predict/v2,5,12.2175

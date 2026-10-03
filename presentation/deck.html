@@ -355,8 +355,10 @@
     }
 
     /* S6: the original ring takes the max width; v2 is sized as its share of
-       the original's time (13.1 / 20.1 = 65%, so 81% of the width, which
-       makes the ring AREA 65%). Values are proportions, not pixel sizes. */
+       the original's time (9.4 / 15.2 = 62%). These are RINGS, not filled
+       discs: band area = pi((r+15)^2 - (r-15)^2) = 60*pi*r, which is LINEAR
+       in r, so r = r1 * ratio. Scaling by sqrt() would make the band area
+       read 62%^2 = 38% of the original instead of 62%. */
     .ph-donuts {
       display: flex;
       align-items: center;
@@ -378,8 +380,9 @@
 
     /* Circle is sized off min(vh, vw) so it shrinks on whichever axis is
        tighter instead of overflowing a short or narrow viewport. v2 keeps the
-       same base and takes the time delta: 13.1 / 20.1 = 65% of the time, so
-       sqrt(0.65) = 81% of the diameter, which makes the ring AREA 65%. */
+       same base and takes the time delta: 9.4 / 15.2 = 62% of the time, and
+       because the svg draws a band rather than a disc, that is 62% of the
+       diameter too - see the band-area note above. */
     .ph-donut svg {
       width: 100%;
       height: auto;
@@ -1772,30 +1775,30 @@
               <div class="ph-chart">
                 <div class="ph-chart-inner">
               <svg viewBox="-140 10 660 314" role="img"
-                aria-label="Original route: 20.1 ms per call, split 12.3 ms debug code at 61%, 1.4 ms artifact loading at 7%, 6.4 ms calculation at 32%">
+                aria-label="Original route: 15.2 ms per call, split 9.7 ms debug code at 64%, 1.2 ms artifact loading at 8%, 4.3 ms calculation at 28%">
                 <circle cx="180" cy="160" r="120" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="30" />
                 <circle cx="180" cy="160" r="120" fill="none" stroke="var(--av)" stroke-width="30"
-                  stroke-dasharray="461 293" stroke-dashoffset="0" transform="rotate(-90 180 160)" />
+                  stroke-dasharray="481 273" stroke-dashoffset="0" transform="rotate(-90 180 160)" />
                 <circle cx="180" cy="160" r="120" fill="none" stroke="var(--md)" stroke-width="30"
-                  stroke-dasharray="52 702" stroke-dashoffset="-461" transform="rotate(-90 180 160)" />
+                  stroke-dasharray="60 694" stroke-dashoffset="-481" transform="rotate(-90 180 160)" />
                 <circle cx="180" cy="160" r="120" fill="none" stroke="var(--knn)" stroke-width="30"
-                  stroke-dasharray="240 514" stroke-dashoffset="-513" transform="rotate(-90 180 160)" />
+                  stroke-dasharray="212 542" stroke-dashoffset="-542" transform="rotate(-90 180 160)" />
                 <g class="ph-seg">
-                  <line x1="318" y1="211" x2="358" y2="226" stroke="rgba(255,255,255,0.28)" stroke-width="4.5" />
-                  <text class="ph-seg-name" x="368" y="229" fill="var(--av)">Debug code</text>
-                  <text class="ph-seg-val" x="368" y="253">12.3 ms &#183; 61%</text>
+                  <line x1="313" y1="222" x2="353" y2="237" stroke="rgba(255,255,255,0.28)" stroke-width="4.5" />
+                  <text class="ph-seg-name" x="363" y="240" fill="var(--av)">Debug code</text>
+                  <text class="ph-seg-val" x="363" y="264">9.7 ms &#183; 64%</text>
                 </g>
                 <g class="ph-seg">
-                  <line x1="63" y1="249" x2="28" y2="274" stroke="rgba(255,255,255,0.28)" stroke-width="4.5" />
-                  <text class="ph-seg-name" x="20" y="280" text-anchor="end" fill="var(--md)">Load</text>
-                  <text class="ph-seg-val" x="20" y="302" text-anchor="end">1.4 ms &#183; 7%</text>
+                  <line x1="48" y1="224" x2="13" y2="249" stroke="rgba(255,255,255,0.28)" stroke-width="4.5" />
+                  <text class="ph-seg-name" x="5" y="255" text-anchor="end" fill="var(--md)">Load</text>
+                  <text class="ph-seg-val" x="5" y="277" text-anchor="end">1.2 ms &#183; 8%</text>
                 </g>
                 <g class="ph-seg">
-                  <line x1="56" y1="80" x2="20" y2="57" stroke="rgba(255,255,255,0.28)" stroke-width="4.5" />
-                  <text class="ph-seg-name" x="12" y="52" text-anchor="end" fill="var(--knn)">Calculation</text>
-                  <text class="ph-seg-val" x="12" y="74" text-anchor="end">6.4 ms &#183; 32%</text>
+                  <line x1="66" y1="67" x2="30" y2="44" stroke="rgba(255,255,255,0.28)" stroke-width="4.5" />
+                  <text class="ph-seg-name" x="22" y="39" text-anchor="end" fill="var(--knn)">Calculation</text>
+                  <text class="ph-seg-val" x="22" y="61" text-anchor="end">4.3 ms &#183; 28%</text>
                 </g>
-                <text class="ph-donut-total" x="180" y="158" text-anchor="middle">20.1</text>
+                <text class="ph-donut-total" x="180" y="158" text-anchor="middle">15.2</text>
                 <text class="ph-donut-unit" x="180" y="182" text-anchor="middle">ms / call</text>
               </svg>
                 </div>
@@ -1806,16 +1809,16 @@
               <div class="ph-chart">
                 <div class="ph-chart-inner">
               <svg viewBox="-140 10 660 314" role="img"
-                aria-label="V2 route: 13.1 ms per call, all of it calculation">
-                <circle cx="180" cy="160" r="96.7" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="30" />
-                <circle cx="180" cy="160" r="96.7" fill="none" stroke="var(--knn)" stroke-width="30"
-                  stroke-dasharray="607 0" stroke-dashoffset="0" transform="rotate(-90 180 160)" />
+                aria-label="V2 route: 9.4 ms per call, all of it calculation">
+                <circle cx="180" cy="160" r="74.4" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="30" />
+                <circle cx="180" cy="160" r="74.4" fill="none" stroke="var(--knn)" stroke-width="30"
+                  stroke-dasharray="467 0" stroke-dashoffset="0" transform="rotate(-90 180 160)" />
                 <g class="ph-seg">
-                  <line x1="281" y1="89" x2="336" y2="51" stroke="rgba(255,255,255,0.28)" stroke-width="4.5" />
+                  <line x1="263" y1="102" x2="336" y2="51" stroke="rgba(255,255,255,0.28)" stroke-width="4.5" />
                   <text class="ph-seg-name" x="344" y="45" fill="var(--knn)">Calculation</text>
-                  <text class="ph-seg-val" x="344" y="69">13.1 ms &#183; 100%</text>
+                  <text class="ph-seg-val" x="344" y="69">9.4 ms &#183; 100%</text>
                 </g>
-                <text class="ph-donut-total" x="180" y="158" text-anchor="middle">13.1</text>
+                <text class="ph-donut-total" x="180" y="158" text-anchor="middle">9.4</text>
                 <text class="ph-donut-unit" x="180" y="182" text-anchor="middle">ms / call</text>
               </svg>
                 </div>
@@ -1837,41 +1840,42 @@
             <tbody>
               <tr class="ph-kpi-av">
                 <th scope="row">Debug code</th>
-                <td><span data-metric="cost.dev">12.3 ms</span></td>
+                <td><span data-metric="cost.dev">9.7 ms</span></td>
                 <td><span class="ph-na">&#183;</span></td>
-                <td><span data-metric="cost.devDelta">&#8722;12.3 ms</span></td>
+                <td><span data-metric="cost.devDelta">&#8722;9.7 ms</span></td>
               </tr>
               <tr class="ph-kpi-md">
                 <th scope="row">Artifact loading</th>
-                <td><span data-metric="cost.load">1.4 ms</span></td>
+                <td><span data-metric="cost.load">1.2 ms</span></td>
                 <td><span class="ph-na">&#183;</span></td>
-                <td><span data-metric="cost.loadDelta">&#8722;1.4 ms</span></td>
+                <td><span data-metric="cost.loadDelta">&#8722;1.2 ms</span></td>
               </tr>
               <tr class="ph-kpi-knn">
                 <th scope="row">Calculation</th>
-                <td><span data-metric="cost.calcOrig">6.4 ms</span></td>
-                <td><span data-metric="cost.calcV2">13.1 ms</span></td>
-                <td><span data-metric="cost.calcDelta">+6.7 ms</span></td>
+                <td><span data-metric="cost.calcOrig">4.3 ms</span></td>
+                <td><span data-metric="cost.calcV2">9.4 ms</span></td>
+                <td><span data-metric="cost.calcDelta">+5.2 ms</span></td>
               </tr>
               <tr>
                 <th scope="row">Total time</th>
-                <td><span data-metric="cost.totalOrig">20.1 ms</span></td>
-                <td><span data-metric="cost.totalV2">13.1 ms</span></td>
-                <td><span data-metric="cost.totalDelta">&#8722;7.0 ms</span></td>
+                <td><span data-metric="cost.totalOrig">15.2 ms</span></td>
+                <td><span data-metric="cost.totalV2">9.4 ms</span></td>
+                <td><span data-metric="cost.totalDelta">&#8722;5.8 ms</span></td>
               </tr>
               <tr class="ph-muted">
                 <th scope="row">Improvement</th>
                 <td><span class="ph-na">&#183;</span></td>
                 <td><span class="ph-na">&#183;</span></td>
-                <td><span data-metric="cost.improvement">35% faster</span></td>
+                <td><span data-metric="cost.improvement">38% faster</span></td>
               </tr>
             </tbody>
               </table>
             </article>
           </div>
           <p class="ph-foot ph-foot-sm">
-            Median of 3 runs &#215; 1000 calls, one at a time, over the 201 examples
-            published on <code>/docs</code>; costs priced by subtraction.
+            Median of 5 runs &#215; 1000 calls, one at a time, over the 201 examples
+            published on <code>/docs</code>; costs priced by subtraction. Figures
+            include the half of the examples v1 rejects with 422.
           </p>
         </div>
       </section>
@@ -2146,20 +2150,22 @@
   <script>
     /* Single source for every number on the slides. Edit here, all renders update. */
     const DECK_METRICS = {
-      // S6 cost split, medians of 3 runs of 1000 calls over the /docs examples.
+      // S6 cost split, median of 5 runs of 1000 calls over the /docs examples,
+      // measured by test/benchmark/benchmake.py. Each cost is a subtraction:
+      // dev = original - noprint, load = original - cached, calc is the
+      // remainder. Reproduce with: uv run python test/benchmark/benchmake.py
       cost: {
-        dev: "12.3 ms",
-        load: "1.4 ms",
-        calcOrig: "6.4 ms",
-        calcV2: "13.1 ms",
-        totalOrig: "20.1 ms",
-        totalV2: "13.1 ms",
-        deltaVsDefault: "65%",
-        devDelta: "−12.3 ms",
-        loadDelta: "−1.4 ms",
-        calcDelta: "+6.7 ms",
-        totalDelta: "−7.0 ms",
-        improvement: "35% faster",
+        dev: "9.7 ms",
+        load: "1.2 ms",
+        calcOrig: "4.3 ms",
+        calcV2: "9.4 ms",
+        totalOrig: "15.2 ms",
+        totalV2: "9.4 ms",
+        devDelta: "−9.7 ms",
+        loadDelta: "−1.2 ms",
+        calcDelta: "+5.2 ms",
+        totalDelta: "−5.8 ms",
+        improvement: "38% faster",
       },
       nnr: { recovered: "10–20%" },
       knn: {
