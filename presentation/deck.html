@@ -31,6 +31,9 @@
       --av: #e8b04b;
       --md: #7fb6d9;
       --knn: #c792ea;
+      /* Imputation cost: not an approach, a cost. Warm coral so it reads as
+         overhead on top of the purple calculation rather than a fourth method. */
+      --imp: #ef8354;
 
       /* Type scale (slide px at 1270x961 design size; reveal scales uniformly). */
       --fs-brand: 16px;
@@ -483,9 +486,40 @@
       backdrop-filter: blur(14px);
     }
 
+    /* S6 row 1: the three donuts are compared by BAND AREA, so all three svgs
+       must render at one scale - different scales would make every area ratio a
+       fiction. Each viewBox is cropped to its own content (384.7, 477.3, 493
+       units wide), and the split below sizes each box to those widths in
+       proportion so all three land on the same 0.804 scale. Percentages rather
+       than pixels so the ratio survives a resize. Basis resolves against the
+       row's CONTENT box, and the three sum to 100% of it - each card's own
+       26px padding is on top of that, which is why the basis values sit below
+       the outer widths the cards measure on screen. */
+    #s6-performance .ph-cols:first-of-type > .ph-chart-card:nth-child(1) {
+      flex: 0 1 37.59%;
+    }
+
+    #s6-performance .ph-cols:first-of-type > .ph-chart-card:nth-child(2) {
+      flex: 0 1 29.11%;
+    }
+
+    #s6-performance .ph-cols:first-of-type > .ph-chart-card:nth-child(3) {
+      flex: 0 1 33.3%;
+    }
+
     /* S6 row 1: card is a column with a fixed-height title; the chart area
-       takes the remaining space and centres the svg inside itself, so the
-       rings grow with the box instead of sitting at a fixed pixel size. */
+       takes the remaining space and holds the callouts on the left with the
+       ring on the right.
+
+       The svg is sized from its HEIGHT alone. Every chart's viewBox is the same
+       height, so all three render at one scale, and an svg's width is then just
+       its aspect ratio - which for a ring is its outer diameter. The outer
+       radius alone decides how wide a chart is; the labels live in HTML beside
+       it and cannot push a ring around. Height drives, width follows.
+
+       Because the rings are strokes of one width, band area = 60*pi*r is
+       linear in r, so r is set from each route's own time and the areas track
+       the costs directly. */
     .ph-chart-card {
       display: flex;
       flex-direction: column;
@@ -501,21 +535,28 @@
       flex: 1 1 auto;
       min-height: 0;
       display: flex;
-      justify-content: center;
       align-items: center;
+      justify-content: flex-end;
+      gap: var(--gap-sm);
     }
 
-    .ph-chart-inner {
+    /* Callouts live in HTML, not the svg, so their width never feeds back into
+       the chart's geometry. One fixed column width across all three cards, so
+       every ring starts at the same x and the three read as one row. */
+    .ph-chart-labels {
+      flex: 0 0 auto;
+      width: 17ch;
       display: flex;
+      flex-direction: column;
       justify-content: center;
-      align-items: center;
-      width: 100%;
-      height: 100%;
+      gap: var(--sp-sm);
+      text-align: right;
     }
 
     .ph-chart svg {
-      width: 100%;
+      flex: 0 0 auto;
       height: 100%;
+      width: auto;
     }
 
     .ph-donut-total {
@@ -1771,32 +1812,32 @@
         <div class="ph-body">
           <div class="ph-cols">
             <article class="ph-chart-card">
-              <h3 class="ph-chart-title">From</h3>
+              <h3 class="ph-chart-title">From &#183; original route</h3>
               <div class="ph-chart">
                 <div class="ph-chart-inner">
-              <svg viewBox="-140 10 660 314" role="img"
+              <svg viewBox="-146.7 -14.6 493 340.9" role="img"
                 aria-label="Original route: 15.2 ms per call, split 9.7 ms debug code at 64%, 1.2 ms artifact loading at 8%, 4.3 ms calculation at 28%">
                 <circle cx="180" cy="160" r="120" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="30" />
                 <circle cx="180" cy="160" r="120" fill="none" stroke="var(--av)" stroke-width="30"
-                  stroke-dasharray="481 273" stroke-dashoffset="0" transform="rotate(-90 180 160)" />
+                  stroke-dasharray="481 273" stroke-dashoffset="0" transform="rotate(-64.13 180 160)" />
                 <circle cx="180" cy="160" r="120" fill="none" stroke="var(--md)" stroke-width="30"
-                  stroke-dasharray="60 694" stroke-dashoffset="-481" transform="rotate(-90 180 160)" />
+                  stroke-dasharray="60 694" stroke-dashoffset="-481" transform="rotate(-64.13 180 160)" />
                 <circle cx="180" cy="160" r="120" fill="none" stroke="var(--knn)" stroke-width="30"
-                  stroke-dasharray="212 542" stroke-dashoffset="-542" transform="rotate(-90 180 160)" />
+                  stroke-dasharray="212 542" stroke-dashoffset="-542" transform="rotate(-64.13 180 160)" />
                 <g class="ph-seg">
-                  <line x1="313" y1="222" x2="353" y2="237" stroke="rgba(255,255,255,0.28)" stroke-width="4.5" />
-                  <text class="ph-seg-name" x="363" y="240" fill="var(--av)">Debug code</text>
-                  <text class="ph-seg-val" x="363" y="264">9.7 ms &#183; 64%</text>
+                  <line x1="76" y1="264" x2="41" y2="298" stroke="rgba(255,255,255,0.28)" stroke-width="4.5" />
+                  <text class="ph-seg-name" x="35" y="290" text-anchor="end" fill="var(--av)">Debug code</text>
+                  <text class="ph-seg-val" x="35" y="312" text-anchor="end">9.7 ms &#183; 64%</text>
                 </g>
                 <g class="ph-seg">
-                  <line x1="48" y1="224" x2="13" y2="249" stroke="rgba(255,255,255,0.28)" stroke-width="4.5" />
-                  <text class="ph-seg-name" x="5" y="255" text-anchor="end" fill="var(--md)">Load</text>
-                  <text class="ph-seg-val" x="5" y="277" text-anchor="end">1.2 ms &#183; 8%</text>
+                  <line x1="33" y1="160" x2="-16" y2="160" stroke="rgba(255,255,255,0.28)" stroke-width="4.5" />
+                  <text class="ph-seg-name" x="-22" y="152" text-anchor="end" fill="var(--md)">Load</text>
+                  <text class="ph-seg-val" x="-22" y="174" text-anchor="end">1.2 ms &#183; 8%</text>
                 </g>
                 <g class="ph-seg">
-                  <line x1="66" y1="67" x2="30" y2="44" stroke="rgba(255,255,255,0.28)" stroke-width="4.5" />
-                  <text class="ph-seg-name" x="22" y="39" text-anchor="end" fill="var(--knn)">Calculation</text>
-                  <text class="ph-seg-val" x="22" y="61" text-anchor="end">4.3 ms &#183; 28%</text>
+                  <line x1="76" y1="56" x2="41" y2="21" stroke="rgba(255,255,255,0.28)" stroke-width="4.5" />
+                  <text class="ph-seg-name" x="35" y="13" text-anchor="end" fill="var(--knn)">Calculation</text>
+                  <text class="ph-seg-val" x="35" y="35" text-anchor="end">4.3 ms &#183; 28%</text>
                 </g>
                 <text class="ph-donut-total" x="180" y="158" text-anchor="middle">15.2</text>
                 <text class="ph-donut-unit" x="180" y="182" text-anchor="middle">ms / call</text>
@@ -1805,20 +1846,47 @@
               </div>
             </article>
             <article class="ph-chart-card">
-              <h3 class="ph-chart-title">To</h3>
+              <h3 class="ph-chart-title">To &#183; no nulls</h3>
               <div class="ph-chart">
                 <div class="ph-chart-inner">
-              <svg viewBox="-140 10 660 314" role="img"
-                aria-label="V2 route: 9.4 ms per call, all of it calculation">
+              <svg viewBox="-121.3 79.6 381.7 160.8" role="img"
+                aria-label="V2 route with every field present: 9.4 ms per call, all of it calculation">
                 <circle cx="180" cy="160" r="74.4" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="30" />
                 <circle cx="180" cy="160" r="74.4" fill="none" stroke="var(--knn)" stroke-width="30"
                   stroke-dasharray="467 0" stroke-dashoffset="0" transform="rotate(-90 180 160)" />
                 <g class="ph-seg">
-                  <line x1="263" y1="102" x2="336" y2="51" stroke="rgba(255,255,255,0.28)" stroke-width="4.5" />
-                  <text class="ph-seg-name" x="344" y="45" fill="var(--knn)">Calculation</text>
-                  <text class="ph-seg-val" x="344" y="69">9.4 ms &#183; 100%</text>
+                  <line x1="79" y1="160" x2="31" y2="160" stroke="rgba(255,255,255,0.28)" stroke-width="4.5" />
+                  <text class="ph-seg-name" x="25" y="152" text-anchor="end" fill="var(--knn)">Calculation</text>
+                  <text class="ph-seg-val" x="25" y="174" text-anchor="end">9.4 ms &#183; 100%</text>
                 </g>
                 <text class="ph-donut-total" x="180" y="158" text-anchor="middle">9.4</text>
+                <text class="ph-donut-unit" x="180" y="182" text-anchor="middle">ms / call</text>
+              </svg>
+                </div>
+              </div>
+            </article>
+            <article class="ph-chart-card">
+              <h3 class="ph-chart-title">To &#183; all seven null</h3>
+              <div class="ph-chart">
+                <div class="ph-chart-inner">
+              <svg viewBox="-105.5 7.5 436.7 334.8" role="img"
+                aria-label="V2 route with all seven nullable fields null: 14.6 ms per call, 64.8% base calculation and 35.2% imputation cost">
+                <circle cx="180" cy="160" r="114.7" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="30" />
+                <circle cx="180" cy="160" r="114.7" fill="none" stroke="var(--knn)" stroke-width="30"
+                  stroke-dasharray="467 253" stroke-dashoffset="0" transform="rotate(-71.5 180 160)" />
+                <circle cx="180" cy="160" r="114.7" fill="none" stroke="var(--imp)" stroke-width="30"
+                  stroke-dasharray="253 467" stroke-dashoffset="-467" transform="rotate(-71.5 180 160)" />
+                <g class="ph-seg">
+                  <line x1="99" y1="276" x2="46" y2="305" stroke="rgba(255,255,255,0.28)" stroke-width="4.5" />
+                  <text class="ph-seg-name" x="40" y="308" text-anchor="end" fill="var(--knn)">Calculation</text>
+                  <text class="ph-seg-val" x="40" y="330" text-anchor="end">9.4 ms &#183; 65%</text>
+                </g>
+                <g class="ph-seg">
+                  <line x1="80" y1="60" x2="36" y2="38" stroke="rgba(255,255,255,0.28)" stroke-width="4.5" />
+                  <text class="ph-seg-name" x="30" y="35" text-anchor="end" fill="var(--imp)">Imputation</text>
+                  <text class="ph-seg-val" x="30" y="57" text-anchor="end">5.1 ms &#183; 35%</text>
+                </g>
+                <text class="ph-donut-total" x="180" y="158" text-anchor="middle">14.6</text>
                 <text class="ph-donut-unit" x="180" y="182" text-anchor="middle">ms / call</text>
               </svg>
                 </div>
