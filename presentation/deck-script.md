@@ -181,13 +181,21 @@ verbatim from `deck.html` CSS.
     `flex-wrap:nowrap`, `gap:var(--sp-xs)`); `li.ph-s8-chip.fragment`
     (`flex:1 1 0`, `display:flex`, `align-items:center`, `gap:var(--gap-sm)`)
     always visible, `span.ph-num` for the number; the
-    `.current-fragment` chip reads as selected with mint text, mint left
+    `.current-fragment` chip reads as selected with mint left
     border and `rgba(165,254,202,0.12)` fill — no light fill, so the
-    chip column stays navy. Right `div.ph-cols.ph-s8-panes`
+    chip column stays navy. Chip 01 and pane 01 carry `ph-is-base` and no
+    `fragment` class: they are the slide's resting state, so the slide opens
+    on step 1 with no click (reveal has no attribute to start a slide
+    mid-fragment, upstream #2560). The base chip/pane are painted by
+    `:not(:has(.fragment.visible))` and retired by
+    `:has(.fragment.visible)`; steps 2-4 are the only fragments,
+    `data-fragment-index` 0-2. Right `div.ph-cols.ph-s8-panes`
     (`display:grid`, panes stretch to the full body height);
     `article.ph-s8-pane` all at `grid-area:1 / 1`, only `.current-fragment`
     shown, so reveal keeps `.visible` on past panes while CSS shows the
-    current one. Fills, borders and type come from `.ph-scr` / `.ph-cols`.
+    current one. The base pane also carries the `.current-fragment` border +
+    glow while it rests. Fills, borders and type come from `.ph-scr` /
+    `.ph-cols`.
     Code listings use `pre.ph-code` with `code.language-*` (inset navy
     fill, mint-tinted frame, `--fs-body`, `white-space:pre` so source line
     breaks hold) instead of inline `code`. Pane subheadings `h4` sit below
@@ -380,14 +388,30 @@ Layout: T-cols-2. Fragments: 2, no foot.
 ## S8 — Modernised base (title same, `section.ph-caps.ph-s8`)
 
 Layout: two columns, `div.ph-s8` inside `.ph-body` — `ol.ph-s8-chips` left,
-`div.ph-s8-panes` right. Fragments: 4, paired by `data-fragment-index`, so each
-step lights one chip and swaps one pane. Chips stay visible (override of
-reveal's `.fragment` opacity); only `.current-fragment` pane is shown.
+`div.ph-s8-panes` right. **Chips 01 and panes 01 carry `ph-is-base` and no
+`fragment` class: they are the slide's resting state, so the slide opens on
+step 1 with no click.** Reveal has no attribute to start a slide mid-fragment
+(upstream #2560), so the base state is expressed as the *absence* of any step
+fragment — `:not(:has(.fragment.visible))` paints the base chip and pane, and
+`:has(.fragment.visible)` retires them. Steps 2-4 are the only fragments,
+`data-fragment-index` 0-2. Chips stay visible (override of reveal's
+`.fragment` opacity); only the `.current-fragment` pane is shown. The base pane
+also carries the `article.current-fragment` border + glow while it rests.
+
+On step 1 the runtime table is centred in its pane both ways (the pane is a
+centred flex column; the table's own `max-width` + `margin-inline: auto` does
+the horizontal half).
+
+Step 3: both captures are `contain`-centred in one shared 419/750 box, so the
+portrait To fills it and the landscape From leaves slack above and below. Each
+shot's `h4` is shifted down by `--ph-shot-drop` (measured in JS from the
+capture's own natural ratio) to stay hard against its picture, and the zoom
+flight's `painted()` measures the painted rect rather than the box.
 
 | Step | Chip | Pane content |
 |------|------|--------------|
-| 1 | 01 Runtime | `table.ph-table`: Library / From / To. `httpx` and `pip` struck as dropped (`class="ph-muted"`), `httpx2` and `uv` as replacements. |
-| 2 | 02 Type hints | Was `def predict(home_features):`; now `def predict_v2(home_features: HomeFeaturesV2, request: Request) -> PredictionResponse:`. |
+| 1 (resting, no click) | 01 Runtime | `table.ph-table`: Library / From / To. `httpx` and `pip` struck as dropped (`class="ph-muted"`), `httpx2` and `uv` as replacements. Table centred v+h in the pane. |
+| 2 | 02 Type hints | Was `def predict(home_features):`; now the two types the signature names, declared above it: `class HomeFeaturesV2(BaseModel)` (`bedrooms: int \| None = Field(default=None, ge=0)`, six more nullable fields elided, `zipcode: str = Field(pattern=r"^\d{5}$")`) and `class PredictionResponse(BaseModel)` (`predicted_price: float = Field(examples=[394708.0])`), then `def predict_v2(home_features: HomeFeaturesV2, request: Request) -> PredictionResponse:`. The six middle fields are elided to fit the pane — the pane holds ~13 code lines and the full class is 8 fields. |
 | 3 | 03 Input validation | Was `HomeFeatures` (every field required); now `HomeFeaturesV2` (nullable fields + `zipcode` pattern `^\d{5}$`). |
 | 4 | 04 Swagger schema | v1 `/predict` generic object, no error model; v2 `/predict/v2` returns `{"predicted_price": 394708.0}` with 404/500 `ErrorDetail`. |
 

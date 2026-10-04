@@ -102,6 +102,14 @@ docker rm housing-api
 docker logs housing-api
 ```
 
+**Logs:** every line is single-line JSON on stdout (app, `uvicorn.error`, `uvicorn.access`), each entry carrying the
+request's `correlation_id`. Send `X-Request-ID` on a request to pin the ID, or read the generated one back from the
+response header.
+
+```bash
+docker logs housing-api | jq -c 'select(.correlation_id != null)'
+```
+
 ## Usage
 
 To get predictions from the model, send a POST request to the `/predict` endpoint with the required features in JSON format. The API will return the predicted home price along with any additional metadata.
@@ -145,6 +153,22 @@ make test-all
 - Verify end-to-end functionality via HTTP requests
 - Ensure Docker networking and orchestration work correctly
 - More comprehensive but slower execution
+
+**Quality** (`test/quality/`)
+
+Analysis scripts that measure output quality rather than assert it. They run locally against the venv and write their results next to themselves.
+
+- `imputation_accuracy.py` - compares mean, median, raw KNN and z-scored KNN imputation of the seven non-zipcode `/predict/v2` fields, on held-out sales rows, and writes `imputation_accuracy.md` plus four CSVs. Scored on scale-free NMAE/NRMSE and on Pearson correlation, with paired Wilcoxon tests and bootstrap confidence intervals.
+
+```bash
+python test/quality/imputation_accuracy.py
+```
+
+**Benchmarks** (`test/benchmark/`)
+
+Scripts that measure speed rather than correctness. Same contract as above: run locally, write results next to themselves.
+
+- `bench_predict.py` - request latency under closed-loop concurrency, writing `results.csv`.
 
 ### Running Tests
 

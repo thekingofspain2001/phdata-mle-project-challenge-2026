@@ -23,12 +23,13 @@ Two forced deviations from e9ef514, both because the original cannot run here:
 
 import json
 import pickle
+from typing import cast
 
 import pandas as pd
 from fastapi import APIRouter, Request
 from pydantic import BaseModel
 
-from api.shared import DEMOGRAPHICS_PATH, FEATURES_PATH, MODEL_PATH, require_artifacts
+from api.shared import DEMOGRAPHICS_PATH, FEATURES_PATH, MODEL_PATH, Predictor, require_artifacts
 
 router_variants = APIRouter(tags=["bench"])
 
@@ -46,10 +47,10 @@ class HomeFeatures(BaseModel):
     zipcode: str
 
 
-def _reload_from_disk() -> tuple[object, list[str], pd.DataFrame]:
+def _reload_from_disk() -> tuple[Predictor, list[str], pd.DataFrame]:
     """Reproduce the e9ef514 per-call load: unpickle the model, read both data files."""
     with MODEL_PATH.open("rb") as model_file:
-        model = pickle.load(model_file)  # noqa: S301 - trusted artifact, mirrors e9ef514
+        model = cast("Predictor", pickle.load(model_file))  # noqa: S301 - trusted artifact, mirrors e9ef514
     with FEATURES_PATH.open() as features_file:
         model_features = json.load(features_file)
     demographics = pd.read_csv(DEMOGRAPHICS_PATH, dtype={"zipcode": str})

@@ -38,6 +38,7 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+import contextlib
 import csv
 import importlib.util
 import itertools
@@ -70,7 +71,7 @@ VARIANT_ENDPOINTS = ("/predict-original", "/predict-sync")
 ENDPOINTS = REAL_ENDPOINTS
 CONCURRENCY_LEVELS = (1, 5, 10, 20, 50)
 
-type Scalar = str | int | float
+type Scalar = str | int | float | None
 type Payload = dict[str, Scalar]
 
 
@@ -156,13 +157,11 @@ async def closed_loop(path: str, payloads: Sequence[Payload], concurrency: int) 
                 if index >= len(payloads):
                     return
                 started = time.perf_counter()
-                try:
+                # The published examples include payloads the routes reject, and a
+                # rejected handler can drop the connection. The call still
+                # happened and still cost time, so record it and move on.
+                with contextlib.suppress(httpx.HTTPError):
                     await client.post(f"{BASE_URL}{path}", json=payloads[index])
-                except httpx.HTTPError:
-                    # The published examples include payloads the routes reject,
-                    # and a rejected handler can drop the connection. The call
-                    # still happened and still cost time, so record it and move on.
-                    pass
                 slots[index] = time.perf_counter() - started
 
         tasks = [asyncio.create_task(caller()) for _ in range(concurrency)]
@@ -199,7 +198,7 @@ def run_test(path: str, concurrency: int, rows: Sequence[Payload]) -> list[tuple
         # The v1 handlers print a DataFrame per call. Send stdout to devnull for
         # the whole run so the report stays readable; the repr is still built,
         # which is the cost under test, only the terminal write is dropped.
-        with open(os.devnull, "w") as sink:
+        with Path(os.devnull).open("w") as sink:
             sys.stdout = sink
             slots, wall = asyncio.run(closed_loop(path, rows, concurrency))
     finally:
@@ -221,7 +220,10 @@ def main() -> None:
     parser.add_argument("--calls", type=int, default=None, help="exact number of calls, cycling the examples")
     parser.add_argument("--source", choices=("swagger", "csv"), default="swagger", help="payload source")
     parser.add_argument(
-        "--routes", choices=("real", "variants"), default="real", help="real API routes or bench variants"
+        "--routes",
+        choices=("real", "variants"),
+        default="real",
+        help="real API routes or bench variants",
     )
     args = parser.parse_args()
 

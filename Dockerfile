@@ -13,8 +13,11 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 
 ARG PYTHON_VERSION=3.14
 FROM python:${PYTHON_VERSION}-slim
-
 WORKDIR /app
+
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONPATH=/app/src
 
 RUN apt-get update && apt-get install -y --no-install-recommends curl && \
     rm -rf /var/lib/apt/lists/*
@@ -26,4 +29,6 @@ ENV PATH="/app/.venv/bin:$PATH"
 
 EXPOSE 8000
 
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+# python -m main (not the uvicorn CLI) so the supervisor process also loads
+# logger_config; workers default to CPU count, override with WEB_CONCURRENCY.
+CMD ["python", "-m", "main"]
