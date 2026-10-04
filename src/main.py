@@ -1,5 +1,6 @@
 """FastAPI application serving home price predictions."""
 
+import os
 import time
 from typing import TYPE_CHECKING
 from uuid import uuid4
@@ -88,6 +89,9 @@ async def unhandled_exception(request: Request, exc: Exception) -> JSONResponse:
 app.add_middleware(CorrelationIdMiddleware, header_name="X-Request-ID", generator=lambda: str(uuid4()))
 
 if __name__ == "__main__":
+    # Import string, not the app object: workers>1 requires it (uvicorn docs).
+    # Starting here also means this process runs setup_logging(), so the
+    # supervisor's own startup/shutdown lines are JSON like the workers'.
     import uvicorn
 
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, workers=int(os.getenv("WEB_CONCURRENCY", os.cpu_count() or 1)))  # noqa: S104 - container entrypoint must bind all interfaces

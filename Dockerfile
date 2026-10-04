@@ -29,5 +29,6 @@ ENV PATH="/app/.venv/bin:$PATH"
 
 EXPOSE 8000
 
-# exec keeps PID 1 signal handling; one worker per CPU, no --reload in prod.
-CMD ["sh", "-c", "exec uvicorn main:app --host 0.0.0.0 --port 8000 --workers ${WEB_CONCURRENCY:-$(nproc)}"]
+# python -m main (not the uvicorn CLI) so the supervisor process also loads
+# logger_config; workers default to CPU count, override with WEB_CONCURRENCY.
+CMD ["python", "-m", "main"]

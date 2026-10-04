@@ -667,6 +667,22 @@
       color: var(--ph-ink-muted);
     }
 
+    /* The row's lowest NMAE - the method that landed closest on that field -
+       steps out of the muted ink into mint at full weight. Mint is the deck's
+       "current answer" token (the card border, the chip selection), so the cell
+       reads as the winner of its row rather than as a fourth method; the
+       method still reads from the tint behind it.
+
+       Marked per cell in the markup rather than derived in CSS: the winner is
+       not always the same column. Plot size is the exception - median (0.243)
+       beats both NN variants there, because plot size is the one field where
+       the unscaled NN is worse than the median and scaling does not recover
+       it. `min()` cannot compare across cells, so the class is the record. */
+    #s5-results .ph-table.ph-quality tbody td.ph-is-best {
+      color: var(--ph-mint);
+      font-weight: 700;
+    }
+
     /* S6 value table carries the headline figures, so it steps up from body
        type rather than sitting at the deck's reading size. */
     .ph-table.ph-figures-lg {
@@ -885,6 +901,29 @@
       color: var(--ph-accent);
     }
 
+    /* Chip 01 / pane 01 are the slide's resting state, not a click step: they
+       carry no .fragment, so the slide lands on 8.1 directly. Reveal exposes no
+       attribute to start a slide mid-fragment (upstream #2560), so the base
+       state is expressed as the absence of any step fragment instead. */
+
+    /* The runtime table is the slide's opening frame, so it sits centred in the
+       pane both ways: the column stacks vertically, and the table's own
+       max-width + margin-inline: auto (below) does the horizontal half. */
+    .ph-caps .ph-s8 .ph-s8-pane.ph-is-base {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    /* While it is the resting pane the base pane is the current card, so it
+       wears the same border + glow `article.current-fragment` gives the other
+       three; it never holds that class itself. */
+    .ph-caps .ph-s8 .ph-s8-panes:not(:has(.ph-s8-pane.fragment.visible))
+      .ph-s8-pane.ph-is-base {
+      border-color: var(--ph-mint);
+      box-shadow: 0 0 24px rgba(165, 254, 202, 0.25);
+    }
+
     /* Chips stay listed through every step; current one reads as selected. */
     .ph-caps .ph-s8 .ph-s8-chip.fragment {
       opacity: 1;
@@ -892,10 +931,25 @@
     }
     /* Selection is carried by the fill and the left rule, not by recolouring the
        title - a chip that changes colour on selection reads as a different kind
-       of item rather than the same item in a different state. */
+       of item rather than the same item in a different state.
+
+       Chip 01 is the slide's base state: it carries no .fragment, so the slide
+       lands on it without a click (reveal exposes no attribute to start a slide
+       mid-fragment - upstream #2560). It holds the selected fill until the
+       first step fragment fires, then hands it over like any other chip. */
+    .ph-caps .ph-s8 .ph-s8-chip.ph-is-base,
     .ph-caps .ph-s8 .ph-s8-chip.current-fragment {
       background-color: rgba(165, 254, 202, 0.12);
       border-left-color: var(--ph-mint);
+    }
+
+    /* Past the base step chip 01 is an ordinary listed chip again: it keeps its
+       row so the column stays a stable index, and drops back to the resting
+       fill .ph-scr li gives every chip. */
+    .ph-caps .ph-s8 .ph-s8-chips:has(.ph-s8-chip.fragment.visible)
+      .ph-s8-chip.ph-is-base {
+      background-color: var(--ph-card-bg);
+      border-left-color: var(--ph-card-border);
     }
 
     /* Panes stack in one cell. Reveal keeps .visible on past fragments, so
@@ -937,6 +991,16 @@
        block is optically centred inside the card. */
     .ph-s8-panes .ph-table tr > :last-child {
       padding-right: 0;
+    }
+
+    /* From and To read as one pair in the deck accent, the same treatment the
+       pane labels and the two shot captions carry (see .ph-s8-pane h4 below).
+       Library keeps the mint header treatment: it names the column, it is not
+       one half of a before/after pair. Scoped to the runtime table so the
+       Swagger table's own headers are untouched. */
+    .ph-s8-pane.ph-is-base .ph-table thead th:nth-child(2),
+    .ph-s8-pane.ph-is-base .ph-table thead th:nth-child(3) {
+      color: var(--ph-accent);
     }
 
     /* Was/To side by side. Stacked, the taller To panel (419x750) ran past the
@@ -984,11 +1048,33 @@
       justify-content: flex-start;
     }
 
+    /* The label rides above its picture, not above the box: the capture is
+       centred in the box, so the landscape From starts far below the box top.
+       --ph-shot-drop is the slack above the picture, measured in JS (the two
+       captures have different natural ratios, so it is not a CSS constant),
+       and the h4 is shifted down by it to stay hard against its picture. */
     .ph-shot h4 {
       margin-bottom: var(--sp-xs);
+      transform: translateY(var(--ph-shot-drop, 0px));
     }
 
     .ph-caps .ph-s8 .ph-s8-pane.fragment {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    /* Pane 01 is the resting pane, the way chip 01 is the resting chip: it has
+       no .fragment, so it is what the slide shows on arrival. A step fragment
+       claims the cell the moment one fires and the base pane leaves. The base
+       pane is never .current-fragment, so it needs its own pair. */
+    .ph-caps .ph-s8 .ph-s8-panes:not(:has(.ph-s8-pane.fragment.visible))
+      .ph-s8-pane.ph-is-base {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .ph-caps .ph-s8 .ph-s8-panes:has(.ph-s8-pane.fragment.visible)
+      .ph-s8-pane.ph-is-base {
       opacity: 0;
       visibility: hidden;
     }
@@ -1507,11 +1593,14 @@
       width: auto;
       max-width: 100%;
       /* Both boxes share the taller capture's ratio, so they come out the same
-         size and render at one scale; Was simply sits inside the same box. */
+         size and render at one scale; Was simply sits inside the same box.
+         The portrait To fills that box, so `center` only moves the landscape
+         From: it used to hang off the top with all its slack below, and now
+         the slack splits evenly above and below. */
       aspect-ratio: 419 / 750;
       flex: 0 1 auto;
       background-repeat: no-repeat;
-      background-position: top center;
+      background-position: center;
       /* Each box honours its own aspect ratio at the shared column width, so
          both captures render at the same scale and their type matches. */
       background-size: contain;
@@ -1785,7 +1874,7 @@
           <h2>Missing value approaches</h2>
           <div class="ph-subs" aria-live="off">
             <p class="ph-subtitle ph-s4-sub ph-is-av">Average Value</p>
-            <p class="ph-subtitle ph-s4-sub ph-is-md">Mean value</p>
+            <p class="ph-subtitle ph-s4-sub ph-is-md">Medium value</p>
             <p class="ph-subtitle ph-s4-sub ph-is-knn">Nearest Neighbor</p>
             <p class="ph-subtitle ph-s4-sub ph-is-sum">Summary: similar homes win</p>
           </div>
@@ -1914,13 +2003,13 @@
                 </text>
                 <line x1="634" y1="44" x2="634" y2="108" stroke-width="2" marker-end="url(#arr-av)" />
               </g>
-              <!-- Median marker -->
+              <!-- Medium marker -->
               <g id="mk-med" class="mk" color="var(--md)" stroke="var(--md)">
                 <g transform="translate(452,10) scale(1.119)">
                   <use href="#hs" />
                 </g>
                 <text x="452" y="-66" text-anchor="middle" font-size="20" fill="var(--md)" stroke="none">
-                  Med
+                  Medium
                 </text>
                 <text x="452" y="30" text-anchor="middle" font-size="16" fill="var(--md)" stroke="none">
                   1885
@@ -1975,7 +2064,7 @@
               </article>
               <article class="ph-panel ph-is-md">
                 <div class="ph-panel-words">
-                  <h3>Mean value</h3>
+                  <h3>Medium value</h3>
                   <p>
                     Sort the row, take the middle. Mansions stop skewing the
                     answer. Still one number for all blanks.
@@ -1986,7 +2075,7 @@
                     role="img" aria-label="Single middle-size house">
                     <use href="#hs" transform="translate(130,102) scale(1.05)" />
                     <text x="130" y="16" text-anchor="middle" font-size="10" fill="var(--md)" stroke="none">
-                      =MEDIAN(1235,1300,1365,1520,1600,1680,
+                      =MEDIUM(1235,1300,1365,1520,1600,1680,
                     </text>
                     <text x="130" y="29" text-anchor="middle" font-size="10" fill="var(--md)" stroke="none">
                       2090,2200,2310,3610,3800,3990)
@@ -2052,7 +2141,7 @@
                 </div>
                 <div class="ph-panel-pick">
                   <p class="ph-panel-nums">
-                    AVG 2225 &#183; MED 1885 &#183; NN(5) 3468
+                    AVG 2225 &#183; MEDIUM 1885 &#183; NN(5) 3468
                   </p>
                 </div>
               </article>
@@ -2075,7 +2164,7 @@
         <div class="ph-body">
           <div class="ph-cols ph-is-stack">
             <article class="fragment custom">
-              <h3>How it was tested</h3>
+              <h3>Data and analysis</h3>
               <p>
                 Each nullable field in turn was hidden on 3,000 sales the
                 imputers had never seen and filled from the other six. Median,
@@ -2256,10 +2345,10 @@
               </table>
             </article>
             <article class="fragment custom">
-              <h3>How close each one landed</h3>
+              <h3>Quality</h3>
               <p class="ph-muted">
-                NMAE on the same 3,000 held-out houses &#8212; error as a share of
-                each field's own spread. Lower is closer.
+                Normalized mean absolute error (NMAE), scaled by each field's own
+                range. Lower is closer; the lowest figure per row is in mint.
               </p>
               <!-- Same grid treatment as the table above, at one figure per
                    method instead of three. The CSS below mirrors it. -->
@@ -2279,26 +2368,26 @@
                     <td>0.806</td>
                     <td>0.731</td>
                     <td>0.611</td>
-                    <td>0.571</td>
+                    <td class="ph-is-best">0.571</td>
                   </tr>
                   <tr>
                     <th scope="row">Bathrooms</th>
                     <td>0.799</td>
                     <td>0.791</td>
                     <td>0.488</td>
-                    <td>0.435</td>
+                    <td class="ph-is-best">0.435</td>
                   </tr>
                   <tr>
                     <th scope="row">Living area</th>
                     <td>0.768</td>
                     <td>0.755</td>
                     <td>0.073</td>
-                    <td>0.048</td>
+                    <td class="ph-is-best">0.048</td>
                   </tr>
                   <tr>
                     <th scope="row">Plot size</th>
                     <td>0.327</td>
-                    <td>0.243</td>
+                    <td class="ph-is-best">0.243</td>
                     <td>0.314</td>
                     <td>0.337</td>
                   </tr>
@@ -2307,21 +2396,21 @@
                     <td>0.905</td>
                     <td>0.905</td>
                     <td>0.345</td>
-                    <td>0.318</td>
+                    <td class="ph-is-best">0.318</td>
                   </tr>
                   <tr>
                     <th scope="row">Above-grade area</th>
                     <td>0.779</td>
                     <td>0.741</td>
                     <td>0.072</td>
-                    <td>0.056</td>
+                    <td class="ph-is-best">0.056</td>
                   </tr>
                   <tr>
                     <th scope="row">Basement area</th>
                     <td>0.834</td>
                     <td>0.659</td>
                     <td>0.099</td>
-                    <td>0.078</td>
+                    <td class="ph-is-best">0.078</td>
                   </tr>
                 </tbody>
               </table>
@@ -2439,25 +2528,25 @@
         <div class="ph-body">
           <div class="ph-s8">
             <ol class="ph-scr ph-s8-chips">
-              <li class="ph-s8-chip fragment" data-fragment-index="0">
+              <li class="ph-s8-chip ph-is-base">
                 <span class="ph-num">1</span>
                 <span>Runtime</span>
               </li>
-              <li class="ph-s8-chip fragment" data-fragment-index="1">
+              <li class="ph-s8-chip fragment" data-fragment-index="0">
                 <span class="ph-num">2</span>
                 <span>Type hints</span>
               </li>
-              <li class="ph-s8-chip fragment" data-fragment-index="2">
+              <li class="ph-s8-chip fragment" data-fragment-index="1">
                 <span class="ph-num">3</span>
                 <span>Input validation</span>
               </li>
-              <li class="ph-s8-chip fragment" data-fragment-index="3">
+              <li class="ph-s8-chip fragment" data-fragment-index="2">
                 <span class="ph-num">4</span>
                 <span>Swagger schema</span>
               </li>
             </ol>
             <div class="ph-cols ph-s8-panes">
-              <article class="fragment ph-s8-pane" data-fragment-index="0">
+              <article class="ph-s8-pane ph-is-base">
                 <table class="ph-table">
                   <thead>
                     <tr>
@@ -2550,22 +2639,35 @@
                   </tbody>
                 </table>
               </article>
-              <article class="fragment ph-s8-pane" data-fragment-index="1">
+              <article class="fragment ph-s8-pane" data-fragment-index="0">
                 <h3>Type hints</h3>
                 <p>
-                  Hints state what each argument and the reply must be. The
-                  editor and type checker flag a wrong call before it runs, and
-                  FastAPI reads them to build the OpenAPI schema.
+                  Hints state what each argument and the reply must be, so the
+                  two types the signature names are declared with it. The editor
+                  and type checker flag a wrong call before it runs, and FastAPI
+                  reads the same two to build the OpenAPI schema &#8212; which is
+                  why nullable input and a named response come from here and not
+                  from a hand-written schema.
                 </p>
                 <h4>From</h4>
                 <pre class="ph-code"><code class="language-python">def predict(home_features):</code></pre>
                 <h4>To</h4>
-                <pre class="ph-code"><code class="language-python">def predict_v2(
+                <pre class="ph-code"><code class="language-python">class HomeFeaturesV2(BaseModel):
+    bedrooms: int | None = Field(default=None, ge=0)
+    # ... six more nullable fields ...
+    zipcode: str = Field(pattern=r"^\d{5}$")
+
+
+class PredictionResponse(BaseModel):
+    predicted_price: float = Field(examples=[394708.0])
+
+
+def predict_v2(
     home_features: HomeFeaturesV2,
     request: Request,
 ) -&gt; PredictionResponse:</code></pre>
               </article>
-              <article class="fragment ph-s8-pane" data-fragment-index="2">
+              <article class="fragment ph-s8-pane" data-fragment-index="1">
                 <div class="ph-s8-input-validation">
                   <h3>Input validation</h3>
                   <div class="ph-shots">
@@ -2580,7 +2682,7 @@
                   </div>
                 </div>
               </article>
-              <article class="fragment ph-s8-pane" data-fragment-index="3">
+              <article class="fragment ph-s8-pane" data-fragment-index="2">
                 <h3>Swagger schema</h3>
                 <table class="ph-table">
                   <thead>
@@ -2973,16 +3075,61 @@
         .getPropertyValue("--ph-t-slide")) * 1000;
       const still = matchMedia("(prefers-reduced-motion: reduce)");
 
-      // The capture is painted into its box by `contain`, top aligned, so the
-      // box is not the picture: on the slide both captures share one tall
-      // 419/750 column, in the zoom each is its own ratio. Measure the painted
-      // part, so what travels is the picture and it travels by a single
-      // uniform scale - the same move for either capture.
+      // The capture is painted into its box by `contain`, centred, so the box
+      // is not the picture: on the slide both captures share one tall 419/750
+      // column, in the zoom each is its own ratio. Measure the painted part, so
+      // what travels is the picture and it travels by a single uniform scale -
+      // the same move for either capture. `contain` centres the picture on both
+      // axes, so the painted rect is centred too; using the box top here would
+      // launch the flight from the wrong origin and leave a visible jump where
+      // it lands.
       const painted = (box, ar) => {
         const w = Math.min(box.width, box.height * ar);
-        return { left: box.left + (box.width - w) / 2, top: box.top, w };
+        return {
+          left: box.left + (box.width - w) / 2,
+          top: box.top + (box.height - w / ar) / 2,
+          w,
+        };
       };
 
+      // Each capture's slack above its picture: none for the portrait To, which
+      // fills the box, half its slack for the landscape From. The h4 sits in
+      // flow above the box, so it is handed this offset to stay hard against its
+      // own picture. Derived from the same numbers as painted(), so the label
+      // and the flight can never disagree about where the picture is.
+      const labelDrop = (box, ar) => (box.height - Math.min(box.width, box.height * ar) / ar) / 2;
+
+      // The h4 sits in flow above the box, so centring the picture leaves the
+      // label stranded at the box top. Read each capture's own ratio off the
+      // same data URI the CSS paints and offset the label to meet its picture.
+      Promise.all([...shots].map((el) => new Promise((done) => {
+        const img = new Image();
+        img.onload = () => {
+          el.dataset.shotAr = img.naturalWidth / img.naturalHeight;
+          done();
+        };
+        img.src = getComputedStyle(el).backgroundImage.slice(5, -2);
+      }))).then(() => {
+        const place = () => {
+          for (const el of shots) {
+            const ar = +el.dataset.shotAr;
+            if (!ar) continue;
+            const box = el.getBoundingClientRect();
+            // The slide is scaled by Reveal, so a rect is in screen px while a
+            // translateY on a slide child is in slide px and gets scaled again.
+            // Convert, or the label drifts off its picture as the deck is
+            // resized.
+            const scale = box.width / el.offsetWidth || 1;
+            el.closest(".ph-shot").querySelector("h4").style.setProperty(
+              "--ph-shot-drop", `${(labelDrop(box, ar) / scale).toFixed(2)}px`);
+          }
+        };
+        place();
+        // Reveal scales and transforms the slide, so the boxes are only final
+        // after it lays out, and a resize rescales them.
+        addEventListener("resize", place);
+        Reveal.on("slidechanged", place);
+      });
       for (const el of shots) {
         const head = el.closest(".ph-shot").querySelector("h4");
         const label = head.textContent;
@@ -3065,7 +3212,10 @@
           }
           spot = el.getBoundingClientRect();   // where the picture lives on the slide
           deck = spot.width / el.offsetWidth;   // and how big its label is drawn there
-          labelGap = spot.top - head.getBoundingClientRect().top;   // label above picture
+          // Label above picture, measured picture-relative: the picture is
+          // centred in its box, so the box top is not where the picture starts
+          // and a box-relative gap would strand the caption in mid-air.
+          labelGap = painted(spot, ar).top - head.getBoundingClientRect().top;
           box.append(el);
           dlg.showModal();
           zoomGap = el.getBoundingClientRect().top - cap.getBoundingClientRect().top;
