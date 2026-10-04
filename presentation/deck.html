@@ -2989,6 +2989,7 @@
         const home = { parent: el.parentNode, next: el.nextSibling };
         let ar = 0;      // this capture's own width / height, read on first open
         let spot = null; // its box in the slide, where every flight ends
+        let deck = 1;    // how much Reveal scales the slide the label sits on
 
         const dlg = document.createElement("dialog");
         dlg.className = "ph-shot-zoom";
@@ -3012,24 +3013,29 @@
         // spot it is leaving, the end transform drops it into the spot it is
         // arriving at, and one transition plays the difference. Opening is the
         // slide then the screen; closing is the same pair the other way round.
-        const move = (from, to) => {
+        const move = (from, to, fromSize, toSize) => {
           if (still.matches || !ar || !to.w) return;
           const box = el.getBoundingClientRect();   // its box in the overlay, untransformed
           const put = (p) =>
             `translate(${p.left - box.left}px, ${p.top - box.top}px) scale(${p.w / box.width})`;
-          // The caption rides the picture's top edge, and sits over its centre.
-          const lead = (p) =>
-            `translate(${p.left + p.w / 2 - box.left - box.width / 2}px, ${p.top - box.top}px)`;
+          // The caption rides the picture's top edge and sits over its centre,
+          // and is drawn at the size of the label it stands in for: Reveal
+          // scales the slide, so on the slide end the same text is smaller than
+          // it is in the overlay. Without that factor the label shrinks at the
+          // moment it hands over.
+          const lead = (p, size) =>
+            `translate(${p.left + p.w / 2 - box.left - box.width / 2}px, ${p.top - box.top}px)` +
+            ` scale(${size})`;
           el.style.cssText = `transition: none; transform-origin: 0 0; transform: ${put(from)};`;
           cap.style.transition = "none";
-          cap.style.transform = lead(from);
+          cap.style.transform = lead(from, fromSize);
           // The start state has to be on a painted frame before the end state,
           // or the browser has nothing to animate between and snaps.
           requestAnimationFrame(() => requestAnimationFrame(() => {
             el.style.transition = `transform ${MOVE}`;
             el.style.transform = put(to);
             cap.style.transition = `transform ${MOVE}`;
-            cap.style.transform = lead(to);
+            cap.style.transform = lead(to, toSize);
           }));
           setTimeout(() => {
             el.style.cssText = "";
@@ -3050,19 +3056,20 @@
             box.style.setProperty("--ph-shot-num", ar);
           }
           spot = el.getBoundingClientRect();   // where the picture lives on the slide
+          deck = spot.width / el.offsetWidth;   // and how big its label is drawn there
           box.append(el);
           dlg.showModal();
           // The caption is this label's stand-in for as long as it is zoomed, so
           // the slide's own copy steps out rather than sitting behind the dim
           // with a second one travelling over the top of it.
           head.style.visibility = "hidden";
-          move(painted(spot, ar), painted(el.getBoundingClientRect(), ar));
+          move(painted(spot, ar), painted(el.getBoundingClientRect(), ar), deck, 1);
           requestAnimationFrame(() => dlg.classList.add("ph-shot-zoom-open"));
         };
 
         const close = () => {
           dlg.classList.remove("ph-shot-zoom-open");
-          move(painted(el.getBoundingClientRect(), ar), painted(spot, ar));
+          move(painted(el.getBoundingClientRect(), ar), painted(spot, ar), 1, deck);
           // The picture flies home inside the dialog and only joins the slide
           // when it has landed, so it is never under the lifting dim.
           setTimeout(() => {
