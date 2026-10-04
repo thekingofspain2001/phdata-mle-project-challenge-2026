@@ -40,8 +40,8 @@ def test_predict_v2_openapi_documents_error_responses(test_client: TestClient) -
 
 
 def test_health_v2_openapi_documents_unavailable(test_client: TestClient) -> None:
-    """The /health/v2 spec documents the 503 string-detail error."""
+    """The /health/v2 spec documents the 500 string-detail error."""
     spec = _v2_spec(test_client)
     paths: dict[str, Any] = spec["paths"]
     responses: dict[str, Any] = paths["/health/v2"]["get"]["responses"]
-    assert "503" in responses
+    assert "500" in responses

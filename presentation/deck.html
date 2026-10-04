@@ -22,9 +22,6 @@
       --ph-card-bg: rgba(12, 20, 46, 0.72);
       --ph-ink-on-dark: #ffffff;
       --ph-ink-muted: rgba(255, 255, 255, 0.75);
-      --ph-cap-bg: #f0f1f5;
-      --ph-cap-h: #232a43;
-      --ph-client-font: "Inter", system-ui, sans-serif;
       --ph-font: "Aspekta", "Inter", system-ui, sans-serif;
 
       /* Approach colors: one per fill-in method, reused in S4 detail + S5. */
@@ -34,6 +31,14 @@
       /* Imputation cost: not an approach, a cost. Warm coral so it reads as
          overhead on top of the purple calculation rather than a fourth method. */
       --imp: #ef8354;
+
+      /* The same three method colours at 22%, for the S5 figure cells. Derived
+         from the tokens above so a hue change carries its tint with it.
+         0.22 is where the hue reads on the card fill; at 0.12 it was in the DOM
+         but not on the screen. */
+      --tint-av: color-mix(in srgb, var(--av) 22%, transparent);
+      --tint-md: color-mix(in srgb, var(--md) 22%, transparent);
+      --tint-knn: color-mix(in srgb, var(--knn) 22%, transparent);
 
       /* Type scale (slide px at 1270x961 design size; reveal scales uniformly). */
       --fs-brand: 16px;
@@ -48,14 +53,12 @@
       /* Spacing scale (slide px at 1270x961; chrome bands stay viewport). */
       --sp-xs: 8px;
       --sp-sm: 15px;
-      --sp-md: 23px;
       --gap-sm: 13px;
       --gap-md: 25px;
       --ph-header-h: 10vh;
       --ph-footer-h: 8vh;
       /* Slide-coord pads: top clears chrome, sides match slide rhythm. */
       --pad-x: 60px;
-      --pad-y: 104px;
       --pad-foot: 72px;
       /* ponytail: chrome bands + pads hand-tuned at 1440x900; recompute if slide size changes. */
       /* One motion language: the slide move (also reveal.js's own, pinned to
@@ -105,8 +108,16 @@
 
     /* Section is the flex column: header fixed, body fills the rest.
          Reveal.js sets inline display:block; !important restores flex.
-         Native element order, no sync JS. */
-    .reveal .slides section.present {
+         Native element order, no sync JS.
+
+         Both declarations are on EVERY section, not just .present. They were
+         scoped to .present, so a slide dropped the height constraint the moment
+         it stopped being current: S6's chart card stopped being height-capped,
+         its 359.6px chart overflowed a 339.6px card, and the whole body
+         reflowed from 961px to 1004px - a 1-2px jump under the outgoing slide
+         as the next one slid over it. A height that changes on the way out is a
+         height that can change mid-transition. */
+    .reveal .slides section {
       height: 100% !important;
       display: flex !important;
       flex-direction: column;
@@ -239,11 +250,6 @@
       font-size: var(--fs-h3);
     }
 
-    .reveal h4 {
-      color: var(--ph-minted);
-      font-size: var(--fs-h4);
-    }
-
     .reveal p {
       font-size: var(--fs-body);
     }
@@ -262,12 +268,6 @@
       text-align: center;
     }
 
-    /* Summary lead + SCR list. Solid fills on bordered items. */
-    .ph-action {
-      color: var(--ph-ink-on-dark);
-      font-size: var(--fs-lead);
-      margin: 0;
-    }
 
     .ph-scr {
       flex: 1 1 auto;
@@ -295,7 +295,6 @@
     }
 
     .ph-scr p {
-      /* color: var(--ph-ink-muted); */
       margin: 0;
     }
 
@@ -307,9 +306,13 @@
       gap: var(--gap-md);
     }
 
-    .ph-cols article {
+    /* One card surface for every bordered panel: S2/S5/S7/S9 (.ph-cols article),
+       the S4 approach panels and the S9 close grid. Same fill, blur, rule,
+       radius and padding, so the deck has a single change point for them. */
+    .ph-cols article,
+    .ph-panel,
+    .ph-close-grid li {
       flex: 1 1 0;
-      min-width: 0;
       background-color: var(--ph-card-bg);
       -webkit-backdrop-filter: blur(2px);
       backdrop-filter: blur(2px);
@@ -318,11 +321,47 @@
       padding: var(--sp-sm) var(--gap-sm);
     }
 
+    .ph-cols article {
+      min-width: 0;
+    }
+
     .ph-cols h3,
     .ph-cols h4 {
       color: var(--ph-mint);
       font-size: var(--fs-h3);
       margin: 0 0 var(--sp-sm);
+    }
+
+    /* S2 Performance: the three sub-boxes' bullets share ONE row grid, so
+       bullet 1 of Issues, Impact and Cost sit on one line and bullet 2 on the
+       next, however many lines each one wraps to. The container is a
+       three-column grid and each article is a subgrid over the same rows, so
+       a bullet that runs long grows that row for all three boxes instead of
+       pushing only its own box's list further down. */
+    .ph-cols.ph-rowgrid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      column-gap: var(--gap-md);
+      row-gap: var(--sp-xs);
+    }
+
+    .ph-cols.ph-rowgrid > article {
+      display: grid;
+      grid-row: span 3;
+      grid-template-rows: subgrid;
+    }
+
+    .ph-cols.ph-rowgrid > article > h4 {
+      margin-bottom: var(--sp-xs);
+    }
+
+    /* The list keeps its own box - indent, disc markers - and spans the bullet
+       rows; only its tracks are borrowed from the parent. */
+    .ph-cols.ph-rowgrid > article > ul {
+      display: grid;
+      grid-row: 2 / -1;
+      grid-template-rows: subgrid;
+      margin: 0;
     }
 
     /* Nested boxes: distinct color, same spacing/scale. */
@@ -340,18 +379,11 @@
       box-shadow: 0 0 24px rgba(165, 254, 202, 0.25);
     }
 
-    /* Box titles at every depth share one accent. --ph-mist sat too close to
-       the body ink over the card fill, so top and nested read the same. */
-    .ph-cols article article h3
-    {
-          color: var(--ph-mint);
-    }
     .ph-cols article article h4 {
       color: var(--ph-accent);
     }
 
     .ph-cols p {
-      /* color: var(--ph-ink-muted); */
       margin: 0;
     }
 
@@ -370,54 +402,6 @@
       font-weight: 400;
     }
 
-    /* S6: the original ring takes the max width; v2 is sized as its share of
-       the original's time (9.4 / 15.2 = 62%). These are RINGS, not filled
-       discs: band area = pi((r+15)^2 - (r-15)^2) = 60*pi*r, which is LINEAR
-       in r, so r = r1 * ratio. Scaling by sqrt() would make the band area
-       read 62%^2 = 38% of the original instead of 62%. */
-    .ph-donuts {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: var(--gap-md);
-      flex: 1 1 auto;
-    }
-
-    .ph-donut {
-      margin: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-end;
-      min-width: 0;
-      flex: 0 1 auto;
-      height: 100%;
-    }
-
-    /* Circle is sized off min(vh, vw) so it shrinks on whichever axis is
-       tighter instead of overflowing a short or narrow viewport. v2 keeps the
-       same base and takes the time delta: 9.4 / 15.2 = 62% of the time, and
-       because the svg draws a band rather than a disc, that is 62% of the
-       diameter too - see the band-area note above. */
-    .ph-donut svg {
-      width: 100%;
-      height: auto;
-      max-width: min(46vh, 30vw);
-    }
-
-    .ph-donut--v2 svg {
-      max-width: calc(min(46vh, 30vw) * 0.81);
-    }
-
-    /* Both captions sit on one baseline even though the circles differ in size:
-       each card fills the row and the caption is pushed to its floor. */
-    .ph-donut figcaption {
-      color: var(--ph-ink-muted);
-      font-size: var(--fs-body);
-      margin-top: auto;
-      padding-top: var(--sp-xs);
-      text-align: center;
-    }
 
     /* Table rows carry the colour of the ring segment they name, so a row maps
        to a slice without needing a legend. */
@@ -426,10 +410,6 @@
       color: var(--av);
     }
 
-    .ph-table tr.ph-kpi-md th,
-    .ph-table tr.ph-kpi-md td {
-      color: var(--md);
-    }
 
     .ph-table tr.ph-kpi-knn th,
     .ph-table tr.ph-kpi-knn td {
@@ -569,10 +549,8 @@
        The row's first child is the label, so each calculation's n/min/max
        triple sits at 5-7 average, 8-10 median, 11-13 NN, 14-16 NN scaled. NN
        scaled is NN, so the two share one tint. The sub-label row has no label
-       cell, so it sits one step left: 4-6, 7-9, 10-12, 13-15.
-
-       0.22 is where the hue reads on the card fill; at 0.12 it was in the DOM
-       but not on the screen. */
+       cell, so it sits one step left: 4-6, 7-9, 10-12, 13-15. The tints
+       themselves are the --tint-* tokens. */
     #s5-results .ph-table.ph-spread thead tr.ph-group th:nth-child(3) {
       color: var(--av);
     }
@@ -588,17 +566,17 @@
 
     #s5-results .ph-table.ph-spread thead tr.ph-group + tr th:nth-child(n+4):nth-child(-n+6),
     #s5-results .ph-table.ph-spread tbody td:nth-child(n+5):nth-child(-n+7) {
-      background-color: rgba(232, 176, 75, 0.22);
+      background-color: var(--tint-av);
     }
 
     #s5-results .ph-table.ph-spread thead tr.ph-group + tr th:nth-child(n+7):nth-child(-n+9),
     #s5-results .ph-table.ph-spread tbody td:nth-child(n+8):nth-child(-n+10) {
-      background-color: rgba(127, 182, 217, 0.22);
+      background-color: var(--tint-md);
     }
 
     #s5-results .ph-table.ph-spread thead tr.ph-group + tr th:nth-child(n+10):nth-child(-n+15),
     #s5-results .ph-table.ph-spread tbody td:nth-child(n+11):nth-child(-n+16) {
-      background-color: rgba(199, 146, 234, 0.22);
+      background-color: var(--tint-knn);
     }
 
     /* n, min and max are the same measurement in the same ink - the colour
@@ -651,16 +629,16 @@
     }
 
     #s5-results .ph-table.ph-quality tbody td:nth-child(2) {
-      background-color: rgba(232, 176, 75, 0.22);
+      background-color: var(--tint-av);
     }
 
     #s5-results .ph-table.ph-quality tbody td:nth-child(3) {
-      background-color: rgba(127, 182, 217, 0.22);
+      background-color: var(--tint-md);
     }
 
     #s5-results .ph-table.ph-quality tbody td:nth-child(4),
     #s5-results .ph-table.ph-quality tbody td:nth-child(5) {
-      background-color: rgba(199, 146, 234, 0.22);
+      background-color: var(--tint-knn);
     }
 
     #s5-results .ph-table.ph-quality tbody td {
@@ -767,10 +745,6 @@
       min-height: 0;
     }
 
-    .ph-chart-title {
-      flex: 0 0 auto;
-      margin: 0 0 var(--sp-xs);
-    }
 
     .ph-chart {
       flex: 1 1 auto;
@@ -831,14 +805,6 @@
       color: var(--ph-mint);
       font-weight: 600;
     }
-
-    .ph-table tbody th {
-      color: var(--ph-ink-on-dark);
-    }
-
-    /* .ph-table tbody td {
-      color: var(--ph-ink-muted);
-    } */
 
     .ph-table tbody th {
       color: var(--ph-ink-on-dark);
@@ -970,14 +936,35 @@
 
     /* .ph-shots layout lives below, with the rest of the S8 input block. */
     /* Runtime table: three equal columns so the whitespace between them is the
-       same everywhere, inset symmetrically so the block reads as a paragraph
-       sitting in the box rather than a grid stretched edge to edge. */
+       same everywhere.
+
+       The width cap is what centres the block inside the card. The table is
+       663px tall in a 734px content box, so the pane's centred flex column
+       leaves ~51px top and bottom; at full width the sides had only 14px, and
+       that mismatch is what read as the table sitting off to the left. Capping
+       the width so the side gutters match the top and bottom ones evens all
+       four, and margin-inline:auto does the centring.
+
+       788px is measured, not guessed: 787.5px is where the side gutter
+       crosses the vertical one, and 788px lands within a quarter pixel of
+       even on all four sides. Layout px, which is what Reveal's fixed 1270x961
+       stage lays out in, so it does not drift with the viewport.
+
+       Safe to narrow this far: every trial width from 773px down to 690px kept
+       the table at 663px tall, i.e. no cell wrapped.
+
+       Scoped to .ph-is-base so the Swagger table on 8.4 keeps the width it had
+       and only the runtime table moves. */
     .ph-s8-panes .ph-table {
-      width: 100%;
       max-width: 62ch;
       margin-inline: auto;
       table-layout: fixed;
       font-size: var(--fs-lead);
+    }
+
+    .ph-s8-pane.ph-is-base .ph-table {
+      width: 100%;
+      max-width: 788px;
     }
 
     .ph-s8-panes .ph-table th,
@@ -1058,27 +1045,21 @@
       transform: translateY(var(--ph-shot-drop, 0px));
     }
 
-    .ph-caps .ph-s8 .ph-s8-pane.fragment {
-      opacity: 0;
-      visibility: hidden;
-    }
+    /* Pane visibility has two states, not four. A pane is shown when it is the
+       resting pane or the current fragment; otherwise it is hidden.
 
-    /* Pane 01 is the resting pane, the way chip 01 is the resting chip: it has
-       no .fragment, so it is what the slide shows on arrival. A step fragment
-       claims the cell the moment one fires and the base pane leaves. The base
-       pane is never .current-fragment, so it needs its own pair. */
-    .ph-caps .ph-s8 .ph-s8-panes:not(:has(.ph-s8-pane.fragment.visible))
-      .ph-s8-pane.ph-is-base {
-      opacity: 1;
-      visibility: visible;
-    }
-
+       Pane 01 carries no .fragment, so it is never .current-fragment and
+       cannot ride that rule - it needs its own two, keyed on whether any step
+       fragment has fired. */
+    .ph-caps .ph-s8 .ph-s8-pane.fragment,
     .ph-caps .ph-s8 .ph-s8-panes:has(.ph-s8-pane.fragment.visible)
       .ph-s8-pane.ph-is-base {
       opacity: 0;
       visibility: hidden;
     }
 
+    .ph-caps .ph-s8 .ph-s8-panes:not(:has(.ph-s8-pane.fragment.visible))
+      .ph-s8-pane.ph-is-base,
     .ph-caps .ph-s8 .ph-s8-pane.fragment.current-fragment {
       opacity: 1;
       visibility: visible;
@@ -1209,7 +1190,6 @@
       top: 100%;
       left: 0;
       right: 0;
-      /* color: var(--ph-ink-muted); */
       font-size: var(--fs-caption);
       margin: 0;
     }
@@ -1271,16 +1251,9 @@
     }
 
     .ph-panel {
-      flex: 1 1 0;
       min-width: 0;
       display: flex;
       gap: var(--gap-md);
-      background-color: var(--ph-card-bg);
-      -webkit-backdrop-filter: blur(2px);
-      backdrop-filter: blur(2px);
-      border: var(--line-sm) solid var(--ph-card-border);
-      border-radius: var(--rad-card);
-      padding: var(--sp-sm) var(--gap-sm);
       overflow: hidden;
     }
 
@@ -1305,7 +1278,6 @@
     }
 
     .ph-panel-words p {
-      /* color: var(--ph-ink-muted); */
       margin: 0;
     }
 
@@ -1353,45 +1325,9 @@
       overflow: hidden;
     }
 
-    /* Winner bars. */
-    .ph-bars {
-      list-style: none;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-      gap: var(--sp-xs);
-    }
-
-    .ph-bars li {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: var(--sp-xs) var(--gap-sm);
-      /* color: var(--ph-ink-muted); */
-    }
-
-    .ph-bars li:nth-child(1) span {
-      color: var(--av);
-    }
-
-    .ph-bars li:nth-child(2) span {
-      color: var(--md);
-    }
-
-    .ph-bars li:nth-child(n + 3) span {
-      color: var(--knn);
-    }
-
-    .ph-bars meter {
-      flex: 1 1 100%;
-      width: 100%;
-      accent-color: var(--ph-mint);
-    }
 
     /* Footnote. */
     .ph-foot {
-      /* color: var(--ph-ink-muted); */
       font-size: var(--fs-caption);
       opacity: 80%;
       margin: 0;
@@ -1408,16 +1344,6 @@
       gap: var(--gap-md);
     }
 
-    .ph-close-grid li {
-      flex: 1 1 0;
-      background-color: var(--ph-card-bg);
-      -webkit-backdrop-filter: blur(2px);
-      backdrop-filter: blur(2px);
-      border: var(--line-sm) solid var(--ph-card-border);
-      border-radius: var(--rad-card);
-      padding: var(--sp-sm) var(--gap-sm);
-    }
-
     .ph-num {
       color: var(--ph-mint);
       font-size: var(--fs-h3);
@@ -1429,7 +1355,6 @@
     }
 
     .ph-close-grid p:last-child {
-      /* color: var(--ph-ink-muted); */
       margin: 0;
     }
 
@@ -1443,36 +1368,6 @@
       text-decoration: line-through;
     }
 
-    /* Template B: Capabilities six-cell grid. */
-    .ph-caps-grid {
-      flex: 1 1 auto;
-      min-height: 0;
-      list-style: none;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      flex-wrap: wrap;
-      align-content: stretch;
-      gap: var(--gap-md);
-    }
-
-    .ph-caps-grid li {
-      flex: 1 1 320px;
-      background-color: var(--ph-cap-bg);
-      border-radius: var(--rad-cell);
-      padding: var(--sp-sm) var(--gap-sm);
-    }
-
-    .ph-caps-grid h3 {
-      color: var(--ph-cap-h);
-      margin: 0 0 var(--sp-xs);
-    }
-
-    .ph-caps-grid p {
-      color: var(--ph-cap-h);
-      margin: 0;
-      opacity: 80%;
-    }
 
     /* Controls: muted phData arrows, pinned to the static footer band. */
     .reveal .controls {
@@ -1499,84 +1394,6 @@
       color: var(--ph-mist);
       background-color: transparent;
       text-decoration: none;
-    }
-
-    /* S8 chip 03: Swagger UI's own model view, rebuilt in the deck's markup.
-       Mirrors swagger-ui's json-schema-2020-12 panels: light panel on the dark
-       slide, monospace field names, mint types, red required asterisk. */
-    .ph-sw {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: var(--gap-md);
-      align-items: start;
-    }
-
-    .ph-sw-panel {
-      background-color: #ffffff;
-      color: #3b4151;
-      border-radius: 4px;
-      padding: 10px 12px;
-      font-size: var(--fs-caption);
-      line-height: 1.5;
-      text-align: left;
-    }
-
-    .ph-sw-title {
-      font-size: var(--fs-body);
-      font-weight: 700;
-      color: #3b4151;
-      display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-      gap: var(--sp-xs);
-    }
-
-    .ph-sw-desc {
-      color: #6b6b7b;
-      font-size: var(--fs-caption);
-      margin: 2px 0 var(--sp-xs);
-      border-bottom: 1px solid #ebebeb;
-      padding-bottom: var(--sp-xs);
-    }
-
-    .ph-sw-row {
-      display: flex;
-      align-items: baseline;
-      gap: 6px;
-      font-family: "SFMono-Regular", Consolas, monospace;
-      padding: 1px 0 1px 8px;
-      border-left: 1px dotted #c8c8d4;
-    }
-
-    .ph-sw-field {
-      background-color: #f7f7f9;
-      border-radius: 3px;
-      padding: 0 4px;
-      font-weight: 600;
-    }
-
-    .ph-sw-req {
-      color: #eb5757;
-      font-weight: 700;
-    }
-
-    .ph-sw-type {
-      color: #55a793;
-      font-weight: 600;
-    }
-
-    .ph-sw-badge {
-      background-color: #c60;
-      color: #ffffff;
-      border-radius: 3px;
-      padding: 0 5px;
-      font-weight: 600;
-    }
-
-    /* .ph-cols p paints body copy in muted light ink, which vanishes on the
-       light Swagger panels; put the dark ink back. */
-    .ph-sw-panel p {
-      color: #3b4151;
     }
 
     .reveal .slide-number a {
@@ -1756,29 +1573,28 @@
                 <article>
                   <h4>Missing / Unknown Data</h4>
                   <p>
-                    Predict service only works if all fields are provided.
+                    Predict API service only works if all fields are provided.
                   </p>
                 </article>
                 <article>
                   <h4>Impact</h4>
-                  <p>10 to 20% of data is missing at least one field.</p>
+                  <p>10% to 20% of data is missing at least one field.</p>
                 </article>
                 <article>
                   <h4>Cost</h4>
                   <p>
-                    Rejected requests delay listings and cost agent time
-                    (placeholder estimate).
+                    Manual lookup of listing data and non data best gueses.
                   </p>
                 </article>
               </div>
             </article>
             <article class="fragment custom">
               <h3>Performance</h3>
-              <div class="ph-cols">
+              <div class="ph-cols ph-rowgrid">
                 <article>
                   <h4>Issues</h4>
                   <ul>
-                    <li>Model reloading per call</li>
+                    <li>Model and Deomgraphic reread per predict API call</li>
                     <li>Running non production code</li>
                   </ul>
 
@@ -1814,7 +1630,7 @@
                 <article>
                   <h4>Type hints</h4>
                   <p>
-                    Upgrade codie to detect errors in development vs production.
+                    Upgrade code to detect errors in development vs production.
                   </p>
                 </article>
                 <article>
@@ -1826,7 +1642,7 @@
                 <article>
                   <h4>Swagger</h4>
                   <p>
-                    Make sure FastAPI's Swagger documentation match the actual API behavior.
+                    Make sure FastAPI's Swagger documentations match the actual API behavior.
                   </p>
                 </article>
               </div>
@@ -1836,17 +1652,17 @@
       </section>
 
       <!-- S3 Core problem. -->
-      <section id="s3-problem" aria-label="Listings with blanks get turned away">
+      <section id="s3-problem" aria-label="Opportunity">
         <header class="ph-head">
-          <h2>Listings with blanks get turned away</h2>
+          <h2>Opportunity</h2>
         </header>
         <div class="ph-body">
           <div class="ph-cols">
             <article class="fragment custom">
               <h3>Problem</h3>
               <p>
-                A seller's listing is missing the bathroom count or the plot
-                size. The API rejects the whole request. No price comes back.
+                The predict API can only be called with all input parameter are known.
+                Requests with non complete inputs return a 406 Http error.
               </p>
             </article>
             <article class="fragment custom">

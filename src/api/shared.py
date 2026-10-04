@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 import csv
+import hashlib
 import json
-import pathlib
 import pickle
 from typing import TYPE_CHECKING, Protocol, cast, runtime_checkable
 
@@ -15,7 +15,10 @@ from fastapi.openapi.models import Example
 from pydantic import BaseModel
 from sklearn.impute import KNNImputer
 
+from paths import DEMOGRAPHICS_PATH, FEATURES_PATH, MODEL_PATH, SALES_PATH, UNSEEN_PATH
+
 if TYPE_CHECKING:
+    import pathlib
     from collections.abc import Iterator, Mapping
 
     import numpy as np
@@ -46,13 +49,6 @@ class ImputerProtocol(Protocol):
         ...
 
 
-# ponytail: anchored to package file, CWD-independent; no symlinks needed
-_SRC = pathlib.Path(__file__).resolve().parents[1]
-MODEL_PATH = _SRC / "model" / "model.pkl"
-FEATURES_PATH = _SRC / "model" / "model_features.json"
-DEMOGRAPHICS_PATH = _SRC / "data" / "zipcode_demographics.csv"
-SALES_PATH = _SRC / "data" / "kc_house_data.csv"
-UNSEEN_PATH = _SRC / "data" / "future_unseen_examples.csv"
 REQUEST_COLUMNS = [
     "bedrooms",
     "bathrooms",
@@ -155,22 +151,53 @@ class ArtifactLoadError(RuntimeError):
     """Raised when a startup artifact fails to load; message carries the artifact name."""
 
 
+def _digest(path: pathlib.Path) -> str:
+    """Short content digest of an artifact, for identifying it in the logs."""
+    return hashlib.sha256(path.read_bytes()).hexdigest()[:12]
+
+
 def load_model() -> Predictor:
     """Load the trained regressor from its trusted build artifact."""
     try:
         with MODEL_PATH.open("rb") as model_file:
-            return cast("Predictor", pickle.load(model_file))  # noqa: S301 - trusted build artifact from create_model.py
+            model = cast("Predictor", pickle.load(model_file))  # noqa: S301 - trusted build artifact from create_model.py
     except Exception as exc:
         logger.exception("artifact_load_failed", artifact=ARTIFACT_MODEL)
         raise ArtifactLoadError(ARTIFACT_MODEL) from exc
+
+    # Identify which model.pkl this process is serving. The artifact gets
+    # retrained and re-committed, so a stale image layer and a fresh one are
+    # otherwise indistinguishable in the logs.
+    logger.info("artifact_loaded", artifact=ARTIFACT_MODEL, sha256=_digest(MODEL_PATH))
+    return model
+
+
+def _require_feature_list(raw: object) -> list[str]:
+    """Return raw as a feature list, or raise if it is not one.
+
+    json.load hands back Any, so without this the list[str] return type is an
+    unchecked assertion and a corrupt file only fails inside predict_price,
+    as an opaque 500 on the first request.
+    """
+    got = type(raw).__name__
+    if not isinstance(raw, list):
+        msg = f"{FEATURES_PATH.name} must be a non-empty list of strings, got {got}"
+        raise TypeError(msg)
+    features = cast("list[object]", raw)
+    if not features:
+        msg = f"{FEATURES_PATH.name} must be a non-empty list of strings, got empty list"
+        raise TypeError(msg)
+    if not all(isinstance(feature, str) for feature in features):
+        msg = f"{FEATURES_PATH.name} must be a non-empty list of strings, got list of {type(features[0]).__name__}"
+        raise TypeError(msg)
+    return cast("list[str]", features)
 
 
 def load_model_features() -> list[str]:
     """Load the ordered model feature list."""
     try:
         with FEATURES_PATH.open() as features_file:
-            model_features: list[str] = json.load(features_file)
-            return model_features
+            return _require_feature_list(json.load(features_file))
     except Exception as exc:
         logger.exception("artifact_load_failed", artifact=ARTIFACT_MODEL_FEATURES)
         raise ArtifactLoadError(ARTIFACT_MODEL_FEATURES) from exc
@@ -179,10 +206,16 @@ def load_model_features() -> list[str]:
 def load_demographics() -> pd.DataFrame:
     """Load the zipcode demographics table."""
     try:
-        return pd.read_csv(DEMOGRAPHICS_PATH, dtype={"zipcode": str})
+        demographics = pd.read_csv(DEMOGRAPHICS_PATH, dtype={"zipcode": str})
     except Exception as exc:
         logger.exception("artifact_load_failed", artifact=ARTIFACT_DEMOGRAPHICS)
         raise ArtifactLoadError(ARTIFACT_DEMOGRAPHICS) from exc
+
+    # The lookup is what decides both the 404 boundary and 26 of the 33 model
+    # features, so a retrained model paired with a stale table is the case worth
+    # being able to spot.
+    logger.info("artifact_loaded", artifact=ARTIFACT_DEMOGRAPHICS, sha256=_digest(DEMOGRAPHICS_PATH), rows=len(demographics))
+    return demographics
 
 
 def load_imputer() -> ImputerProtocol:
@@ -198,19 +231,6 @@ def load_imputer() -> ImputerProtocol:
         raise ArtifactLoadError(ARTIFACT_IMPUTER) from exc
 
 
-def load_predict_artifacts() -> PredictArtifacts:
-    """Load model, features, and demographics only.
-
-    This is exactly what the first version of /predict loaded on every
-    request; the KNN imputer is fitted elsewhere and is not touched here.
-    """
-    return PredictArtifacts(
-        model=load_model(),
-        model_features=load_model_features(),
-        demographics=load_demographics(),
-    )
-
-
 def load_artifacts() -> Artifacts:
     """Load model, features, demographics, and fitted KNN imputer."""
     return Artifacts(
@@ -222,11 +242,11 @@ def load_artifacts() -> Artifacts:
 
 
 def require_artifacts(request: Request) -> Artifacts:
-    """Return lifespan artifacts or raise 503 when startup loading failed."""
+    """Return lifespan artifacts or raise 500 when startup loading failed."""
     artifacts = getattr(request.app.state, "artifacts", None)
     if artifacts is None:
         detail = "Prediction service unavailable"
-        raise HTTPException(status_code=503, detail=detail)
+        raise HTTPException(status_code=500, detail=detail)
     return artifacts
 
 
