@@ -13,7 +13,6 @@ if TYPE_CHECKING:
 
 HTTP_STATUS_OK = 200
 HTTP_STATUS_INTERNAL_ERROR = 500
-HTTP_STATUS_UNAVAILABLE = 503
 
 # Contract: lifespan must populate app.state under these exact keys.
 LIFESPAN_ARTIFACTS = ["model", "model_features", "demographics", "imputer"]
@@ -41,14 +40,14 @@ def loaded_client() -> Iterator[TestClient]:
 
 
 @pytest.mark.parametrize("artifact", LIFESPAN_ARTIFACTS)
-def test_health_v2_unavailable_when_artifact_missing(
+def test_health_v2_500_when_artifact_missing(
     unloaded_client: TestClient,
     artifact: str,
 ) -> None:
-    """V2 health reports unavailable when any lifespan artifact failed to load."""
+    """V2 health reports a 500 when any lifespan artifact failed to load."""
     _ = artifact
     response = unloaded_client.get(HEALTH_V2_ENDPOINT)
-    assert response.status_code == HTTP_STATUS_UNAVAILABLE
+    assert response.status_code == HTTP_STATUS_INTERNAL_ERROR
 
 
 def test_predict_v1_ok_when_lifespan_unloaded(

@@ -18,6 +18,7 @@ WORKDIR /app
 
 COPY --from=builder /app/.venv /app/.venv
 COPY src/model/create_model.py ./
+COPY src/paths.py ./
 COPY src/data ./data
 
 ENV PATH="/app/.venv/bin:$PATH"

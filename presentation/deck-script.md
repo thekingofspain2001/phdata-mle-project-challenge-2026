@@ -382,8 +382,8 @@ Layout: T-cols-2. Fragments: 2, no foot.
 | Card 2 body | A plain-words reply names the bad code. Fix the digit, move on. |
 
 - Say: "A typo'd postcode used to blow up. Now it names the bad code."
-- Source: `src/api/shared.py:151-153` (404 `Unknown zipcode`); tests
-  `test/unit/test_api_unit.py:57-83`.
+- Source: `src/api/shared.py:241-244` (404 `Unknown zipcode`); tests
+  `test/unit/test_api_unit.py:57-80`.
 
 ## S8 — Modernised base (title same, `section.ph-caps.ph-s8`)
 
@@ -417,7 +417,8 @@ flight's `painted()` measures the painted rect rather than the box.
 
 - Say (one line each): "Locked installs. Annotated defs. Nullable input.
   Honest schema."
-- Sources: `src/api/endpoints_v2.py:30-55` (`HomeFeaturesV2`, `predict_v2`),
+- Sources: `src/api/endpoints_v2.py:35-58` (`HomeFeaturesV2`) and
+  `src/api/endpoints_v2.py:105-131` (`predict_v2`),
   `src/api/endpoints.py:11-34` (`HomeFeatures`, `predict`); `uv.lock` +
   PyPI for the To column.
 
@@ -457,11 +458,11 @@ talk-track only, no slide.
 
 1. Missing data: POST `/predict/v2` with `bathrooms: null`,
    `sqft_lot: null` → 200 + `predicted_price`; same payload to v1 fails.
-   Trace: `src/api/endpoints_v2.py:63-71`.
+   Trace: `src/api/endpoints_v2.py:121-130`.
 2. Unknown zip: `"zipcode": "00000"` → 404 naming the zip.
 3. Speed: lifespan load-once vs v1 per-request; cite `DECK_METRICS`
    p50/p95, offer live re-run.
-4. Readiness: `/health/v2` 200 vs 503 when artifacts missing.
+4. Readiness: `/health/v2` 200 vs 500 when artifacts missing.
 5. Contracts: `/docs` shows typed responses with examples.
 6. AI usage (`CANDIDATE_PROJECT.md:163-170`): tool used, context technique,
    validation via unit/integration suites + live probes.

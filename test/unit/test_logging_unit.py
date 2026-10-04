@@ -32,13 +32,13 @@ def explode(_payload: dict[str, object], _artifacts: object) -> dict[str, float]
 
 def test_inbound_request_id_is_echoed(client: TestClient) -> None:
     """A supplied X-Request-ID comes back on the response."""
-    response = client.get("/items/1", headers={"X-Request-ID": REQUEST_ID})
+    response = client.get("/health", headers={"X-Request-ID": REQUEST_ID})
     assert response.headers["x-request-id"] == REQUEST_ID
 
 
 def test_missing_request_id_is_generated(client: TestClient) -> None:
     """Without the header, the server mints a UUIDv4 and returns it."""
-    response = client.get("/items/1")
+    response = client.get("/health")
     generated = response.headers["x-request-id"]
     assert len(generated) == UUID_LENGTH
     assert generated[UUID4_VERSION_INDEX] == "4"

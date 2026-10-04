@@ -1,13 +1,17 @@
 """FastAPI application serving home price predictions."""
 
+import math
 import os
 import time
-from typing import TYPE_CHECKING
+from collections.abc import Mapping, Sequence
+from typing import TYPE_CHECKING, cast
 from uuid import uuid4
 
 import structlog
 from asgi_correlation_id import CorrelationIdMiddleware, correlation_id
 from fastapi import FastAPI, Request, Response
+from fastapi.encoders import jsonable_encoder
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
@@ -62,16 +66,40 @@ async def log_request(request: Request, call_next: RequestResponseEndpoint) -> R
     return response
 
 
-def audit_item(item_id: int) -> None:
-    """Nested helper: the correlation ID reaches it from context, no plumbing."""
-    log.info("item_audit", item_id=item_id)
+@app.exception_handler(RequestValidationError)
+async def validation_exception(_request: Request, exc: RequestValidationError) -> JSONResponse:
+    """Answer 422 without crashing on a non-finite input.
 
+    FastAPI echoes the offending value into detail[].input, and Starlette's
+    JSONResponse renders with allow_nan=False - so rejecting Infinity or NaN
+    turns the 422 itself into a 500. Replace non-finite floats with null so
+    the error survives serialization.
+    """
 
-@app.get("/items/{item_id}")
-async def read_item(item_id: int) -> dict[str, int]:
-    """Sample route proving the request ID propagates into nested calls."""
-    audit_item(item_id)
-    return {"item_id": item_id}
+    def scrub(value: object) -> object:
+        if isinstance(value, float) and not math.isfinite(value):
+            return None
+        if isinstance(value, Mapping):
+            mapping = cast("Mapping[object, object]", value)
+            return {str(k): scrub(v) for k, v in mapping.items()}
+        if isinstance(value, Sequence) and not isinstance(value, str | bytes):
+            items = cast("Sequence[object]", value)
+            return [scrub(v) for v in items]
+        return value
+
+    errors = exc.errors()
+    # A 422 is the one v2 outcome with no domain event: without this, a
+    # rejected payload logs only the middleware's status_code and gives no
+    # field name or reason to grep on.
+    log.warning(
+        "validation_failed",
+        fields=[f"{'.'.join(str(part) for part in error['loc'])}: {error['msg']}" for error in errors],
+    )
+    return JSONResponse(
+        status_code=422,
+        content={"detail": jsonable_encoder(scrub(errors))},
+        headers={"X-Request-ID": correlation_id.get() or ""},
+    )
 
 
 @app.exception_handler(Exception)

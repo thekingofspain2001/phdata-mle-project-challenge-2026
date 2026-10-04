@@ -5,7 +5,7 @@ from typing import Annotated
 import pandas as pd
 import structlog
 from fastapi import APIRouter, Body, HTTPException, Request
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from api.shared import REQUEST_COLUMNS, UNKNOWN_ZIP, Artifacts, listing_examples, predict_price, require_artifacts
 
@@ -34,6 +34,12 @@ class ErrorDetail(BaseModel):
 
 class HomeFeaturesV2(BaseModel):
     """Input features for home price prediction v2; non-zipcode fields nullable."""
+
+    # Infinity and NaN pass plain float validation, then blow up inside
+    # model.predict as an opaque 500. Rejecting them here turns that into a
+    # 422 at the boundary. None is still allowed - that is what the imputer
+    # is for.
+    model_config = ConfigDict(allow_inf_nan=False)
 
     # Field-level examples were dropped: Swagger prints schema examples
     # verbatim (swagger-ui json-schema-2020-12 Examples.jsx) and they had
@@ -89,7 +95,7 @@ ERROR_RESPONSES: dict[int | str, dict[str, object]] = {
 }
 
 
-@router_v2.get("/health/v2", response_model=HealthResponse, responses={503: {"model": ErrorDetail}})
+@router_v2.get("/health/v2", response_model=HealthResponse, responses={500: {"model": ErrorDetail}})
 def health_check_v2(request: Request) -> HealthResponse:
     """Check v2 API readiness (lifespan artifacts incl. imputer)."""
     require_artifacts(request)
@@ -109,9 +115,9 @@ def predict_v2(
     try:
         artifacts: Artifacts = require_artifacts(request)
     except HTTPException as exc:
-        detail = str(exc.detail) if exc.detail else "Prediction service unavailable"
-        log.warning("artifacts_unavailable", detail=detail, status_code=exc.status_code)
-        raise HTTPException(status_code=500, detail=detail) from exc
+        # require_artifacts already answers 500 for this state; log before it propagates.
+        log.warning("artifacts_unavailable", detail=str(exc.detail), status_code=exc.status_code)
+        raise
     payload = home_features.model_dump()
     row = pd.DataFrame([{c: payload.get(c) for c in REQUEST_COLUMNS}])
     if row.isna().any().any():

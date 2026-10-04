@@ -1,7 +1,6 @@
 """Train a home price model and export artifacts."""
 
 import json
-import pathlib
 import pickle
 from typing import cast
 
@@ -10,8 +9,8 @@ import pandas as pd
 from sklearn import model_selection, neighbors, pipeline, preprocessing
 from sklearn.pipeline import Pipeline
 
-SALES_PATH = "data/kc_house_data.csv"  # path to CSV with home sale data
-DEMOGRAPHICS_PATH = "data/zipcode_demographics.csv"  # path to CSV with demographics
+from paths import DEMOGRAPHICS_PATH, FEATURES_PATH, MODEL_PATH, SALES_PATH
+
 # List of columns (subset) that will be taken from home sale data
 SALES_COLUMN_SELECTION = [
     "price",
@@ -24,7 +23,6 @@ SALES_COLUMN_SELECTION = [
     "sqft_basement",
     "zipcode",
 ]
-OUTPUT_DIR = "model"  # Directory where output artifacts will be saved
 
 # Updated to use modern X | Y union and native lowercase collections
 type DataFrameOrArray = pd.DataFrame | np.ndarray | pd.Series
@@ -78,7 +76,7 @@ def load_data(
 
 def main() -> None:
     """Load data, train model, and export artifacts."""
-    x, y = load_data(SALES_PATH, DEMOGRAPHICS_PATH, SALES_COLUMN_SELECTION)
+    x, y = load_data(str(SALES_PATH), str(DEMOGRAPHICS_PATH), SALES_COLUMN_SELECTION)
 
     # Silenced Pyright's partial unknown on internal library return signatures
     split: SplitFrames = cast(
@@ -93,13 +91,12 @@ def main() -> None:
         neighbors.KNeighborsRegressor(),
     ).fit(x_train, y_train)  # type: ignore[reportUnknownMemberType]
 
-    output_dir = pathlib.Path(OUTPUT_DIR)
-    output_dir.mkdir(exist_ok=True)
+    MODEL_PATH.parent.mkdir(exist_ok=True)
 
     # Output model artifacts: pickled model and JSON list of features
-    with (output_dir / "model.pkl").open("wb") as model_file:
+    with MODEL_PATH.open("wb") as model_file:
         pickle.dump(model, model_file)
-    with (output_dir / "model_features.json").open("w") as features_file:
+    with FEATURES_PATH.open("w") as features_file:
         # Cast to pd.DataFrame cleanly handles column checking
         json.dump(list(cast("pd.DataFrame", x_train).columns), features_file)
 
