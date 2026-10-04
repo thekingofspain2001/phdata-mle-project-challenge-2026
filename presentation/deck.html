@@ -63,6 +63,11 @@
       --ph-t-slide: 1.2s;
       --ph-t-fade: 0.18s;
       --ph-ease: cubic-bezier(0.26, 0.86, 0.44, 0.985);
+      /* The zoom travels a long way (the From capture grows about four times),
+         so it needs an ease that spends the whole duration moving instead of
+         --ph-ease, which lands most of the move in its first fifth and reads
+         as a jerk followed by a crawl. Same ramp in, ramp out, even pace. */
+      --ph-ease-soft: cubic-bezier(0.4, 0, 0.2, 1);
       /* Shape + line tokens. */
       --rad-card: 12px;
       --rad-cell: 10px;
@@ -1552,6 +1557,9 @@
       box-shadow: 0 0 0 var(--line-sm) var(--ph-mint), 0 12px 28px rgba(0, 0, 0, 0.45);
     }
 
+    /* The dialog is the top layer: the picture and its caption live in it, so
+       they are opaque and above everything for the whole flight. Only the dim
+       fades. */
     dialog.ph-shot-zoom {
       padding: 0;
       border: 0;
@@ -1562,28 +1570,29 @@
       max-width: 96vw;
       max-height: 96vh;
       overflow: visible;
-      opacity: 0;
-      transition: opacity var(--ph-t-fade) var(--ph-ease);
     }
 
     dialog.ph-shot-zoom::backdrop {
       background: rgba(8, 14, 34, 0.82);
       opacity: 0;
-      transition: opacity var(--ph-t-fade) var(--ph-ease);
+      transition: opacity var(--ph-t-slide) var(--ph-ease-soft);
     }
 
-    /* The wrapper only stacks caption over capture. The motion is the capture
-       itself: JS puts it in its new box and plays one transform between the
-       two, so there is nothing to scale here. */
+    /* The wrapper stacks caption over capture and holds the height the capture
+       gives it, so when the capture leaves for the slide the caption stays put
+       instead of collapsing to the middle of the screen mid-flight. The
+       motion is the capture itself: JS puts it in its new box and plays one
+       transform between the two, so there is nothing to scale here. */
     dialog.ph-shot-zoom .ph-zoom-box {
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: var(--sp-xs);
+      min-height: calc(min(92vw / var(--ph-shot-num, 0.559), 88vh) + var(--sp-xs));
     }
 
-    /* Open state: the backdrop and dialog fade in under the moving capture. */
-    dialog.ph-shot-zoom.ph-shot-zoom-open,
+    /* The dim rides the same duration and curve as the move, so the fade and
+       the travel are one gesture. */
     dialog.ph-shot-zoom.ph-shot-zoom-open::backdrop {
       opacity: 1;
     }
@@ -2947,107 +2956,122 @@
       });
     })();
     /* Click-to-zoom for the two S8 input-validation captures (S8 step 3).
-       Both are the same kind of box - a background-image div - so one handler
-       covers both, and each image is customised from the markup already there:
-       .from/.to pick the caption colour, the sibling <h4> is the caption.
-       A native <dialog> does the rest: top layer (so Reveal's slide transform
-       cannot clip it), centred, backdrop, Esc-to-close. */
+       Each capture owns its overlay end to end - its own <dialog>, its own
+       caption, its own measured ratio, its own transition - so neither can
+       disturb the other and there is no shared "which one is open" state to
+       get wrong. The <dialog> is a native top-layer modal, so Reveal's slide
+       transform cannot clip it and Esc, the backdrop and the focus ring come
+       from the platform. */
     (() => {
       const shots = document.querySelectorAll(".ph-s8-input-validation .input-validation");
       if (!shots.length) return;
 
-      const dlg = document.createElement("dialog");
-      dlg.className = "ph-shot-zoom";
-      const box = document.createElement("div");
-      box.className = "ph-zoom-box";
-      const cap = document.createElement("figcaption");
-      cap.className = "ph-zoom-cap";
-      box.append(cap);
-      dlg.append(box);
-      document.body.append(dlg);
-
-      let shot = null;      // capture currently lifted into the dialog
-      let home = null;      // where it came from, so it goes back exactly
-
-      // How long the move between slide box and zoom box takes: the same
-      // --ph-t-slide the rest of the deck animates on, read once from the token
-      // so retiming the deck retimes this too.
+      // The move runs on the deck's slide timing, read once from the token so
+      // retiming the deck retimes the zoom with it.
+      const MOVE = "var(--ph-t-slide) var(--ph-ease-soft)";
       const moveMs = parseFloat(getComputedStyle(document.documentElement)
         .getPropertyValue("--ph-t-slide")) * 1000;
       const still = matchMedia("(prefers-reduced-motion: reduce)");
 
       // The capture is painted into its box by `contain`, top aligned, so the
-      // box is not the picture: on the slide both captures share the 419/750
-      // column, in the zoom each one is its own ratio. Measure the painted
-      // part in both states and move that, so what travels is the picture, and
-      // it travels by a single uniform scale - the same move for either
-      // capture, rather than the From box stretching sideways while the To
-      // barely grows.
+      // box is not the picture: on the slide both captures share one tall
+      // 419/750 column, in the zoom each is its own ratio. Measure the painted
+      // part, so what travels is the picture and it travels by a single
+      // uniform scale - the same move for either capture.
       const painted = (box, ar) => {
         const w = Math.min(box.width, box.height * ar);
         return { left: box.left + (box.width - w) / 2, top: box.top, w };
       };
 
-      const arOf = new WeakMap();   // each capture's own width / height
-
-      const move = (el, from, to, ar) => {
-        if (still.matches || !to.width || !ar) return;
-        const a = painted(from, ar);
-        const b = painted(to, ar);
-        const zoom = to.width / el.offsetWidth;   // reveal scales the deck uniformly
-        el.style.cssText =
-          `transition: none;` +
-          `transform-origin: ${a.left - from.left}px ${a.top - from.top}px;` +
-          `transform: translate(${(b.left - a.left) / zoom}px, ${(b.top - a.top) / zoom}px)` +
-          ` scale(${b.w / a.w});`;
-        // Flush that start state, or both values land in one frame and the
-        // browser has nothing to animate between.
-        el.offsetWidth;
-        requestAnimationFrame(() => {
-          el.style.transition = `transform var(--ph-t-slide) var(--ph-ease)`;
-          el.style.transform = "none";
-        });
-        setTimeout(() => { el.style.cssText = ""; }, moveMs);
-      };
-
-      const close = () => {
-        if (!shot) return;
-        const el = shot;
-        shot = null;
-        const from = el.getBoundingClientRect();   // where it is now: zoomed
-        home.parent.insertBefore(el, home.next);    // straight back, no gap
-        dlg.close();
-        dlg.classList.remove("ph-shot-zoom-open");  // so the next open fades in
-        move(el, from, el.getBoundingClientRect(), arOf.get(el));
-      };
-
       for (const el of shots) {
-        const label = el.closest(".ph-shot").querySelector("h4").textContent;
+        const head = el.closest(".ph-shot").querySelector("h4");
+        const label = head.textContent;
+        const home = { parent: el.parentNode, next: el.nextSibling };
+        let ar = 0;      // this capture's own width / height, read on first open
+        let spot = null; // its box in the slide, where every flight ends
+
+        const dlg = document.createElement("dialog");
+        dlg.className = "ph-shot-zoom";
+        dlg.setAttribute("aria-label", label);
+        const box = document.createElement("div");
+        box.className = "ph-zoom-box";
+        const cap = document.createElement("figcaption");
+        cap.className = "ph-zoom-cap";
+        cap.textContent = label;
+        box.append(cap);
+        dlg.append(box);
+        document.body.append(dlg);
+
         el.tabIndex = 0;
         el.setAttribute("role", "button");
         el.setAttribute("aria-label", `Enlarge ${label} screenshot`);
+
+        // The picture lives in the overlay for the whole time it is zoomed, so
+        // it is never under the dim and never clipped by the slide. A flight is
+        // then just two places: the start transform paints the picture over the
+        // spot it is leaving, the end transform drops it into the spot it is
+        // arriving at, and one transition plays the difference. Opening is the
+        // slide then the screen; closing is the same pair the other way round.
+        const move = (from, to) => {
+          if (still.matches || !ar || !to.w) return;
+          const box = el.getBoundingClientRect();   // its box in the overlay, untransformed
+          const put = (p) =>
+            `translate(${p.left - box.left}px, ${p.top - box.top}px) scale(${p.w / box.width})`;
+          // The caption rides the picture's top edge, and sits over its centre.
+          const lead = (p) =>
+            `translate(${p.left + p.w / 2 - box.left - box.width / 2}px, ${p.top - box.top}px)`;
+          el.style.cssText = `transition: none; transform-origin: 0 0; transform: ${put(from)};`;
+          cap.style.transition = "none";
+          cap.style.transform = lead(from);
+          // The start state has to be on a painted frame before the end state,
+          // or the browser has nothing to animate between and snaps.
+          requestAnimationFrame(() => requestAnimationFrame(() => {
+            el.style.transition = `transform ${MOVE}`;
+            el.style.transform = put(to);
+            cap.style.transition = `transform ${MOVE}`;
+            cap.style.transform = lead(to);
+          }));
+          setTimeout(() => {
+            el.style.cssText = "";
+            cap.style.cssText = "";
+          }, moveMs);
+        };
+
         const open = async () => {
-          // Clicking the capture while it is the zoomed one would re-lift it;
-          // that click bubbles to the dialog, which closes it instead.
-          if (shot) return;
-          shot = el;
-          const from = el.getBoundingClientRect();   // where it is now: in the slide
-          home = { parent: el.parentNode, next: el.nextSibling };
-          cap.textContent = label;
-          dlg.setAttribute("aria-label", label);
-          // Size the zoom box to the capture itself, read off the same data URI
-          // the CSS paints, so the caption sits hard against the picture edge.
-          const img = new Image();
-          img.src = getComputedStyle(el).backgroundImage.slice(5, -2);
-          await img.decode();
-          arOf.set(el, img.naturalWidth / img.naturalHeight);
-          box.style.setProperty("--ph-shot-ar", `${img.naturalWidth} / ${img.naturalHeight}`);
-          box.style.setProperty("--ph-shot-num", img.naturalWidth / img.naturalHeight);
+          if (dlg.open) return;   // already zoomed: this click closes instead
+          if (!ar) {
+            // Size the overlay to this capture, read off the same data URI the
+            // CSS paints, so the caption sits hard against the picture edge.
+            const img = new Image();
+            img.src = getComputedStyle(el).backgroundImage.slice(5, -2);
+            await img.decode();
+            ar = img.naturalWidth / img.naturalHeight;
+            box.style.setProperty("--ph-shot-ar", `${img.naturalWidth} / ${img.naturalHeight}`);
+            box.style.setProperty("--ph-shot-num", ar);
+          }
+          spot = el.getBoundingClientRect();   // where the picture lives on the slide
           box.append(el);
           dlg.showModal();
-          move(el, from, el.getBoundingClientRect(), arOf.get(el));
+          // The caption is this label's stand-in for as long as it is zoomed, so
+          // the slide's own copy steps out rather than sitting behind the dim
+          // with a second one travelling over the top of it.
+          head.style.visibility = "hidden";
+          move(painted(spot, ar), painted(el.getBoundingClientRect(), ar));
           requestAnimationFrame(() => dlg.classList.add("ph-shot-zoom-open"));
         };
+
+        const close = () => {
+          dlg.classList.remove("ph-shot-zoom-open");
+          move(painted(el.getBoundingClientRect(), ar), painted(spot, ar));
+          // The picture flies home inside the dialog and only joins the slide
+          // when it has landed, so it is never under the lifting dim.
+          setTimeout(() => {
+            dlg.close();
+            home.parent.insertBefore(el, home.next);
+            head.style.visibility = "";
+          }, still.matches ? 0 : moveMs);
+        };
+
         el.addEventListener("click", open);
         el.addEventListener("keydown", (e) => {
           if (e.key === "Enter" || e.key === " ") {
@@ -3055,18 +3079,16 @@
             open();
           }
         });
+        // Backdrop, caption and the picture itself all close. Esc would skip
+        // the fade, so it is caught and routed through close().
+        dlg.addEventListener("click", close);
+        dlg.addEventListener("cancel", (e) => {
+          e.preventDefault();
+          close();
+        });
+        // Reveal listens on document, so keys must not reach it while zoomed.
+        dlg.addEventListener("keydown", (e) => e.stopPropagation());
       }
-
-      // Backdrop click and Esc both land here; Esc would skip the fade, so it is
-      // caught and routed through close().
-      dlg.addEventListener("click", close);
-      dlg.addEventListener("cancel", (e) => {
-        e.preventDefault();
-        close();
-      });
-      // While zoomed, the deck must not advance under the overlay: Reveal
-      // listens on document, so keys are stopped here before they reach it.
-      dlg.addEventListener("keydown", (e) => e.stopPropagation());
     })();
 
     Reveal.initialize({
