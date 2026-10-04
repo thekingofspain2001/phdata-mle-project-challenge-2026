@@ -124,7 +124,6 @@ docker rm housing-api
 docker logs housing-api
 ```
 
-
 ### Logging
 
 **Location:** stdout only. There is no log file and no rotation to configure — the container's stdout is the log, so

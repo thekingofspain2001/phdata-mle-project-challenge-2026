@@ -57,7 +57,7 @@ in-band); rest `#6f8590`, all four directions `color:inherit`,
 with `bottom:calc((var(--ph-footer-h) - 34px)/2)` left of the arrows, zero
 overlap; current slide only.
 
-  - Layout rule: reveal.js owns `.slides` geometry (`width:1270`,
+- Layout rule: reveal.js owns `.slides` geometry (`width:1270`,
     `height:961`, `margin:0.04`, `center:true` — uniform scale, no CSS
     overrides). Each `section` flex-fills its slide box (`display:flex`,
     `flex-direction:column`, `height:100%`). `.ph-body` flex-fills that
@@ -65,7 +65,7 @@ overlap; current slide only.
     (`padding:var(--ph-header-h) var(--gap-md) var(--ph-footer-h)`), so the
     header title aligns with content at any viewport. Card rows fill the
     same area (`flex:1 1 auto`). Cover (`T-cover`) is the exception: centered.
-  - Header title source: `aria-label` per slide — `Cover` (S1, hidden) ·
+- Header title source: `aria-label` per slide — `Cover` (S1, hidden) ·
     `Executive summary` · `Listings with blanks get turned away` ·
     `Missing value approaches` · `Why similar homes won` · `Faster answers` ·
     `Errors you can act on` · `Modernised base` · `What you get` ·
@@ -95,6 +95,7 @@ No wordmark tokens. `--logo-size:6vh` is the single logo size token.
   amber = Average Value; `--md:#7fb6d9` blue = Mean value;
   `--knn:#c792ea` purple = Nearest Neighbor. Complement, never clash with,
 phData mint/navy; distinct from Sound Realty house amber (header only).
+
 ## Metrics (single source)
 
 Inline `DECK_METRICS` (`deck.html:830-841`); spans with `data-metric`
@@ -118,11 +119,11 @@ headline average excluded — two lot-size outlier fields swamp it).
 Each reused layout defined once. Class names + flex rules + fragment order
 verbatim from `deck.html` CSS.
 
-  - T-cover — used by S1. `section.ph-cover > div.ph-body` (`align-items:center`,
+- T-cover — used by S1. `section.ph-cover > div.ph-body` (`align-items:center`,
     `justify-content:center`, `text-align:center`): the centered exception.
     Single `h1` (margin 0, `max-width:20ch`), no sub, no fragments, no metrics.
     Cover `aria-label="Cover"` hides the header title via `is-empty`.
-  - T-scr — used by S2. Lead `p.ph-action` (always visible;
+- T-scr — used by S2. Lead `p.ph-action` (always visible;
     `var(--ph-why-h)`, `var(--fs-lead)`, margin 0) + `ul.ph-scr`
     (wrapping, `flex:1 1 auto`, `align-content:stretch`,
     `gap:var(--sp-sm) var(--gap-md)`); cards `li` `flex:1 1 28vw`, dark fill
@@ -130,7 +131,7 @@ verbatim from `deck.html` CSS.
     var(--ph-card-border)`), `padding-left:var(--gap-sm)`, no radius;
     `h3` default white, body `p` dim `var(--ph-why-body)`. Fragments: 6
     cards in DOM order (pains 1–3, fixes 4–6).
-  - T-cols-3 — used by S3, S5, S6. `div.ph-cols` (`flex:1 1 auto`,
+- T-cols-3 — used by S3, S5, S6. `div.ph-cols` (`flex:1 1 auto`,
     `gap:var(--gap-md)`); each `article` `flex:1 1 0`, dark fill
     `var(--ph-card-bg)`, full border
     (`var(--line-sm) solid var(--ph-card-border)`),
@@ -235,11 +236,11 @@ Reveal.initialize({ width:1270, height:961, margin:0.04,
   transition:"slide", backgroundTransition:"none" });
 ```
 
-  - `ready` → `setGlobalTitle(currentSlide)`.
-  - `fragmentshown/hidden` → `s4Index(fragment)` over `.ph-s4-go` order →
+- `ready` → `setGlobalTitle(currentSlide)`.
+- `fragmentshown/hidden` → `s4Index(fragment)` over `.ph-s4-go` order →
     `setS4Stage(i+1)` / `setS4Stage(i)`; `setS4Stage` swaps `is-stage-N`
-    + shows the Nth `.ph-panel` in DOM order (S4 staging; §S4).
-  - `slidechanged` → sync title; entering `#s4` resets fragments to stage 0
+  - shows the Nth `.ph-panel` in DOM order (S4 staging; §S4).
+- `slidechanged` → sync title; entering `#s4` resets fragments to stage 0
     (`Reveal.slide(h,0,-1)` + `setS4Stage("0")` after 60 ms); leaving a
     non-zero S4 resets it to `"0"`.
 - Chrome styling (appended after caps grid, verified headless 1280×800):
@@ -267,7 +268,7 @@ Reveal.initialize({ width:1270, height:961, margin:0.04,
 Layout: T-scr. Fragments: 6 (cards in DOM order).
 
 | Item | Content |
-|------|---------|
+| ------ | --------- |
 | Lead (`p.ph-action`, always visible) | The valuation API now prices incomplete listings, answers faster, and fails clearly. |
 | Card 1 h3 | Listings arrive with blanks. |
 | Card 1 body | Up to [nnr.recovered] of requests arrive with missing fields and used to be rejected. |
@@ -291,7 +292,7 @@ Cards 1–3 are pains, 4–6 the matching fixes, revealed in order.
 Layout: T-cols-3. Fragments: 3.
 
 | Item | Content |
-|------|---------|
+| ------ | --------- |
 | Card 1 h3 | Problem |
 | Card 1 body | A seller's listing is missing the bathroom count or the plot size. The API rejects the whole request. No price comes back. |
 | Card 2 h3 | Impact |
@@ -309,7 +310,7 @@ fixed). Markers staged (floating house + stem + equation below + equation
 on the pick).
 
 | Item | Content |
-|------|---------|
+| ------ | --------- |
   | Corner sub (stage 1 only) | Average Value (amber) |
   | Corner sub (stage 2 only) | Mean value (blue) |
   | Corner sub (stage 3 only) | Nearest Neighbor (purple) |
@@ -338,7 +339,7 @@ on the pick).
 Layout: T-cols-3 + T-bars in Card 3 + foot. Fragments: 4 (3 cards + foot).
 
 | Item | Content |
-|------|---------|
+| ------ | --------- |
 | Card 1 h3 | Problem |
 | Card 1 body | Averages ignore the house in front of us. A flat and a family home get the same guess. |
 | Card 2 h3 | Impact |
@@ -357,7 +358,7 @@ Layout: T-cols-3 + T-bars in Card 3 + foot. Fragments: 4 (3 cards + foot).
 Layout: T-cols-3 + foot. Fragments: 4 (3 cards + foot).
 
 | Item | Content |
-|------|---------|
+| ------ | --------- |
 | Card 1 h3 | Problem |
 | Card 1 body | Every request reloads the model, the maps, and the comparables from disk. Under load, that queues up. |
 | Card 2 h3 | Impact |
@@ -375,7 +376,7 @@ Layout: T-cols-3 + foot. Fragments: 4 (3 cards + foot).
 Layout: T-cols-2. Fragments: 2, no foot.
 
 | Item | Content |
-|------|---------|
+| ------ | --------- |
 | Card 1 h3 | Before |
 | Card 1 body | A mistyped area code blows up. The agent sees a dead end and starts over. |
 | Card 2 h3 | After |
@@ -409,7 +410,7 @@ capture's own natural ratio) to stay hard against its picture, and the zoom
 flight's `painted()` measures the painted rect rather than the box.
 
 | Step | Chip | Pane content |
-|------|------|--------------|
+| ------ | ------ | -------------- |
 | 1 (resting, no click) | 01 Runtime | `table.ph-table`: Library / From / To. `httpx` and `pip` struck as dropped (`class="ph-muted"`), `httpx2` and `uv` as replacements. Table centred v+h in the pane. |
 | 2 | 02 Type hints | Was `def predict(home_features):`; now the two types the signature names, declared above it: `class HomeFeaturesV2(BaseModel)` (`bedrooms: int \| None = Field(default=None, ge=0)`, six more nullable fields elided, `zipcode: str = Field(pattern=r"^\d{5}$")`) and `class PredictionResponse(BaseModel)` (`predicted_price: float = Field(examples=[394708.0])`), then `def predict_v2(home_features: HomeFeaturesV2, request: Request) -> PredictionResponse:`. The six middle fields are elided to fit the pane — the pane holds ~13 code lines and the full class is 8 fields. |
 | 3 | 03 Input validation | Was `HomeFeatures` (every field required); now `HomeFeaturesV2` (nullable fields + `zipcode` pattern `^\d{5}$`). |
@@ -427,7 +428,7 @@ flight's `painted()` measures the painted rect rather than the box.
 Layout: T-why-3 + handoff. Fragments: 4 (3 cards + handoff).
 
 | Item | Content |
-|------|---------|
+| ------ | --------- |
 | Card 1 num | 01 |
 | Card 1 h3 | No listing left behind |
 | Card 1 body | Incomplete paperwork still prices. |
@@ -449,7 +450,7 @@ presented. Five plain `<li>` mirror checklist items 1–5 below; item 6 is
 talk-track only, no slide.
 
 | Item | Content |
-|------|---------|
+| ------ | --------- |
 | Step 1 | Blank fields score; same payload to the old endpoint fails. |
 | Step 2 | Bad area code returns a named plain-words reply. |
 | Step 3 | Load-once versus per-request; cite harness numbers, offer live rerun. |
