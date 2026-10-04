@@ -5,9 +5,10 @@ from typing import TYPE_CHECKING
 from uuid import uuid4
 
 import structlog
-from asgi_correlation_id import CorrelationIdMiddleware
+from asgi_correlation_id import CorrelationIdMiddleware, correlation_id
 from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
 from api.endpoints import router as api_router
 from api.endpoints_v2 import router_v2 as api_router_v2
@@ -36,22 +37,27 @@ app.include_router(api_router)
 app.include_router(api_router_v2)
 
 
-@app.middleware("http")
-async def log_request(request: Request, call_next: RequestResponseEndpoint) -> Response:
-    """Emit one end-of-request entry, tagged with the request's correlation ID."""
-    start = time.perf_counter()
-    try:
-        response = await call_next(request)
-    except Exception:
-        log.exception("request_failed", method=request.method, path=request.url.path)
-        raise
+def log_request_end(request: Request, status_code: int, started: float) -> None:
+    """Emit the end-of-transaction entry, tagged with the correlation ID."""
     log.info(
         "request",
         method=request.method,
         path=request.url.path,
-        status_code=response.status_code,
-        duration_ms=round((time.perf_counter() - start) * 1000, 2),
+        status_code=status_code,
+        duration_ms=round((time.perf_counter() - started) * 1000, 2),
     )
+
+
+@app.middleware("http")
+async def log_request(request: Request, call_next: RequestResponseEndpoint) -> Response:
+    """Time the request; an unhandled exception escapes as a 500 and is logged as one."""
+    started = time.perf_counter()
+    try:
+        response = await call_next(request)
+    except Exception:
+        log_request_end(request, 500, started)
+        raise
+    log_request_end(request, response.status_code, started)
     return response
 
 
@@ -65,6 +71,17 @@ async def read_item(item_id: int) -> dict[str, int]:
     """Sample route proving the request ID propagates into nested calls."""
     audit_item(item_id)
     return {"item_id": item_id}
+
+
+@app.exception_handler(Exception)
+async def unhandled_exception(request: Request, exc: Exception) -> JSONResponse:
+    """Log the captured exception with its traceback, then answer 500."""
+    log.error("unhandled_exception", method=request.method, path=request.url.path, exc_info=exc)
+    return JSONResponse(
+        status_code=500,
+        content={"detail": "Internal server error"},
+        headers={"X-Request-ID": correlation_id.get() or ""},
+    )
 
 
 # Added last so it wraps everything: the ID is bound before any log runs.

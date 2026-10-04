@@ -65,7 +65,6 @@ async def predict(home_features: Annotated[HomeFeatures, Body(openapi_examples=l
 
     # Combine input data with demographic data
     input_data = pd.concat([input_data, demographic_info], axis=1)
-    print(input_data)
 
     # Ensure the input data has the correct features
     selected: pd.DataFrame = input_data[model_features]

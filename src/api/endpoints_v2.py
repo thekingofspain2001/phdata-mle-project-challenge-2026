@@ -3,12 +3,15 @@
 from typing import Annotated
 
 import pandas as pd
+import structlog
 from fastapi import APIRouter, Body, HTTPException, Request
 from pydantic import BaseModel, Field
 
 from api.shared import REQUEST_COLUMNS, UNKNOWN_ZIP, Artifacts, listing_examples, predict_price, require_artifacts
 
 router_v2 = APIRouter(tags=["v2"])
+
+log = structlog.get_logger(__name__)
 
 
 class PredictionResponse(BaseModel):
@@ -107,10 +110,12 @@ def predict_v2(
         artifacts: Artifacts = require_artifacts(request)
     except HTTPException as exc:
         detail = str(exc.detail) if exc.detail else "Prediction service unavailable"
+        log.warning("artifacts_unavailable", detail=detail, status_code=exc.status_code)
         raise HTTPException(status_code=500, detail=detail) from exc
     payload = home_features.model_dump()
     row = pd.DataFrame([{c: payload.get(c) for c in REQUEST_COLUMNS}])
     if row.isna().any().any():
+        log.info("imputing_null_features", zipcode=home_features.zipcode)
         filled = pd.DataFrame(
             artifacts.imputer.transform(row[REQUEST_COLUMNS]),
             columns=REQUEST_COLUMNS,

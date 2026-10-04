@@ -4,12 +4,12 @@ from __future__ import annotations
 
 import csv
 import json
-import logging
 import pathlib
 import pickle
 from typing import TYPE_CHECKING, Protocol, cast, runtime_checkable
 
 import pandas as pd
+import structlog
 from fastapi import HTTPException, Request
 from fastapi.openapi.models import Example
 from pydantic import BaseModel
@@ -21,7 +21,7 @@ if TYPE_CHECKING:
     import numpy as np
     import numpy.typing as npt
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 @runtime_checkable
@@ -161,7 +161,7 @@ def load_model() -> Predictor:
         with MODEL_PATH.open("rb") as model_file:
             return cast("Predictor", pickle.load(model_file))  # noqa: S301 - trusted build artifact from create_model.py
     except Exception as exc:
-        logger.exception("Failed to load model artifact.")
+        logger.exception("artifact_load_failed", artifact=ARTIFACT_MODEL)
         raise ArtifactLoadError(ARTIFACT_MODEL) from exc
 
 
@@ -172,7 +172,7 @@ def load_model_features() -> list[str]:
             model_features: list[str] = json.load(features_file)
             return model_features
     except Exception as exc:
-        logger.exception("Failed to load model features artifact.")
+        logger.exception("artifact_load_failed", artifact=ARTIFACT_MODEL_FEATURES)
         raise ArtifactLoadError(ARTIFACT_MODEL_FEATURES) from exc
 
 
@@ -181,7 +181,7 @@ def load_demographics() -> pd.DataFrame:
     try:
         return pd.read_csv(DEMOGRAPHICS_PATH, dtype={"zipcode": str})
     except Exception as exc:
-        logger.exception("Failed to load demographics artifact.")
+        logger.exception("artifact_load_failed", artifact=ARTIFACT_DEMOGRAPHICS)
         raise ArtifactLoadError(ARTIFACT_DEMOGRAPHICS) from exc
 
 
@@ -194,7 +194,7 @@ def load_imputer() -> ImputerProtocol:
             KNNImputer(n_neighbors=5, weights="distance").fit(sales[REQUEST_COLUMNS]),  # type: ignore[reportUnknownMemberType]
         )
     except Exception as exc:
-        logger.exception("Failed to load imputer artifact.")
+        logger.exception("artifact_load_failed", artifact=ARTIFACT_IMPUTER)
         raise ArtifactLoadError(ARTIFACT_IMPUTER) from exc
 
 
@@ -240,15 +240,17 @@ def predict_price(payload: dict[str, int | float | str | None], artifacts: Artif
 
     demographic_info = demographics[demographics["zipcode"] == payload["zipcode"]].drop(columns="zipcode").reset_index(drop=True)
     if demographic_info.empty:
+        logger.warning("unknown_zipcode", zipcode=payload["zipcode"])
         raise HTTPException(status_code=404, detail=f"Unknown zipcode: {payload['zipcode']}")
 
     # Combine input data with demographic data
     input_data = pd.concat([input_data, demographic_info], axis=1)
-    logger.info("input_data: %s", input_data)
+    logger.debug("joined_features", columns=len(input_data.columns))
 
     # Ensure the input data has the correct features
     input_data = input_data[model_features]
     # Make prediction
     prediction = model.predict(input_data)
+    logger.info("prediction_complete", predicted_price=float(prediction[0]))
 
     return {"predicted_price": float(prediction[0])}

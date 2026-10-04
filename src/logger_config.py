@@ -55,6 +55,7 @@ SHARED_PROCESSORS: list[Processor] = [
     add_logger_name,
     add_log_level,
     TimeStamper(fmt="iso"),
+    structlog.processors.format_exc_info,
     uvicorn_access_fields,
 ]
 
