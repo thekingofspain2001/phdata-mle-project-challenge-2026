@@ -105,8 +105,16 @@
 
     /* Section is the flex column: header fixed, body fills the rest.
          Reveal.js sets inline display:block; !important restores flex.
-         Native element order, no sync JS. */
-    .reveal .slides section.present {
+         Native element order, no sync JS.
+
+         Both declarations are on EVERY section, not just .present. They were
+         scoped to .present, so a slide dropped the height constraint the moment
+         it stopped being current: S6's chart card stopped being height-capped,
+         its 359.6px chart overflowed a 339.6px card, and the whole body
+         reflowed from 961px to 1004px - a 1-2px jump under the outgoing slide
+         as the next one slid over it. A height that changes on the way out is a
+         height that can change mid-transition. */
+    .reveal .slides section {
       height: 100% !important;
       display: flex !important;
       flex-direction: column;
@@ -970,14 +978,35 @@
 
     /* .ph-shots layout lives below, with the rest of the S8 input block. */
     /* Runtime table: three equal columns so the whitespace between them is the
-       same everywhere, inset symmetrically so the block reads as a paragraph
-       sitting in the box rather than a grid stretched edge to edge. */
+       same everywhere.
+
+       The width cap is what centres the block inside the card. The table is
+       663px tall in a 734px content box, so the pane's centred flex column
+       leaves ~51px top and bottom; at full width the sides had only 14px, and
+       that mismatch is what read as the table sitting off to the left. Capping
+       the width so the side gutters match the top and bottom ones evens all
+       four, and margin-inline:auto does the centring.
+
+       788px is measured, not guessed: 787.5px is where the side gutter
+       crosses the vertical one, and 788px lands within a quarter pixel of
+       even on all four sides. Layout px, which is what Reveal's fixed 1270x961
+       stage lays out in, so it does not drift with the viewport.
+
+       Safe to narrow this far: every trial width from 773px down to 690px kept
+       the table at 663px tall, i.e. no cell wrapped.
+
+       Scoped to .ph-is-base so the Swagger table on 8.4 keeps the width it had
+       and only the runtime table moves. */
     .ph-s8-panes .ph-table {
-      width: 100%;
       max-width: 62ch;
       margin-inline: auto;
       table-layout: fixed;
       font-size: var(--fs-lead);
+    }
+
+    .ph-s8-pane.ph-is-base .ph-table {
+      width: 100%;
+      max-width: 788px;
     }
 
     .ph-s8-panes .ph-table th,
