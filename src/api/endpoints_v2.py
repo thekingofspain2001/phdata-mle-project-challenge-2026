@@ -48,7 +48,7 @@ class HomeFeaturesV2(BaseModel):
     zipcode: str = Field(pattern=r"^\d{5}$")
 
 
-ERROR_RESPONSES = {
+ERROR_RESPONSES: dict[int | str, dict[str, object]] = {
     404: {
         "model": ErrorDetail,
         "content": {

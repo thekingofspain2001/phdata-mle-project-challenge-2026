@@ -159,7 +159,7 @@ def load_model() -> Predictor:
     """Load the trained regressor from its trusted build artifact."""
     try:
         with MODEL_PATH.open("rb") as model_file:
-            return cast("Predictor", pickle.load(model_file))  # trusted build artifact from create_model.py
+            return cast("Predictor", pickle.load(model_file))  # noqa: S301 - trusted build artifact from create_model.py
     except Exception as exc:
         logger.exception("Failed to load model artifact.")
         raise ArtifactLoadError(ARTIFACT_MODEL) from exc

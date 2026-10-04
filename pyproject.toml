@@ -24,6 +24,8 @@ test = [
     "hypothesis>=6.82.0",
     "pyright>=1.1.390",
     "pandas-stubs>=2.2",
+    "scipy-stubs==1.18.1.1",
+    "scikit-learn-stubs==0.0.3",
 ]
 
 [tool.pytest.ini_options]

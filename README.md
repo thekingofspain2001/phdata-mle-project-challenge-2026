@@ -146,6 +146,22 @@ make test-all
 - Ensure Docker networking and orchestration work correctly
 - More comprehensive but slower execution
 
+**Quality** (`test/quality/`)
+
+Analysis scripts that measure output quality rather than assert it. They run locally against the venv and write their results next to themselves.
+
+- `imputation_accuracy.py` - compares mean, median, raw KNN and z-scored KNN imputation of the seven non-zipcode `/predict/v2` fields, on held-out sales rows, and writes `imputation_accuracy.md` plus four CSVs. Scored on scale-free NMAE/NRMSE and on Pearson correlation, with paired Wilcoxon tests and bootstrap confidence intervals.
+
+```bash
+python test/quality/imputation_accuracy.py
+```
+
+**Benchmarks** (`test/benchmark/`)
+
+Scripts that measure speed rather than correctness. Same contract as above: run locally, write results next to themselves.
+
+- `bench_predict.py` - request latency under closed-loop concurrency, writing `results.csv`.
+
 ### Running Tests
 
 #### Unit Tests Only

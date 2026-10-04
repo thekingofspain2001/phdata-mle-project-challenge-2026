@@ -48,9 +48,9 @@ async def predict(home_features: Annotated[HomeFeatures, Body(openapi_examples=l
         model = pickle.load(model_file)
 
     with FEATURES_PATH.open() as features_file:
-        model_features = json.load(features_file)
+        model_features: list[str] = json.load(features_file)
 
-    input_data = pd.DataFrame([home_features.dict()])
+    input_data: pd.DataFrame = pd.DataFrame([home_features.model_dump()])
 
     # Load demographic data
     demographics = pd.read_csv(DEMOGRAPHICS_PATH, dtype={"zipcode": str})
@@ -58,14 +58,19 @@ async def predict(home_features: Annotated[HomeFeatures, Body(openapi_examples=l
         demographics["zipcode"] == home_features.zipcode
     ].drop(columns="zipcode").reset_index(drop=True)
 
+    # A zipcode with no demographics row joins to nothing; without this guard the
+    # model is handed NaN features and fails with an opaque 500.
+    if demographic_info.empty:
+        raise HTTPException(status_code=404, detail=f"Unknown zipcode: {home_features.zipcode}")
+
     # Combine input data with demographic data
     input_data = pd.concat([input_data, demographic_info], axis=1)
     print(input_data)
 
     # Ensure the input data has the correct features
-    input_data = input_data[model_features]
+    selected: pd.DataFrame = input_data[model_features]
 
     # Make prediction
-    prediction = model.predict(input_data)
+    prediction = model.predict(selected)
 
     return {"predicted_price": prediction[0]}
