@@ -102,6 +102,14 @@ docker rm housing-api
 docker logs housing-api
 ```
 
+**Logs:** every line is single-line JSON on stdout (app, `uvicorn.error`, `uvicorn.access`), each entry carrying the
+request's `correlation_id`. Send `X-Request-ID` on a request to pin the ID, or read the generated one back from the
+response header.
+
+```bash
+docker logs housing-api | jq -c 'select(.correlation_id != null)'
+```
+
 ## Usage
 
 To get predictions from the model, send a POST request to the `/predict` endpoint with the required features in JSON format. The API will return the predicted home price along with any additional metadata.

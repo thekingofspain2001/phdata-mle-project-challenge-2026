@@ -6,6 +6,7 @@ from contextlib import asynccontextmanager
 from typing import TYPE_CHECKING
 
 from api.shared import ArtifactLoadError, load_artifacts
+from logger_config import setup_logging
 
 if TYPE_CHECKING:
     from collections.abc import AsyncGenerator
@@ -15,7 +16,8 @@ if TYPE_CHECKING:
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
-    """Load prediction artifacts once before serving requests."""
+    """Configure JSON logging, then load prediction artifacts once."""
+    setup_logging()
     try:
         app.state.artifacts = load_artifacts()
     except ArtifactLoadError:

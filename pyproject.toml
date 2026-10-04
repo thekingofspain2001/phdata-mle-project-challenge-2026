@@ -12,6 +12,8 @@ dependencies = [
     "matplotlib",
     "nbclient",
     "seaborn",
+    "structlog>=26.1.0",
+    "asgi-correlation-id>=5.0.1",
 ]
 
 
