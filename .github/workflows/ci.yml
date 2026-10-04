@@ -14,6 +14,8 @@ jobs:
       - uses: astral-sh/setup-uv@v7
       - run: uv sync --locked --group test
       - run: uv run --group test pytest test/unit -q -p no:cacheprovider --no-cov
+      - run: uvx ruff@0.16.10 check .
+      - run: uv run --group test pyright
 
   images:
     runs-on: ubuntu-latest
