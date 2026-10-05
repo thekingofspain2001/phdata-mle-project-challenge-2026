@@ -28,6 +28,11 @@
       --av: #e8b04b;
       --md: #7fb6d9;
       --knn: #c792ea;
+      /* Scaled (distance-weighted) KNN: the same method as --knn with a weight
+         per neighbour, so on S4 it is a panel of its own and needs its own hue.
+         A lighter tint of --knn was the first thought and reads as a typo
+         beside it - these panels are seen one after another, but compared. */
+      --snn: #e879f9;
       /* Imputation cost: not an approach, a cost. Warm coral so it reads as
          overhead on top of the purple calculation rather than a fourth method. */
       --imp: #ef8354;
@@ -1267,6 +1272,10 @@
       color: var(--knn);
     }
 
+    .ph-s4-sub.ph-is-snn {
+      color: var(--snn);
+    }
+
     .ph-s4-sub.ph-is-sum {
       color: var(--ph-accent);
     }
@@ -1278,7 +1287,8 @@
     section[data-s4]:has(.ph-s4-go:nth-of-type(1).visible):not(:has(.ph-s4-go:nth-of-type(2).visible)) .ph-s4-sub.ph-is-av,
     section[data-s4]:has(.ph-s4-go:nth-of-type(2).visible):not(:has(.ph-s4-go:nth-of-type(3).visible)) .ph-s4-sub.ph-is-md,
     section[data-s4]:has(.ph-s4-go:nth-of-type(3).visible):not(:has(.ph-s4-go:nth-of-type(4).visible)) .ph-s4-sub.ph-is-knn,
-    section[data-s4]:has(.ph-s4-go:nth-of-type(4).visible) .ph-s4-sub.ph-is-sum {
+    section[data-s4]:has(.ph-s4-go:nth-of-type(4).visible):not(:has(.ph-s4-go:nth-of-type(5).visible)) .ph-s4-sub.ph-is-snn,
+    section[data-s4]:has(.ph-s4-go:nth-of-type(5).visible) .ph-s4-sub.ph-is-sum {
       opacity: 1;
     }
 
@@ -1319,26 +1329,30 @@
         transform var(--ph-t-slide) var(--ph-ease);
     }
 
-    /* Per-stage eq houses + input boxes. KNN stands alone at full size;
-       the summary shows all three at full size too. */
+    /* Per-stage eq houses + input boxes. KNN and scaled KNN stand alone at full
+       size; the summary shows all four at full size too. */
     section[data-s4]:has(.ph-s4-go:nth-of-type(1).visible):not(:has(.ph-s4-go:nth-of-type(2).visible)) #mk-avg,
     section[data-s4]:has(.ph-s4-go:nth-of-type(2).visible):not(:has(.ph-s4-go:nth-of-type(3).visible)) #mk-med,
     section[data-s4]:has(.ph-s4-go:nth-of-type(3).visible) #mk-knn,
-    section[data-s4]:has(.ph-s4-go:nth-of-type(4).visible) #mk-avg,
-    section[data-s4]:has(.ph-s4-go:nth-of-type(4).visible) #mk-med,
-    section[data-s4]:has(.ph-s4-go:nth-of-type(4).visible) #mk-knn {
+    section[data-s4]:has(.ph-s4-go:nth-of-type(4).visible) #mk-snn,
+    section[data-s4]:has(.ph-s4-go:nth-of-type(5).visible) #mk-avg,
+    section[data-s4]:has(.ph-s4-go:nth-of-type(5).visible) #mk-med,
+    section[data-s4]:has(.ph-s4-go:nth-of-type(5).visible) #mk-knn,
+    section[data-s4]:has(.ph-s4-go:nth-of-type(5).visible) #mk-snn {
       opacity: 1;
     }
 
     section[data-s4]:has(.ph-s4-go:nth-of-type(1).visible):not(:has(.ph-s4-go:nth-of-type(2).visible)) #bx-avg,
     section[data-s4]:has(.ph-s4-go:nth-of-type(2).visible):not(:has(.ph-s4-go:nth-of-type(3).visible)) #bx-med,
-    section[data-s4]:has(.ph-s4-go:nth-of-type(3).visible):not(:has(.ph-s4-go:nth-of-type(4).visible)) #bx-knn {
+    section[data-s4]:has(.ph-s4-go:nth-of-type(3).visible):not(:has(.ph-s4-go:nth-of-type(4).visible)) #bx-knn,
+    section[data-s4]:has(.ph-s4-go:nth-of-type(4).visible):not(:has(.ph-s4-go:nth-of-type(5).visible)) #bx-snn {
       opacity: 1;
     }
 
-    /* No extra scale or offset on the KNN marker: its base transform already
-       encodes 3468, and the other two markers carry no transform either, so any
-       override would break both the value sizing and the shared baseline. */
+    /* No extra scale or offset on the two KNN markers: each base transform
+       already encodes its own value - 2802 unweighted, 3468 weighted - and the
+       other two markers carry no transform either, so any override would break
+       both the value sizing and the shared baseline. */
 
     .ph-stage-bottom {
       flex: 0 0 0;
@@ -1371,7 +1385,8 @@
     section[data-s4]:has(.ph-s4-go:nth-of-type(1).visible):not(:has(.ph-s4-go:nth-of-type(2).visible)) .ph-panel.ph-is-av,
     section[data-s4]:has(.ph-s4-go:nth-of-type(2).visible):not(:has(.ph-s4-go:nth-of-type(3).visible)) .ph-panel.ph-is-md,
     section[data-s4]:has(.ph-s4-go:nth-of-type(3).visible):not(:has(.ph-s4-go:nth-of-type(4).visible)) .ph-panel.ph-is-knn,
-    section[data-s4]:has(.ph-s4-go:nth-of-type(4).visible) .ph-panel.ph-is-sum {
+    section[data-s4]:has(.ph-s4-go:nth-of-type(4).visible):not(:has(.ph-s4-go:nth-of-type(5).visible)) .ph-panel.ph-is-snn,
+    section[data-s4]:has(.ph-s4-go:nth-of-type(5).visible) .ph-panel.ph-is-sum {
       display: flex;
     }
 
@@ -1388,9 +1403,11 @@
       margin: 0;
     }
 
-    /* Two-row fact list under each approach heading: a muted label and the
-       figure it names. Grid, so the labels align into a column and the
-       figures align into a second one across all four panels. */
+    /* The five-row fact list every calculation panel wears: a muted label and
+       the answer beside it. Grid, so the labels align into a column and the
+       answers into a second one across all four panels - each row meaning the
+       same thing in each is the only reason four panels can be read against
+       each other. */
     .ph-panel-words dl {
       margin: 0;
       display: grid;
@@ -1461,6 +1478,98 @@
 
     .ph-panel.ph-is-knn h3 {
       color: var(--knn);
+    }
+
+    .ph-panel.ph-is-snn {
+      border-color: var(--snn);
+    }
+
+    .ph-panel.ph-is-snn h3 {
+      color: var(--snn);
+    }
+
+    /* c-calc: the calculation half of every approach panel, same shape four
+       times - formula, result, then the strip of n houses the method read.
+       Every panel draws all 12 houses at the same positions and CSS lights the
+       ones its method uses, so "nothing is chosen" and "5 of 12" are the same
+       picture with different houses bright.
+
+       The houses are the #hs glyph at 0.3, which keeps each roof clear of its
+       neighbour at 22u spacing. Colour comes from `color`, not `stroke`: #hs
+       strokes with currentColor (see the SVG comment by the group A marks). */
+    .ph-calc {
+      color: var(--ph-mist);
+    }
+
+    .ph-calc-f,
+    .ph-calc-n,
+    .ph-calc-c,
+    .ph-calc-r {
+      fill: currentColor;
+      stroke: none;
+      font-family: "SFMono-Regular", Consolas, monospace;
+    }
+
+    .ph-calc-f {
+      font-size: 9px;
+    }
+
+    .ph-calc-n,
+    .ph-calc-c {
+      font-size: 10px;
+      opacity: 0.75;
+    }
+
+    .ph-calc-r {
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .ph-calc-strip use {
+      color: var(--ph-mist);
+      opacity: 0.28;
+    }
+
+    /* Average reads all 12. Median reads the two in the middle - houses 6 and 7
+       of the sorted strip, the same two 1885 is the average of. Both KNN panels
+       read the five closest, houses 7-11: the same five the diagram's dashed
+       box draws, whether or not they are weighted. */
+
+    .ph-panel.ph-is-av .ph-calc {
+      color: var(--av);
+    }
+
+    .ph-panel.ph-is-md .ph-calc {
+      color: var(--md);
+    }
+
+    .ph-panel.ph-is-knn .ph-calc {
+      color: var(--knn);
+    }
+
+    .ph-panel.ph-is-snn .ph-calc {
+      color: var(--snn);
+    }
+
+    .ph-panel.ph-is-av .ph-calc-strip use {
+      color: var(--av);
+      opacity: 1;
+    }
+
+    .ph-panel.ph-is-md .ph-calc-strip use:nth-child(6),
+    .ph-panel.ph-is-md .ph-calc-strip use:nth-child(7) {
+      color: var(--md);
+      opacity: 1;
+    }
+
+    .ph-panel.ph-is-knn .ph-calc-strip use:nth-child(n+7):nth-child(-n+11) {
+      color: var(--knn);
+      opacity: 1;
+    }
+
+    .ph-panel.ph-is-snn .ph-calc-strip use:nth-child(n+7):nth-child(-n+11) {
+      color: var(--snn);
+      opacity: 1;
     }
 
     .s4-drivers {
@@ -1847,6 +1956,7 @@
             <p class="ph-subtitle ph-s4-sub ph-is-av">Average Value</p>
             <p class="ph-subtitle ph-s4-sub ph-is-md">Medium value</p>
             <p class="ph-subtitle ph-s4-sub ph-is-knn">Nearest Neighbor</p>
+            <p class="ph-subtitle ph-s4-sub ph-is-snn">Scaled Nearest Neighbor</p>
             <p class="ph-subtitle ph-s4-sub ph-is-sum">Summary: similar homes win</p>
           </div>
         </header>
@@ -1871,6 +1981,10 @@
                 <marker id="arr-knn" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7"
                   orient="auto-start-reverse">
                   <path d="M0 0 L10 5 L0 10 z" fill="var(--knn)" />
+                </marker>
+                <marker id="arr-snn" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7"
+                  orient="auto-start-reverse">
+                  <path d="M0 0 L10 5 L0 10 z" fill="var(--snn)" />
                 </marker>
               </defs>
               <!-- Group A: intra 44u clears roofs (need 39); left edge pinned at 35 -->
@@ -1959,6 +2073,8 @@
                 stroke-width="2" stroke-dasharray="8 5" />
               <rect id="bx-knn" class="bx" x="584" y="116" width="611" height="132" fill="none" stroke="var(--knn)"
                 stroke-width="2" stroke-dasharray="8 5" />
+              <rect id="bx-snn" class="bx" x="584" y="116" width="611" height="132" fill="none" stroke="var(--snn)"
+                stroke-width="2" stroke-dasharray="8 5" />
               <!-- Average marker: house lifted clear; equal text gaps; down arrow to box -->
               <!-- color: #hs strokes with currentColor, which follows the CSS
                    color property, not stroke. stroke alone left every house grey. -->
@@ -1987,18 +2103,35 @@
                 </text>
                 <line x1="452" y1="44" x2="452" y2="108" stroke-width="2" marker-end="url(#arr-md)" />
               </g>
-              <!-- KNN marker cluster -->
+              <!-- KNN marker: the five closest houses averaged with EQUAL weight.
+                   That lands below the city average, because four of the five
+                   are smaller than the mean. -->
               <g id="mk-knn" class="mk" color="var(--knn)" stroke="var(--knn)">
-                <g transform="translate(952,10) scale(1.465)">
+                <g transform="translate(952,10) scale(1.35)">
                   <use href="#hs" />
                 </g>
                 <text x="952" y="-66" text-anchor="middle" font-size="20" fill="var(--knn)" stroke="none">
                   NN(5)
                 </text>
                 <text x="952" y="30" text-anchor="middle" font-size="16" fill="var(--knn)" stroke="none">
-                  3468
+                  2802
                 </text>
                 <line x1="952" y1="44" x2="952" y2="116" stroke-width="2" marker-end="url(#arr-knn)" />
+              </g>
+              <!-- Scaled KNN marker: the same five houses, each weighted by how
+                   close it is. The biggest one dominates, so the answer lands
+                   higher than the equal-weight average of the identical five. -->
+              <g id="mk-snn" class="mk" color="var(--snn)" stroke="var(--snn)">
+                <g transform="translate(1150,10) scale(1.465)">
+                  <use href="#hs" />
+                </g>
+                <text x="1150" y="-66" text-anchor="middle" font-size="20" fill="var(--snn)" stroke="none">
+                  NN(5)w
+                </text>
+                <text x="1150" y="30" text-anchor="middle" font-size="16" fill="var(--snn)" stroke="none">
+                  3468
+                </text>
+                <line x1="1150" y1="44" x2="1150" y2="116" stroke-width="2" marker-end="url(#arr-snn)" />
               </g>
               <p class="ph-stage-hint">
                 The diagram above is a data set of 12 houses with a single
@@ -2007,34 +2140,48 @@
           </div>
           <div class="ph-stage-bottom">
             <div class="ph-panels">
+              <!-- The four calculation panels are one template repeated: five
+                   labelled rows on the left, the calculation on the right. Each
+                   row means the same thing in every panel, which is what lets
+                   them be read against each other. -->
               <article class="ph-panel ph-is-av">
                 <div class="ph-panel-words">
                   <h3>Average Value</h3>
                   <dl>
-                    <dt>Inputs</dt>
-                    <dd>Every house in the data set</dd>
-                    <dt>Values produced</dt>
-                    <dd>1</dd>
+                    <dt>Steps</dt>
+                    <dd>1 step</dd>
+                    <dt>Reads</dt>
+                    <dd>1 column &#8212; square feet</dd>
+                    <dt>Chooses</dt>
+                    <dd>Nothing &#8212; all 12 houses</dd>
+                    <dt>Computes</dt>
+                    <dd>1 number: the average of all 12</dd>
+                    <dt>Per house</dt>
+                    <dd>Same answer for every blank</dd>
                   </dl>
-                  <p>
-                    A single city-wide figure, so the imputed value ignores
-                    the house being valued.
-                  </p>
                 </div>
                 <div class="ph-panel-pick">
-                  <svg viewBox="0 0 260 120" fill="none" color="var(--av)" stroke="var(--av)" stroke-width="3"
-                    role="img" aria-label="Single average-size house">
-                    <use href="#hs" transform="translate(130,102) scale(1.05)" />
-                    <text x="130" y="16" text-anchor="middle" font-size="10" fill="var(--av)" stroke="none">
-                      =AVERAGE(1235,1300,1365,1520,1600,1680,
-                    </text>
-                    <text x="130" y="29" text-anchor="middle" font-size="10" fill="var(--av)" stroke="none">
-                      2090,2200,2310,3610,3800,3990)
-                    </text>
-                    <text x="130" y="49" text-anchor="middle" font-size="14" font-weight="700" fill="var(--av)"
-                      stroke="none">
-                      = 2225
-                    </text>
+                  <svg class="ph-calc" viewBox="0 0 300 118" fill="none" role="img"
+                    aria-label="Average of all 12 houses: 2225 square feet. All 12 houses in the strip are read.">
+                    <text class="ph-calc-f" x="150" y="10" text-anchor="middle">=AVERAGE(1235,1300,1365,1520,1600,1680,</text>
+                    <text class="ph-calc-f" x="150" y="22" text-anchor="middle">2090,2200,2310,3610,3800,3990)</text>
+                    <text class="ph-calc-r" x="150" y="48" text-anchor="middle">= 2225</text>
+                    <text class="ph-calc-n" x="150" y="70" text-anchor="middle">n = 12 houses</text>
+                    <g class="ph-calc-strip">
+                      <use href="#hs" transform="translate(22,96) scale(0.3)" />
+                      <use href="#hs" transform="translate(44,96) scale(0.3)" />
+                      <use href="#hs" transform="translate(66,96) scale(0.3)" />
+                      <use href="#hs" transform="translate(88,96) scale(0.3)" />
+                      <use href="#hs" transform="translate(110,96) scale(0.3)" />
+                      <use href="#hs" transform="translate(132,96) scale(0.3)" />
+                      <use href="#hs" transform="translate(154,96) scale(0.3)" />
+                      <use href="#hs" transform="translate(176,96) scale(0.3)" />
+                      <use href="#hs" transform="translate(198,96) scale(0.3)" />
+                      <use href="#hs" transform="translate(220,96) scale(0.3)" />
+                      <use href="#hs" transform="translate(242,96) scale(0.3)" />
+                      <use href="#hs" transform="translate(264,96) scale(0.3)" />
+                    </g>
+                    <text class="ph-calc-c" x="150" y="112" text-anchor="middle">12 of 12 read</text>
                   </svg>
                 </div>
               </article>
@@ -2042,31 +2189,40 @@
                 <div class="ph-panel-words">
                   <h3>Medium value</h3>
                   <dl>
-                    <dt>Inputs</dt>
-                    <dd>All houses in the data set</dd>
-                    <dt>Values produced</dt>
-                    <dd>Up to 2</dd>
+                    <dt>Steps</dt>
+                    <dd>1 step, or 2 on an even count</dd>
+                    <dt>Reads</dt>
+                    <dd>1 column &#8212; square feet</dd>
+                    <dt>Chooses</dt>
+                    <dd>The 1 middle house, or the 2 middle ones</dd>
+                    <dt>Computes</dt>
+                    <dd>1 number: its value, or the average of 2</dd>
+                    <dt>Per house</dt>
+                    <dd>Same answer for every blank</dd>
                   </dl>
-                  <p>
-                    One or two central houses set the answer, so mansions no
-                    longer skew it — but the result is still not specific to
-                    the house being valued.
-                  </p>
                 </div>
                 <div class="ph-panel-pick">
-                  <svg viewBox="0 0 260 120" fill="none" color="var(--md)" stroke="var(--md)" stroke-width="3"
-                    role="img" aria-label="Single middle-size house">
-                    <use href="#hs" transform="translate(130,102) scale(1.05)" />
-                    <text x="130" y="16" text-anchor="middle" font-size="10" fill="var(--md)" stroke="none">
-                      =MEDIUM(1235,1300,1365,1520,1600,1680,
-                    </text>
-                    <text x="130" y="29" text-anchor="middle" font-size="10" fill="var(--md)" stroke="none">
-                      2090,2200,2310,3610,3800,3990)
-                    </text>
-                    <text x="130" y="49" text-anchor="middle" font-size="14" font-weight="700" fill="var(--md)"
-                      stroke="none">
-                      = 1885
-                    </text>
+                  <svg class="ph-calc" viewBox="0 0 300 118" fill="none" role="img"
+                    aria-label="Median of all 12 houses: 1885 square feet, the average of the two middle houses. Houses 6 and 7 in the strip are read.">
+                    <text class="ph-calc-f" x="150" y="10" text-anchor="middle">=MEDIUM(1235,1300,1365,1520,1600,1680,</text>
+                    <text class="ph-calc-f" x="150" y="22" text-anchor="middle">2090,2200,2310,3610,3800,3990)</text>
+                    <text class="ph-calc-r" x="150" y="48" text-anchor="middle">= 1885</text>
+                    <text class="ph-calc-n" x="150" y="70" text-anchor="middle">n = 12 houses</text>
+                    <g class="ph-calc-strip">
+                      <use href="#hs" transform="translate(22,96) scale(0.3)" />
+                      <use href="#hs" transform="translate(44,96) scale(0.3)" />
+                      <use href="#hs" transform="translate(66,96) scale(0.3)" />
+                      <use href="#hs" transform="translate(88,96) scale(0.3)" />
+                      <use href="#hs" transform="translate(110,96) scale(0.3)" />
+                      <use href="#hs" transform="translate(132,96) scale(0.3)" />
+                      <use href="#hs" transform="translate(154,96) scale(0.3)" />
+                      <use href="#hs" transform="translate(176,96) scale(0.3)" />
+                      <use href="#hs" transform="translate(198,96) scale(0.3)" />
+                      <use href="#hs" transform="translate(220,96) scale(0.3)" />
+                      <use href="#hs" transform="translate(242,96) scale(0.3)" />
+                      <use href="#hs" transform="translate(264,96) scale(0.3)" />
+                    </g>
+                    <text class="ph-calc-c" x="150" y="112" text-anchor="middle">2 of 12 read &#8212; the two middle</text>
                   </svg>
                 </div>
               </article>
@@ -2074,48 +2230,81 @@
                 <div class="ph-panel-words">
                   <h3>Nearest Neighbor</h3>
                   <dl>
-                    <dt>Inputs</dt>
-                    <dd>The n nearest houses</dd>
-                    <dt>Values produced</dt>
-                    <dd>Up to n</dd>
+                    <dt>Steps</dt>
+                    <dd>2 steps</dd>
+                    <dt>Reads</dt>
+                    <dd>Every column already filled in</dd>
+                    <dt>Chooses</dt>
+                    <dd>The 5 closest houses</dd>
+                    <dt>Computes</dt>
+                    <dd>1 number: plain average of the 5</dd>
+                    <dt>Per house</dt>
+                    <dd>The answer changes with the house</dd>
                   </dl>
-                  <p>
-                    Each blank receives its own weighted answer, drawn from the
-                    comparable homes around it rather than from the whole data
-                    set.
-                  </p>
                 </div>
                 <div class="ph-panel-pick">
-                  <svg viewBox="0 0 300 120" fill="none" color="var(--knn)" stroke="var(--knn)" stroke-width="3"
-                    role="img" aria-label="Five similar houses and the blank">
-                    <g transform="translate(35,112) scale(0.62)">
-                      <use href="#hs" />
+                  <svg class="ph-calc" viewBox="0 0 300 118" fill="none" role="img"
+                    aria-label="Average of the 5 closest houses with equal weight: 2802 square feet. Houses 7 to 11 in the strip are read.">
+                    <text class="ph-calc-f" x="150" y="10" text-anchor="middle">=AVERAGE(3800,3610,2310,2200,2090)</text>
+                    <text class="ph-calc-f" x="150" y="22" text-anchor="middle">each house counts the same</text>
+                    <text class="ph-calc-r" x="150" y="48" text-anchor="middle">= 2802</text>
+                    <text class="ph-calc-n" x="150" y="70" text-anchor="middle">n = 12 houses</text>
+                    <g class="ph-calc-strip">
+                      <use href="#hs" transform="translate(22,96) scale(0.3)" />
+                      <use href="#hs" transform="translate(44,96) scale(0.3)" />
+                      <use href="#hs" transform="translate(66,96) scale(0.3)" />
+                      <use href="#hs" transform="translate(88,96) scale(0.3)" />
+                      <use href="#hs" transform="translate(110,96) scale(0.3)" />
+                      <use href="#hs" transform="translate(132,96) scale(0.3)" />
+                      <use href="#hs" transform="translate(154,96) scale(0.3)" />
+                      <use href="#hs" transform="translate(176,96) scale(0.3)" />
+                      <use href="#hs" transform="translate(198,96) scale(0.3)" />
+                      <use href="#hs" transform="translate(220,96) scale(0.3)" />
+                      <use href="#hs" transform="translate(242,96) scale(0.3)" />
+                      <use href="#hs" transform="translate(264,96) scale(0.3)" />
                     </g>
-                    <g transform="translate(92,112) scale(0.68)">
-                      <use href="#hs" />
+                    <text class="ph-calc-c" x="150" y="112" text-anchor="middle">5 of 12 read &#8212; the 5 closest</text>
+                  </svg>
+                </div>
+              </article>
+              <article class="ph-panel ph-is-snn">
+                <div class="ph-panel-words">
+                  <h3>Scaled Nearest Neighbor</h3>
+                  <dl>
+                    <dt>Steps</dt>
+                    <dd>2 steps</dd>
+                    <dt>Reads</dt>
+                    <dd>Every column already filled in</dd>
+                    <dt>Chooses</dt>
+                    <dd>The 5 closest houses</dd>
+                    <dt>Computes</dt>
+                    <dd>1 number: weighted average of the 5</dd>
+                    <dt>Per house</dt>
+                    <dd>The answer changes with the house</dd>
+                  </dl>
+                </div>
+                <div class="ph-panel-pick">
+                  <svg class="ph-calc" viewBox="0 0 300 118" fill="none" role="img"
+                    aria-label="Same 5 closest houses, weighted by closeness: 3468 square feet. Houses 7 to 11 in the strip are read, each weighted 1 over its distance.">
+                    <text class="ph-calc-f" x="150" y="10" text-anchor="middle">=SUMPRODUCT({3800;3610;2310;2200;2090},</text>
+                    <text class="ph-calc-f" x="150" y="22" text-anchor="middle">{1/190;1/380;1/1680;1/1790;1/1900}) &#247; SUM(w)</text>
+                    <text class="ph-calc-r" x="150" y="48" text-anchor="middle">= 3468</text>
+                    <text class="ph-calc-n" x="150" y="70" text-anchor="middle">n = 12 houses</text>
+                    <g class="ph-calc-strip">
+                      <use href="#hs" transform="translate(22,96) scale(0.3)" />
+                      <use href="#hs" transform="translate(44,96) scale(0.3)" />
+                      <use href="#hs" transform="translate(66,96) scale(0.3)" />
+                      <use href="#hs" transform="translate(88,96) scale(0.3)" />
+                      <use href="#hs" transform="translate(110,96) scale(0.3)" />
+                      <use href="#hs" transform="translate(132,96) scale(0.3)" />
+                      <use href="#hs" transform="translate(154,96) scale(0.3)" />
+                      <use href="#hs" transform="translate(176,96) scale(0.3)" />
+                      <use href="#hs" transform="translate(198,96) scale(0.3)" />
+                      <use href="#hs" transform="translate(220,96) scale(0.3)" />
+                      <use href="#hs" transform="translate(242,96) scale(0.3)" />
+                      <use href="#hs" transform="translate(264,96) scale(0.3)" />
                     </g>
-                    <g transform="translate(150,112) scale(0.78)">
-                      <use href="#hs" />
-                    </g>
-                    <g transform="translate(208,112) scale(0.68)">
-                      <use href="#hs" />
-                    </g>
-                    <g transform="translate(265,112) scale(0.62)">
-                      <use href="#hs" />
-                    </g>
-                    <text x="150" y="14" text-anchor="middle" font-size="9" fill="var(--knn)" stroke="none">
-                      =SUMPRODUCT({3800;3610;2310;2200;2090},
-                    </text>
-                    <text x="150" y="27" text-anchor="middle" font-size="9" fill="var(--knn)" stroke="none">
-                      {1/190;1/380;1/1680;1/1790;1/1900})
-                    </text>
-                    <text x="150" y="40" text-anchor="middle" font-size="9" fill="var(--knn)" stroke="none">
-                      /SUM({1/190;1/380;1/1680;1/1790;1/1900})
-                    </text>
-                    <text x="150" y="60" text-anchor="middle" font-size="14" font-weight="700" fill="var(--knn)"
-                      stroke="none">
-                      = 3468
-                    </text>
+                    <text class="ph-calc-c" x="150" y="112" text-anchor="middle">same 5, weighted by closeness</text>
                   </svg>
                 </div>
               </article>
@@ -2123,20 +2312,22 @@
                 <div class="ph-panel-words">
                   <h3>Summary: which value to fill</h3>
                   <ul>
-                    <li>Size driven — one value for the whole data set</li>
-                    <li>n points in the data set — up to n values</li>
-                    <li>Unique calculated value per data point</li>
+                    <li>Average &#8212; one value for the whole column</li>
+                    <li>Medium &#8212; the middle of that column</li>
+                    <li>Nearest Neighbor &#8212; a value per house, from its 5 closest</li>
+                    <li>Scaled NN &#8212; the same 5, weighted by closeness</li>
                   </ul>
                 </div>
                 <div class="ph-panel-pick">
                   <p class="ph-panel-nums">
-                    AVG 2225 &#183; MEDIUM 1885 &#183; NN(5) 3468
+                    AVG 2225 &#183; MEDIUM 1885 &#183; NN(5) 2802 &#183; NN(5)w 3468
                   </p>
                 </div>
               </article>
             </div>
           </div>
           <div class="s4-drivers" aria-hidden="true">
+            <span class="fragment ph-s4-go"></span>
             <span class="fragment ph-s4-go"></span>
             <span class="fragment ph-s4-go"></span>
             <span class="fragment ph-s4-go"></span>

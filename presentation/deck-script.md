@@ -98,7 +98,11 @@ its inner `a`. Placement is reveal's own default (`controlsLayout:"edges"`).
 
 /* Fill-in approaches (S4/S5) — one colour per method. */
 --av:#e8b04b; --md:#7fb6d9; --knn:#c792ea;
-/* Imputation COST, not a fourth approach (S6). */
+/* Scaled (distance-weighted) KNN: KNN with a weight per neighbour, so it is
+   a panel of its own on S4. Its own hue, not a tint of --knn — the two are
+   compared side by side on the summary stage. */
+--snn:#e879f9;
+/* Imputation COST, not a fifth approach (S6). */
 --imp:#ef8354;
 /* Same three method colours at 22%, for the S5 figure cells. */
 --tint-av:color-mix(in srgb, var(--av) 22%, transparent);
@@ -133,8 +137,11 @@ Colour roles, stated so a rebuild does not invent new ones:
   **not** a method colour and carries no per-method meaning.
 - `--av/--md/--knn` = the three S4/S5 approaches, reused on the S6 donut
   slices so a figure maps to a method without a legend.
+- `--snn` = fuchsia, the S4 scaled-KNN panel only. It has no S5 column and no
+  S6 slice, because the service runs the weighted variant under the one
+  `NN(5)` name.
 - `--imp` = warm coral, cost on top of the purple calculation, so it
-  never reads as a fourth fill-in method.
+  never reads as a fifth fill-in method.
 
 ## Metrics (single source)
 
@@ -434,7 +441,7 @@ of the record they use.
 
 ## S4 — Missing value approaches (`#s4-approaches`, `data-s4`)
 
-Layout: T-houses-staged. Fragments: 4 hidden `.ph-s4-go` drivers.
+Layout: T-houses-staged. Fragments: 5 hidden `.ph-s4-go` drivers.
 **Staging is CSS only** — `section[data-s4]:has(.ph-s4-go:nth-of-type(N).visible)`
 selects stage N. There is no `setS4Stage`, no `is-stage-N` class, no
 `Reveal.slide(h,0,-1)` reset. Houses are STATIC (mist stroke, fixed
@@ -465,6 +472,7 @@ leaves every house grey.
 | `bx-avg` | 16 | 1190 | `var(--av)` | 1 |
 | `bx-med` | 324 | 260 | `var(--md)` | 2 |
 | `bx-knn` | 584 | 611 | `var(--knn)` | 3 |
+| `bx-snn` | 584 | 611 | `var(--snn)` | 4 |
 
 **Markers** (`.mk`) — floating house + name above + value below + a
 vertical leader with an arrowhead:
@@ -473,23 +481,31 @@ vertical leader with an arrowhead:
 |--------|----|-------------|--------------------|--------------------|--------|-----------|
 | Average | 634 | 1.264 | `Avg` | `2225` | y 44→108, `url(#arr-av)` | `arr-av` |
 | Medium | 452 | 1.119 | `Medium` | `1885` | y 44→108, `url(#arr-md)` | `arr-md` |
-| NN | 952 | 1.465 | `NN(5)` | `3468` | y 44→116, `url(#arr-knn)` | `arr-knn` |
+| NN | 952 | 1.35 | `NN(5)` | `2802` | y 44→116, `url(#arr-knn)` | `arr-knn` |
+| NN weighted | 1150 | 1.465 | `NN(5)w` | `3468` | y 44→116, `url(#arr-snn)` | `arr-snn` |
 
-No extra scale or offset on the KNN marker: its base transform already
-encodes 3468, and the other two carry no transform, so any override
-would break both the value sizing and the shared baseline.
+No extra scale or offset on either KNN marker: each base transform
+already encodes its own value — 2802 equal-weight, 3468 weighted — and the
+other two carry no transform either, so any override would break both the
+value sizing and the shared baseline. The two live side by side at stage 5;
+1150 puts the weighted house clear of the plain one at 952.
 
 **Corner subtitles** — `div.ph-subs`, a one-cell grid
-(`min-height:calc(var(--fs-sub) * 1.3)`) holding four stacked
+(`min-height:calc(var(--fs-sub) * 1.3)`) holding five stacked
 `p.ph-subtitle.ph-s4-sub` at `opacity:0`; the active one fades to 1.
-Stage 4 shows all three markers and the summary panel.
+Stage 5 shows all four markers and the summary panel.
 
 | Stage | Subtitle | Class |
 |-------|----------|-------|
 | 1 | Average Value | `ph-is-av` (amber) |
 | 2 | Medium value | `ph-is-md` (blue) |
 | 3 | Nearest Neighbor | `ph-is-knn` (purple) |
-| 4 | Summary: similar homes win | `ph-is-sum` (`--ph-accent`) |
+| 4 | Scaled Nearest Neighbor | `ph-is-snn` (fuchsia, `--snn`) |
+| 5 | Summary: similar homes win | `ph-is-sum` (`--ph-accent`) |
+
+`--snn` is a hue of its own rather than a tint of `--knn`: the two panels
+are seen one after another and then compared on the summary stage, and a
+lighter purple read as a typo beside the original.
 
 `p.ph-stage-hint` is `position:absolute` **below** the top row
 (`top:100%`), not in flow — in flow it added ~19px that the 50% flex
@@ -508,36 +524,60 @@ fires, then `flex:0 0 50%`. `.ph-panels` is a flex row; every
 `.ph-panel` is `display:none` and exactly one is `display:flex` per
 stage. Each panel is `ph-panel-words` (50%) + `ph-panel-pick` (50%).
 
-| Stage | Panel `h3` | Inputs | Values produced | Body |
-|-------|-----------|--------|-----------------|------|
-| 1 | Average Value | Every house in the data set | 1 | A single city-wide figure, so the imputed value ignores the house being valued. |
-| 2 | Medium value | All houses in the data set | Up to 2 | One or two central houses set the answer, so mansions no longer skew it — but the result is still not specific to the house being valued. |
-| 3 | Nearest Neighbor | The n nearest houses | Up to n | Each blank receives its own weighted answer, drawn from the comparable homes around it rather than from the whole data set. |
-| 4 | Summary: which value to fill | — (`ul` instead of `dl`) | — | See bullets below. |
+| Stage | Panel `h3` | Steps | Reads | Chooses | Computes | Per house |
+|-------|-----------|-------|-------|---------|----------|-----------|
+| 1 | Average Value | 1 step | 1 column — square feet | Nothing — all 12 houses | 1 number: the average of all 12 | Same answer for every blank |
+| 2 | Medium value | 1 step, or 2 on an even count | 1 column — square feet | The 1 middle house, or the 2 middle ones | 1 number: its value, or the average of 2 | Same answer for every blank |
+| 3 | Nearest Neighbor | 2 steps | Every column already filled in | The 5 closest houses | 1 number: plain average of the 5 | The answer changes with the house |
+| 4 | Scaled Nearest Neighbor | 2 steps | Every column already filled in | The 5 closest houses | 1 number: weighted average of the 5 | The answer changes with the house |
+| 5 | Summary: which value to fill | — (`ul` instead of `dl`) | — | — | — | See bullets below. |
+
+**The four calculation panels are one template.** Same five `dt` labels in
+the same order in each, so a row means the same thing in every panel and the
+four can be read down the column instead of across four layouts. There is no
+prose paragraph in them any more; the five rows carry the argument, and the
+`Inputs`/`Values produced` pair they replaced could not express the
+selection step, which is the only row where KNN differs from Average.
 
 `dl` is a 2-column grid so the labels align into one column and the
-figures into a second across all four panels; `dt` is uppercase
+answers into a second across all four panels; `dt` is uppercase
 caption-size in `--ph-ink-muted`.
 
 Summary panel bullets (`.ph-panel.ph-is-sum .ph-panel-words ul`, no list
 markers, flex column):
 
-- Size driven — one value for the whole data set
-- n points in the data set — up to n values
-- Unique calculated value per data point
+- Average — one value for the whole column
+- Medium — the middle of that column
+- Nearest Neighbor — a value per house, from its 5 closest
+- Scaled NN — the same 5, weighted by closeness
 
-**Pick SVGs** — one per panel, `max-height:240px`, `width:100%`:
+**c-calc SVGs** — `svg.ph-calc`, one per calculation panel, identical shape:
+two formula lines, the result, `n = 12 houses`, a strip of twelve `#hs` at
+0.3 scale (x = 22 to 264 in steps of 22, baseline y=96), and a caption.
+`max-height:240px`, `width:100%`, `viewBox="0 0 300 118"`.
 
-| Panel | Content |
-|-------|---------|
-| 1 | One house + `=AVERAGE(1235,1300,1365,1520,1600,1680,` / `2090,2200,2310,3610,3800,3990)` / `= 2225` |
-| 2 | One house + `=MEDIUM(1235,1300,1365,1520,1600,1680,` / `2090,2200,2310,3610,3800,3990)` / `= 1885` |
-| 3 | Five houses + `=SUMPRODUCT({3800;3610;2310;2200;2090},` / `{1/190;1/380;1/1680;1/1790;1/1900})` / `/SUM({1/190;1/380;1/1680;1/1790;1/1900})` / `= 3468` |
-| 4 | `p.ph-panel-nums`: `AVG 2225 · MEDIUM 1885 · NN(5) 3468` |
+Every panel draws all twelve houses at the same positions; CSS lights the
+ones its method reads, which is what makes "nothing is chosen" and "5 of
+12" the same picture with different houses bright:
+
+| Panel | Houses lit | Formula | Result |
+|-------|-----------|---------|--------|
+| Average | all 12 | `=AVERAGE(1235,1300,1365,1520,1600,1680,` / `2090,2200,2310,3610,3800,3990)` | `= 2225` |
+| Medium | 6 and 7 — the two middle | `=MEDIUM(1235,1300,1365,1520,1600,1680,` / `2090,2200,2310,3610,3800,3990)` | `= 1885` |
+| KNN | 7-11 — the five closest | `=AVERAGE(3800,3610,2310,2200,2090)` / `each house counts the same` | `= 2802` |
+| Scaled NN | 7-11 — the same five | `=SUMPRODUCT({3800;3610;2310;2200;2090},` / `{1/190;1/380;1/1680;1/1790;1/1900}) ÷ SUM(w)` | `= 3468` |
+
+The two KNN answers are 14010/5 = **2802** equal-weight and the same five
+weighted 1/d = **3468**. The deck previously printed 3468 for plain `NN(5)`,
+which is the weighted number: `src/api/shared.py` fits
+`KNNImputer(n_neighbors=5, weights="distance")`, so the service always runs
+the scaled variant. Splitting them is what makes the weighting visible.
+Summary: `p.ph-panel-nums`: `AVG 2225 · MEDIUM 1885 · NN(5) 2802 · NN(5)w 3468`
 
 - Say (per click): "City average — one number for every house." →
   "Middle value — mansions stop skewing it, still one number." →
-  "Five similar homes, closest count most — each blank gets its own answer." →
+  "Five similar homes, counted equally — each blank gets its own answer." →
+  "Same five, but the closest count most — this is the one that ships." →
   "Summary: neighbours adapt, averages don't."
 - Sources: `notebooks/imputation_experiment.ipynb`,
   `notebooks/six_way_imputation_comparison.ipynb`,
