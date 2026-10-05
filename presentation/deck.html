@@ -22,6 +22,13 @@
       --ph-card-bg: rgba(12, 20, 46, 0.72);
       --ph-ink-on-dark: #ffffff;
       --ph-ink-muted: rgba(255, 255, 255, 0.75);
+      /* Code listing syntax: the deck's own hues read for grammar rather than
+         data. Sky = keyword, mint = type name, amber = literal (the --av hue,
+         which is already the "a value" hue in this deck), muted = comment. */
+      --syn-kw: #38bdf8;
+      --syn-ty: #a5feca;
+      --syn-lit: #e8b04b;
+      --syn-com: rgba(255, 255, 255, 0.55);
       --ph-font: "Aspekta", "Inter", system-ui, sans-serif;
 
       /* Approach colors: one per fill-in method, reused in S4 detail + S5. */
@@ -1006,7 +1013,7 @@
     .ph-s7-panes .ph-table {
       max-width: 62ch;
       margin-inline: auto;
-      table-layout: fixed;
+      /* table-layout: fixed; */
       font-size: var(--fs-lead);
     }
 
@@ -1017,7 +1024,7 @@
 
     .ph-s7-panes .ph-table th,
     .ph-s7-panes .ph-table td {
-      width: 33.333%;
+      /* width: 33.333%; */
       padding: 3px var(--gap-md) 3px 0;
       text-align: left;
     }
@@ -1168,6 +1175,72 @@
       font: inherit;
     }
 
+    /* Code emitted by a .md-slot: marked() writes a bare <pre><code>, which
+       would otherwise land on the slide unframed and in the browser default
+       monospace, unlike every hand-written .ph-code listing. Reuse that class
+       so a fenced block and a written-out block read as the same object. */
+    .md-slot pre {
+      margin: 0 0 var(--sp-sm);
+      padding: var(--gap-sm);
+      background-color: rgba(8, 14, 34, 0.6);
+      border: var(--line-sm) solid var(--ph-card-border);
+      border-radius: var(--rad-cell);
+      color: var(--ph-ink-on-dark);
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: var(--fs-body);
+      line-height: 1.35;
+      white-space: pre;
+      overflow-x: auto;
+    }
+
+    .md-slot pre code {
+      font: inherit;
+    }
+
+    /* marked() wraps loose prose in <p>, which reveal's base stylesheet margins
+       more loosely than the pane's own paragraphs did. Match the pane rhythm. */
+    .md-slot p {
+      margin: 0 0 var(--sp-sm);
+    }
+
+    /* Code listing syntax: hand-tagged spans, not a highlighter. The listings
+       are 1 and 15 lines, so a runtime tokenizer would be more code than the
+       markup it replaces, and the deck loads no highlighter today.
+
+       Five roles, and the tags name them: .ph-kw keyword (def, class, from,
+       import), .ph-ty type name (the class a model is built on, a class named
+       in an annotation, and the builtins int / str / float / None), .ph-s and
+       .ph-n string and number literal, .ph-c comment. Names, parameters,
+       Field(...) calls and punctuation stay in --ph-ink-on-dark, which is
+       where the eye should land first. The two listings on the slide tag the
+       same roles the same way, so From and To read as one language. */
+    .ph-code .ph-kw {
+      color: var(--syn-kw);
+    }
+
+    .ph-code .ph-ty {
+      color: var(--syn-ty);
+    }
+
+    .ph-code .ph-s,
+    .ph-code .ph-n {
+      color: var(--syn-lit);
+    }
+
+    .ph-code .ph-c {
+      color: var(--syn-com);
+    }
+
+    /* S7 pane 02 holds the deck's longest listing, 15 lines once the import
+       that names Request is in it. Measured at the 1270x961 stage: at 1.35
+       that block is 22.5px taller than the 9px of slack the pane had, so the
+       last line fell past the foot; at 1.25 it ends 2.7px above where the
+       14-line block used to end, leaving 13.5px clear. Scoped to the slide,
+       so every other .ph-code block keeps 1.35. */
+    .ph-s7 .ph-code {
+      line-height: 1.25;
+    }
+
     /* S2 stacked variant: same bordered cards, full-width rows. */
     .ph-cols.ph-is-stack {
       flex-direction: column;
@@ -1284,11 +1357,17 @@
       transition: opacity var(--ph-t-slide) var(--ph-ease);
     }
 
-    section[data-s4]:has(.ph-s4-go:nth-of-type(1).visible):not(:has(.ph-s4-go:nth-of-type(2).visible)) .ph-s4-sub.ph-is-av,
-    section[data-s4]:has(.ph-s4-go:nth-of-type(2).visible):not(:has(.ph-s4-go:nth-of-type(3).visible)) .ph-s4-sub.ph-is-md,
-    section[data-s4]:has(.ph-s4-go:nth-of-type(3).visible):not(:has(.ph-s4-go:nth-of-type(4).visible)) .ph-s4-sub.ph-is-knn,
-    section[data-s4]:has(.ph-s4-go:nth-of-type(4).visible):not(:has(.ph-s4-go:nth-of-type(5).visible)) .ph-s4-sub.ph-is-snn,
-    section[data-s4]:has(.ph-s4-go:nth-of-type(5).visible) .ph-s4-sub.ph-is-sum {
+    /* Reveal only ever ADDS .visible, so at stage N drivers 1..N are all visible.
+       The :not() guard is what makes each rule match at exactly one stage; drop it
+       and every earlier stage's rules fire at once. Stage 7 is the one bare
+       :has() rule, unique because driver 7 exists nowhere else. */
+    section[data-s4]:has(.ph-s4-go:nth-of-type(1).visible):not(:has(.ph-s4-go:nth-of-type(2).visible)) .ph-s4-sub:nth-of-type(1),
+    section[data-s4]:has(.ph-s4-go:nth-of-type(2).visible):not(:has(.ph-s4-go:nth-of-type(3).visible)) .ph-s4-sub:nth-of-type(2),
+    section[data-s4]:has(.ph-s4-go:nth-of-type(3).visible):not(:has(.ph-s4-go:nth-of-type(4).visible)) .ph-s4-sub:nth-of-type(3),
+    section[data-s4]:has(.ph-s4-go:nth-of-type(4).visible):not(:has(.ph-s4-go:nth-of-type(5).visible)) .ph-s4-sub:nth-of-type(4),
+    section[data-s4]:has(.ph-s4-go:nth-of-type(5).visible):not(:has(.ph-s4-go:nth-of-type(6).visible)) .ph-s4-sub:nth-of-type(5),
+    section[data-s4]:has(.ph-s4-go:nth-of-type(6).visible):not(:has(.ph-s4-go:nth-of-type(7).visible)) .ph-s4-sub:nth-of-type(6),
+    section[data-s4]:has(.ph-s4-go:nth-of-type(7).visible) .ph-s4-sub:nth-of-type(7) {
       opacity: 1;
     }
 
@@ -1329,28 +1408,165 @@
         transform var(--ph-t-slide) var(--ph-ease);
     }
 
-    /* Per-stage eq houses + input boxes. KNN and scaled KNN stand alone at full
-       size; the summary shows all four at full size too. */
-    section[data-s4]:has(.ph-s4-go:nth-of-type(1).visible):not(:has(.ph-s4-go:nth-of-type(2).visible)) #mk-avg,
-    section[data-s4]:has(.ph-s4-go:nth-of-type(2).visible):not(:has(.ph-s4-go:nth-of-type(3).visible)) #mk-med,
-    section[data-s4]:has(.ph-s4-go:nth-of-type(3).visible) #mk-knn,
-    section[data-s4]:has(.ph-s4-go:nth-of-type(4).visible) #mk-snn,
-    section[data-s4]:has(.ph-s4-go:nth-of-type(5).visible) #mk-avg,
-    section[data-s4]:has(.ph-s4-go:nth-of-type(5).visible) #mk-med,
-    section[data-s4]:has(.ph-s4-go:nth-of-type(5).visible) #mk-knn,
-    section[data-s4]:has(.ph-s4-go:nth-of-type(5).visible) #mk-snn {
+    /* Attribute rows: the rest state is the whole data set, everything present and
+       legible, nothing claimed. The per-stage rules are the only things that light a
+       value - a value that is not lit is a value the method did not read.
+
+       The rest opacity lives here and nowhere else. Do not put opacity on the
+       .ar-lab group: SVG group opacity multiplies with child opacity, which would
+       halve every label and cap a lit label at half brightness. */
+    .houses-svg .v,
+    .houses-svg .al {
+      transition:
+        opacity var(--ph-t-fade) var(--ph-ease),
+        fill var(--ph-t-fade) var(--ph-ease);
+    }
+
+    .houses-svg .v,
+    .houses-svg .al {
+      opacity: 0.55;
+    }
+
+    /* One stage at a time matches, so each block states that stage's COMPLETE
+       state - every row explicitly lit or explicitly dimmed. Nothing is
+       inherited from the stage before and nothing has to be undone after. */
+
+    /* Stage 1 - Average: one column, every house. */
+    section[data-s4]:has(.ph-s4-go:nth-of-type(1).visible):not(:has(.ph-s4-go:nth-of-type(2).visible)) .ar-living .v,
+    section[data-s4]:has(.ph-s4-go:nth-of-type(1).visible):not(:has(.ph-s4-go:nth-of-type(2).visible)) .al-living {
+      fill: var(--av);
       opacity: 1;
     }
 
+    section[data-s4]:has(.ph-s4-go:nth-of-type(1).visible):not(:has(.ph-s4-go:nth-of-type(2).visible)) .ar-lot .v,
+    section[data-s4]:has(.ph-s4-go:nth-of-type(1).visible):not(:has(.ph-s4-go:nth-of-type(2).visible)) .ar-bed .v,
+    section[data-s4]:has(.ph-s4-go:nth-of-type(1).visible):not(:has(.ph-s4-go:nth-of-type(2).visible)) .ar-bath .v,
+    section[data-s4]:has(.ph-s4-go:nth-of-type(1).visible):not(:has(.ph-s4-go:nth-of-type(2).visible)) .al-lot,
+    section[data-s4]:has(.ph-s4-go:nth-of-type(1).visible):not(:has(.ph-s4-go:nth-of-type(2).visible)) .al-bed,
+    section[data-s4]:has(.ph-s4-go:nth-of-type(1).visible):not(:has(.ph-s4-go:nth-of-type(2).visible)) .al-bath {
+      opacity: 0.22;
+    }
+
+    /* Stage 2 - Medium: the same one column, only the two middle houses. */
+    section[data-s4]:has(.ph-s4-go:nth-of-type(2).visible):not(:has(.ph-s4-go:nth-of-type(3).visible)) .ar-living .v.h-mid,
+    section[data-s4]:has(.ph-s4-go:nth-of-type(2).visible):not(:has(.ph-s4-go:nth-of-type(3).visible)) .al-living {
+      fill: var(--md);
+      opacity: 1;
+    }
+
+    section[data-s4]:has(.ph-s4-go:nth-of-type(2).visible):not(:has(.ph-s4-go:nth-of-type(3).visible)) .ar-living .v:not(.h-mid),
+    section[data-s4]:has(.ph-s4-go:nth-of-type(2).visible):not(:has(.ph-s4-go:nth-of-type(3).visible)) .ar-lot .v,
+    section[data-s4]:has(.ph-s4-go:nth-of-type(2).visible):not(:has(.ph-s4-go:nth-of-type(3).visible)) .ar-bed .v,
+    section[data-s4]:has(.ph-s4-go:nth-of-type(2).visible):not(:has(.ph-s4-go:nth-of-type(3).visible)) .ar-bath .v,
+    section[data-s4]:has(.ph-s4-go:nth-of-type(2).visible):not(:has(.ph-s4-go:nth-of-type(3).visible)) .al-lot,
+    section[data-s4]:has(.ph-s4-go:nth-of-type(2).visible):not(:has(.ph-s4-go:nth-of-type(3).visible)) .al-bed,
+    section[data-s4]:has(.ph-s4-go:nth-of-type(2).visible):not(:has(.ph-s4-go:nth-of-type(3).visible)) .al-bath {
+      opacity: 0.22;
+    }
+
+    /* Stage 3 - Nearest Neighbor, step 1: three columns decide which houses are
+       close. All twelve are compared; the five that win are the only ones lit. */
+    section[data-s4]:has(.ph-s4-go:nth-of-type(3).visible):not(:has(.ph-s4-go:nth-of-type(4).visible)) .ar-lot .v.h-nn,
+    section[data-s4]:has(.ph-s4-go:nth-of-type(3).visible):not(:has(.ph-s4-go:nth-of-type(4).visible)) .ar-bed .v.h-nn,
+    section[data-s4]:has(.ph-s4-go:nth-of-type(3).visible):not(:has(.ph-s4-go:nth-of-type(4).visible)) .ar-bath .v.h-nn,
+    section[data-s4]:has(.ph-s4-go:nth-of-type(3).visible):not(:has(.ph-s4-go:nth-of-type(4).visible)) .al-lot,
+    section[data-s4]:has(.ph-s4-go:nth-of-type(3).visible):not(:has(.ph-s4-go:nth-of-type(4).visible)) .al-bed,
+    section[data-s4]:has(.ph-s4-go:nth-of-type(3).visible):not(:has(.ph-s4-go:nth-of-type(4).visible)) .al-bath {
+      fill: var(--knn);
+      opacity: 1;
+    }
+
+    section[data-s4]:has(.ph-s4-go:nth-of-type(3).visible):not(:has(.ph-s4-go:nth-of-type(4).visible)) .ar-living .v,
+    section[data-s4]:has(.ph-s4-go:nth-of-type(3).visible):not(:has(.ph-s4-go:nth-of-type(4).visible)) .ar-lot .v:not(.h-nn),
+    section[data-s4]:has(.ph-s4-go:nth-of-type(3).visible):not(:has(.ph-s4-go:nth-of-type(4).visible)) .ar-bed .v:not(.h-nn),
+    section[data-s4]:has(.ph-s4-go:nth-of-type(3).visible):not(:has(.ph-s4-go:nth-of-type(4).visible)) .ar-bath .v:not(.h-nn),
+    section[data-s4]:has(.ph-s4-go:nth-of-type(3).visible):not(:has(.ph-s4-go:nth-of-type(4).visible)) .al-living {
+      opacity: 0.22;
+    }
+
+    /* Stage 4 - Nearest Neighbor, step 2: the three comparison columns go quiet and
+       the one column that gets averaged comes up. */
+    section[data-s4]:has(.ph-s4-go:nth-of-type(4).visible):not(:has(.ph-s4-go:nth-of-type(5).visible)) .ar-living .v.h-nn,
+    section[data-s4]:has(.ph-s4-go:nth-of-type(4).visible):not(:has(.ph-s4-go:nth-of-type(5).visible)) .al-living {
+      fill: var(--knn);
+      opacity: 1;
+    }
+
+    section[data-s4]:has(.ph-s4-go:nth-of-type(4).visible):not(:has(.ph-s4-go:nth-of-type(5).visible)) .ar-living .v:not(.h-nn),
+    section[data-s4]:has(.ph-s4-go:nth-of-type(4).visible):not(:has(.ph-s4-go:nth-of-type(5).visible)) .ar-lot .v,
+    section[data-s4]:has(.ph-s4-go:nth-of-type(4).visible):not(:has(.ph-s4-go:nth-of-type(5).visible)) .ar-bed .v,
+    section[data-s4]:has(.ph-s4-go:nth-of-type(4).visible):not(:has(.ph-s4-go:nth-of-type(5).visible)) .ar-bath .v,
+    section[data-s4]:has(.ph-s4-go:nth-of-type(4).visible):not(:has(.ph-s4-go:nth-of-type(5).visible)) .al-lot,
+    section[data-s4]:has(.ph-s4-go:nth-of-type(4).visible):not(:has(.ph-s4-go:nth-of-type(5).visible)) .al-bed,
+    section[data-s4]:has(.ph-s4-go:nth-of-type(4).visible):not(:has(.ph-s4-go:nth-of-type(5).visible)) .al-bath {
+      opacity: 0.22;
+    }
+
+    /* Stage 5 - Scaled NN, step 1: stage 3 again, in the scaled colour. */
+    section[data-s4]:has(.ph-s4-go:nth-of-type(5).visible):not(:has(.ph-s4-go:nth-of-type(6).visible)) .ar-lot .v.h-nn,
+    section[data-s4]:has(.ph-s4-go:nth-of-type(5).visible):not(:has(.ph-s4-go:nth-of-type(6).visible)) .ar-bed .v.h-nn,
+    section[data-s4]:has(.ph-s4-go:nth-of-type(5).visible):not(:has(.ph-s4-go:nth-of-type(6).visible)) .ar-bath .v.h-nn,
+    section[data-s4]:has(.ph-s4-go:nth-of-type(5).visible):not(:has(.ph-s4-go:nth-of-type(6).visible)) .al-lot,
+    section[data-s4]:has(.ph-s4-go:nth-of-type(5).visible):not(:has(.ph-s4-go:nth-of-type(6).visible)) .al-bed,
+    section[data-s4]:has(.ph-s4-go:nth-of-type(5).visible):not(:has(.ph-s4-go:nth-of-type(6).visible)) .al-bath {
+      fill: var(--snn);
+      opacity: 1;
+    }
+
+    section[data-s4]:has(.ph-s4-go:nth-of-type(5).visible):not(:has(.ph-s4-go:nth-of-type(6).visible)) .ar-living .v,
+    section[data-s4]:has(.ph-s4-go:nth-of-type(5).visible):not(:has(.ph-s4-go:nth-of-type(6).visible)) .ar-lot .v:not(.h-nn),
+    section[data-s4]:has(.ph-s4-go:nth-of-type(5).visible):not(:has(.ph-s4-go:nth-of-type(6).visible)) .ar-bed .v:not(.h-nn),
+    section[data-s4]:has(.ph-s4-go:nth-of-type(5).visible):not(:has(.ph-s4-go:nth-of-type(6).visible)) .ar-bath .v:not(.h-nn),
+    section[data-s4]:has(.ph-s4-go:nth-of-type(5).visible):not(:has(.ph-s4-go:nth-of-type(6).visible)) .al-living {
+      opacity: 0.22;
+    }
+
+    /* Stage 6 - Scaled NN, step 2: stage 4 again, in the scaled colour. */
+    section[data-s4]:has(.ph-s4-go:nth-of-type(6).visible):not(:has(.ph-s4-go:nth-of-type(7).visible)) .ar-living .v.h-nn,
+    section[data-s4]:has(.ph-s4-go:nth-of-type(6).visible):not(:has(.ph-s4-go:nth-of-type(7).visible)) .al-living {
+      fill: var(--snn);
+      opacity: 1;
+    }
+
+    section[data-s4]:has(.ph-s4-go:nth-of-type(6).visible):not(:has(.ph-s4-go:nth-of-type(7).visible)) .ar-living .v:not(.h-nn),
+    section[data-s4]:has(.ph-s4-go:nth-of-type(6).visible):not(:has(.ph-s4-go:nth-of-type(7).visible)) .ar-lot .v,
+    section[data-s4]:has(.ph-s4-go:nth-of-type(6).visible):not(:has(.ph-s4-go:nth-of-type(7).visible)) .ar-bed .v,
+    section[data-s4]:has(.ph-s4-go:nth-of-type(6).visible):not(:has(.ph-s4-go:nth-of-type(7).visible)) .ar-bath .v,
+    section[data-s4]:has(.ph-s4-go:nth-of-type(6).visible):not(:has(.ph-s4-go:nth-of-type(7).visible)) .al-lot,
+    section[data-s4]:has(.ph-s4-go:nth-of-type(6).visible):not(:has(.ph-s4-go:nth-of-type(7).visible)) .al-bed,
+    section[data-s4]:has(.ph-s4-go:nth-of-type(6).visible):not(:has(.ph-s4-go:nth-of-type(7).visible)) .al-bath {
+      opacity: 0.22;
+    }
+
+    /* Stage 7 has no attribute rules at all: with every other stage guarded, no
+       stage rule matches and all 48 values fall back to the 0.55 rest opacity. */
+
+    /* Per-stage eq houses + input boxes. Stages 3 and 5 have no marker: nothing
+       has been computed yet. Stage 7 shows all four. */
+    section[data-s4]:has(.ph-s4-go:nth-of-type(1).visible):not(:has(.ph-s4-go:nth-of-type(2).visible)) #mk-avg,
+    section[data-s4]:has(.ph-s4-go:nth-of-type(2).visible):not(:has(.ph-s4-go:nth-of-type(3).visible)) #mk-med,
+    section[data-s4]:has(.ph-s4-go:nth-of-type(4).visible):not(:has(.ph-s4-go:nth-of-type(5).visible)) #mk-knn,
+    section[data-s4]:has(.ph-s4-go:nth-of-type(6).visible):not(:has(.ph-s4-go:nth-of-type(7).visible)) #mk-snn,
+    section[data-s4]:has(.ph-s4-go:nth-of-type(7).visible) #mk-avg,
+    section[data-s4]:has(.ph-s4-go:nth-of-type(7).visible) #mk-med,
+    section[data-s4]:has(.ph-s4-go:nth-of-type(7).visible) #mk-knn,
+    section[data-s4]:has(.ph-s4-go:nth-of-type(7).visible) #mk-snn {
+      opacity: 1;
+    }
+
+    /* Box height is half the encoding: 122 stops between the sqft_living row and
+       the sqft_lot row, 180 reaches past bathrooms. No box at stage 7. */
     section[data-s4]:has(.ph-s4-go:nth-of-type(1).visible):not(:has(.ph-s4-go:nth-of-type(2).visible)) #bx-avg,
     section[data-s4]:has(.ph-s4-go:nth-of-type(2).visible):not(:has(.ph-s4-go:nth-of-type(3).visible)) #bx-med,
-    section[data-s4]:has(.ph-s4-go:nth-of-type(3).visible):not(:has(.ph-s4-go:nth-of-type(4).visible)) #bx-knn,
-    section[data-s4]:has(.ph-s4-go:nth-of-type(4).visible):not(:has(.ph-s4-go:nth-of-type(5).visible)) #bx-snn {
+    section[data-s4]:has(.ph-s4-go:nth-of-type(3).visible):not(:has(.ph-s4-go:nth-of-type(4).visible)) #bx-knn-pick,
+    section[data-s4]:has(.ph-s4-go:nth-of-type(4).visible):not(:has(.ph-s4-go:nth-of-type(5).visible)) #bx-knn,
+    section[data-s4]:has(.ph-s4-go:nth-of-type(5).visible):not(:has(.ph-s4-go:nth-of-type(6).visible)) #bx-snn-pick,
+    section[data-s4]:has(.ph-s4-go:nth-of-type(6).visible):not(:has(.ph-s4-go:nth-of-type(7).visible)) #bx-snn {
       opacity: 1;
     }
 
     /* No extra scale or offset on the two KNN markers: each base transform
-       already encodes its own value - 2802 unweighted, 3468 weighted - and the
+       already encodes its own value - 2802 unweighted, 3470 weighted - and the
        other two markers carry no transform either, so any override would break
        both the value sizing and the shared baseline. */
 
@@ -1382,11 +1598,15 @@
       display: none;
     }
 
+    /* Panels map to METHODS, not stages: Nearest Neighbor spans stages 3-4 and
+       Scaled NN spans 5-6, so each guard stops at the stage after its LAST stage.
+       ph-is-snn guards on driver 7, not 6 - guarding on 6 would leave stage 6 with
+       no panel at all. */
     section[data-s4]:has(.ph-s4-go:nth-of-type(1).visible):not(:has(.ph-s4-go:nth-of-type(2).visible)) .ph-panel.ph-is-av,
     section[data-s4]:has(.ph-s4-go:nth-of-type(2).visible):not(:has(.ph-s4-go:nth-of-type(3).visible)) .ph-panel.ph-is-md,
-    section[data-s4]:has(.ph-s4-go:nth-of-type(3).visible):not(:has(.ph-s4-go:nth-of-type(4).visible)) .ph-panel.ph-is-knn,
-    section[data-s4]:has(.ph-s4-go:nth-of-type(4).visible):not(:has(.ph-s4-go:nth-of-type(5).visible)) .ph-panel.ph-is-snn,
-    section[data-s4]:has(.ph-s4-go:nth-of-type(5).visible) .ph-panel.ph-is-sum {
+    section[data-s4]:has(.ph-s4-go:nth-of-type(3).visible):not(:has(.ph-s4-go:nth-of-type(5).visible)) .ph-panel.ph-is-knn,
+    section[data-s4]:has(.ph-s4-go:nth-of-type(5).visible):not(:has(.ph-s4-go:nth-of-type(7).visible)) .ph-panel.ph-is-snn,
+    section[data-s4]:has(.ph-s4-go:nth-of-type(7).visible) .ph-panel.ph-is-sum {
       display: flex;
     }
 
@@ -1955,15 +2175,17 @@
           <div class="ph-subs" aria-live="off">
             <p class="ph-subtitle ph-s4-sub ph-is-av">Average Value</p>
             <p class="ph-subtitle ph-s4-sub ph-is-md">Medium value</p>
-            <p class="ph-subtitle ph-s4-sub ph-is-knn">Nearest Neighbor</p>
-            <p class="ph-subtitle ph-s4-sub ph-is-snn">Scaled Nearest Neighbor</p>
+            <p class="ph-subtitle ph-s4-sub ph-is-knn">Nearest Neighbor &#8212; find the 5 closest</p>
+            <p class="ph-subtitle ph-s4-sub ph-is-knn">Nearest Neighbor &#8212; read their size</p>
+            <p class="ph-subtitle ph-s4-sub ph-is-snn">Scaled Nearest Neighbor &#8212; find the 5 closest</p>
+            <p class="ph-subtitle ph-s4-sub ph-is-snn">Scaled Nearest Neighbor &#8212; read and weight</p>
             <p class="ph-subtitle ph-s4-sub ph-is-sum">Summary: similar homes win</p>
           </div>
         </header>
         <div class="ph-body ph-houses">
           <div class="ph-houses-top">
-            <svg id="houses-svg" class="houses-svg" viewBox="15 -80 1195 340" fill="none" color="#BCCCD4" role="img"
-              aria-label="Twelve houses in four groups of three, sorted smallest to largest">
+            <svg id="houses-svg" class="houses-svg" viewBox="-30 -80 1240 380" fill="none" color="#BCCCD4" role="img"
+              aria-label="Twelve houses in four groups of three, sorted smallest to largest. Under each house, four attribute values in four rows: square feet, year built, grade, and bedrooms.">
               <defs>
                 <g id="hs" stroke="currentColor" stroke-width="3">
                   <rect x="-20" y="-30" width="40" height="30" />
@@ -2029,51 +2251,85 @@
               </g>
               <!-- Sorted-size baseline -->
               <line x1="35" y1="214" x2="1188" y2="214" stroke="#BCCCD4" stroke-width="1" opacity="0.4" />
-              <!-- House size data (sqft, proportional to scale) -->
-              <text x="54" y="232" text-anchor="middle" font-size="14" fill="#BCCCD4">
-                1235
-              </text>
-              <text x="98" y="232" text-anchor="middle" font-size="14" fill="#BCCCD4">
-                1300
-              </text>
-              <text x="142" y="232" text-anchor="middle" font-size="14" fill="#BCCCD4">
-                1365
-              </text>
-              <text x="241" y="232" text-anchor="middle" font-size="14" fill="#BCCCD4">
-                1520
-              </text>
-              <text x="297" y="232" text-anchor="middle" font-size="14" fill="#BCCCD4">
-                1600
-              </text>
-              <text x="353" y="232" text-anchor="middle" font-size="14" fill="#BCCCD4">
-                1680
-              </text>
-              <text x="551" y="232" text-anchor="middle" font-size="14" fill="#BCCCD4">
-                2090
-              </text>
-              <text x="619" y="232" text-anchor="middle" font-size="14" fill="#BCCCD4">
-                2200
-              </text>
-              <text x="687" y="232" text-anchor="middle" font-size="14" fill="#BCCCD4">
-                2310
-              </text>
-              <text x="984" y="232" text-anchor="middle" font-size="14" fill="#BCCCD4">
-                3610
-              </text>
-              <text x="1066" y="232" text-anchor="middle" font-size="14" fill="#BCCCD4">
-                3800
-              </text>
-              <text x="1148" y="232" text-anchor="middle" font-size="14" fill="#BCCCD4">
-                3990
-              </text>
-              <!-- Input boxes: dashed eq inputs on the housing line, fade per fragment -->
-              <rect id="bx-avg" class="bx" x="16" y="116" width="1190" height="132" fill="none" stroke="var(--av)"
+              <!-- Attribute rows: one line per attribute, one value per house, twelve values
+                   per row. Which rows light, and which values inside them, is stage-driven
+                   CSS - see the .ar-living / .ar-lot / .ar-bed / .ar-bath rules. -->
+              <g class="ar-lab" font-size="11" fill="#BCCCD4" text-anchor="end">
+                <text class="al al-living" x="30" y="235">sqft_living</text>
+                <text class="al al-lot" x="30" y="254">sqft_lot</text>
+                <text class="al al-bed" x="30" y="273">bedrooms</text>
+                <text class="al al-bath" x="30" y="292">bathrooms</text>
+              </g>
+              <g class="ar-row ar-living" font-size="14" fill="#BCCCD4" text-anchor="middle">
+                <text class="v" x="54" y="232">1235</text>
+                <text class="v" x="98" y="232">1300</text>
+                <text class="v" x="142" y="232">1365</text>
+                <text class="v" x="241" y="232">1520</text>
+                <text class="v" x="297" y="232">1600</text>
+                <text class="v h-mid" x="353" y="232">1680</text>
+                <text class="v h-mid h-nn" x="551" y="232">2090</text>
+                <text class="v h-nn" x="619" y="232">2200</text>
+                <text class="v h-nn" x="687" y="232">2310</text>
+                <text class="v h-nn" x="984" y="232">3610</text>
+                <text class="v h-nn" x="1066" y="232">3800</text>
+                <text class="v" x="1148" y="232">3990</text>
+              </g>
+              <g class="ar-row ar-lot" font-size="13" fill="#BCCCD4" text-anchor="middle">
+                <text class="v" x="54" y="251">4600</text>
+                <text class="v" x="98" y="251">4900</text>
+                <text class="v" x="142" y="251">5300</text>
+                <text class="v" x="241" y="251">5600</text>
+                <text class="v" x="297" y="251">6200</text>
+                <text class="v" x="353" y="251">5900</text>
+                <text class="v h-nn" x="551" y="251">7600</text>
+                <text class="v h-nn" x="619" y="251">8000</text>
+                <text class="v h-nn" x="687" y="251">8400</text>
+                <text class="v h-nn" x="984" y="251">8800</text>
+                <text class="v h-nn" x="1066" y="251">9100</text>
+                <text class="v" x="1148" y="251">6400</text>
+              </g>
+              <g class="ar-row ar-bed" font-size="13" fill="#BCCCD4" text-anchor="middle">
+                <text class="v" x="54" y="270">2</text>
+                <text class="v" x="98" y="270">2</text>
+                <text class="v" x="142" y="270">2</text>
+                <text class="v" x="241" y="270">3</text>
+                <text class="v" x="297" y="270">3</text>
+                <text class="v" x="353" y="270">3</text>
+                <text class="v h-nn" x="551" y="270">4</text>
+                <text class="v h-nn" x="619" y="270">4</text>
+                <text class="v h-nn" x="687" y="270">5</text>
+                <text class="v h-nn" x="984" y="270">5</text>
+                <text class="v h-nn" x="1066" y="270">5</text>
+                <text class="v" x="1148" y="270">6</text>
+              </g>
+              <g class="ar-row ar-bath" font-size="13" fill="#BCCCD4" text-anchor="middle">
+                <text class="v" x="54" y="289">1</text>
+                <text class="v" x="98" y="289">1.5</text>
+                <text class="v" x="142" y="289">1.5</text>
+                <text class="v" x="241" y="289">1.5</text>
+                <text class="v" x="297" y="289">1.5</text>
+                <text class="v" x="353" y="289">2</text>
+                <text class="v h-nn" x="551" y="289">2.5</text>
+                <text class="v h-nn" x="619" y="289">2.5</text>
+                <text class="v h-nn" x="687" y="289">3</text>
+                <text class="v h-nn" x="984" y="289">3</text>
+                <text class="v h-nn" x="1066" y="289">3</text>
+                <text class="v" x="1148" y="289">4</text>
+              </g>
+              <!-- Input boxes: dashed. Horizontal extent = which houses the method reads.
+                   Vertical extent = which attributes it reads: height 122 stops between the
+                   sqft_living row and the sqft_lot row, height 180 reaches past the bathrooms row. -->
+              <rect id="bx-avg" class="bx" x="32" y="116" width="1164" height="122" fill="none" stroke="var(--av)"
                 stroke-width="2" stroke-dasharray="8 5" />
-              <rect id="bx-med" class="bx" x="324" y="116" width="260" height="132" fill="none" stroke="var(--md)"
+              <rect id="bx-med" class="bx" x="324" y="116" width="260" height="122" fill="none" stroke="var(--md)"
                 stroke-width="2" stroke-dasharray="8 5" />
-              <rect id="bx-knn" class="bx" x="584" y="116" width="611" height="132" fill="none" stroke="var(--knn)"
+              <rect id="bx-knn-pick" class="bx" x="510" y="116" width="596" height="180" fill="none" stroke="var(--knn)"
                 stroke-width="2" stroke-dasharray="8 5" />
-              <rect id="bx-snn" class="bx" x="584" y="116" width="611" height="132" fill="none" stroke="var(--snn)"
+              <rect id="bx-knn" class="bx" x="510" y="116" width="596" height="122" fill="none" stroke="var(--knn)"
+                stroke-width="2" stroke-dasharray="8 5" />
+              <rect id="bx-snn-pick" class="bx" x="510" y="116" width="596" height="180" fill="none" stroke="var(--snn)"
+                stroke-width="2" stroke-dasharray="8 5" />
+              <rect id="bx-snn" class="bx" x="510" y="116" width="596" height="122" fill="none" stroke="var(--snn)"
                 stroke-width="2" stroke-dasharray="8 5" />
               <!-- Average marker: house lifted clear; equal text gaps; down arrow to box -->
               <!-- color: #hs strokes with currentColor, which follows the CSS
@@ -2103,39 +2359,41 @@
                 </text>
                 <line x1="452" y1="44" x2="452" y2="108" stroke-width="2" marker-end="url(#arr-md)" />
               </g>
-              <!-- KNN marker: the five closest houses averaged with EQUAL weight.
-                   That lands below the city average, because four of the five
-                   are smaller than the mean. -->
+              <!-- KNN marker: the five closest houses averaged with EQUAL weight. That lands
+                   above the city average of 2225, because three of the five are larger than
+                   it - but it is still one number for every house. -->
               <g id="mk-knn" class="mk" color="var(--knn)" stroke="var(--knn)">
-                <g transform="translate(952,10) scale(1.35)">
+                <g transform="translate(760,10) scale(1.35)">
                   <use href="#hs" />
                 </g>
-                <text x="952" y="-66" text-anchor="middle" font-size="20" fill="var(--knn)" stroke="none">
+                <text x="760" y="-66" text-anchor="middle" font-size="20" fill="var(--knn)" stroke="none">
                   NN(5)
                 </text>
-                <text x="952" y="30" text-anchor="middle" font-size="16" fill="var(--knn)" stroke="none">
+                <text x="760" y="30" text-anchor="middle" font-size="16" fill="var(--knn)" stroke="none">
                   2802
                 </text>
-                <line x1="952" y1="44" x2="952" y2="116" stroke-width="2" marker-end="url(#arr-knn)" />
+                <line x1="760" y1="44" x2="760" y2="116" stroke-width="2" marker-end="url(#arr-knn)" />
               </g>
-              <!-- Scaled KNN marker: the same five houses, each weighted by how
-                   close it is. The biggest one dominates, so the answer lands
-                   higher than the equal-weight average of the identical five. -->
+              <!-- Scaled KNN marker: the same five houses, each weighted 1 over its distance
+                   across sqft_lot, bedrooms and bathrooms. The two closest dominate, so the
+                   answer lands well above the equal-weight average of the identical five. -->
               <g id="mk-snn" class="mk" color="var(--snn)" stroke="var(--snn)">
-                <g transform="translate(1150,10) scale(1.465)">
+                <g transform="translate(940,10) scale(1.465)">
                   <use href="#hs" />
                 </g>
-                <text x="1150" y="-66" text-anchor="middle" font-size="20" fill="var(--snn)" stroke="none">
+                <text x="940" y="-66" text-anchor="middle" font-size="20" fill="var(--snn)" stroke="none">
                   NN(5)w
                 </text>
-                <text x="1150" y="30" text-anchor="middle" font-size="16" fill="var(--snn)" stroke="none">
-                  3468
+                <text x="940" y="30" text-anchor="middle" font-size="16" fill="var(--snn)" stroke="none">
+                  3470
                 </text>
-                <line x1="1150" y1="44" x2="1150" y2="116" stroke-width="2" marker-end="url(#arr-snn)" />
+                <line x1="940" y1="44" x2="940" y2="116" stroke-width="2" marker-end="url(#arr-snn)" />
               </g>
               <p class="ph-stage-hint">
-                The diagram above is a data set of 12 houses with a single
-                attribute: living area in square feet.
+                The diagram above is 12 houses. Each carries four of the columns
+                this API imputes &#8212; living area, lot size, bedrooms,
+                bathrooms &#8212; and any one of them can be the one that came back
+                blank.
               </p>
           </div>
           <div class="ph-stage-bottom">
@@ -2161,27 +2419,28 @@
                   </dl>
                 </div>
                 <div class="ph-panel-pick">
-                  <svg class="ph-calc" viewBox="0 0 300 118" fill="none" role="img"
-                    aria-label="Average of all 12 houses: 2225 square feet. All 12 houses in the strip are read.">
-                    <text class="ph-calc-f" x="150" y="10" text-anchor="middle">=AVERAGE(1235,1300,1365,1520,1600,1680,</text>
-                    <text class="ph-calc-f" x="150" y="22" text-anchor="middle">2090,2200,2310,3610,3800,3990)</text>
-                    <text class="ph-calc-r" x="150" y="48" text-anchor="middle">= 2225</text>
-                    <text class="ph-calc-n" x="150" y="70" text-anchor="middle">n = 12 houses</text>
+                  <svg class="ph-calc" viewBox="0 0 300 128" fill="none" role="img"
+                    aria-label="Average of all 12 houses: 2225 square feet. One column is read, living area, across all 12 houses.">
+                    <text class="ph-calc-f" x="150" y="10" text-anchor="middle">one column, every house</text>
+                    <text class="ph-calc-f" x="150" y="26" text-anchor="middle">=AVERAGE(1235,1300,1365,1520,1600,1680,</text>
+                    <text class="ph-calc-f" x="150" y="38" text-anchor="middle">2090,2200,2310,3610,3800,3990)</text>
+                    <text class="ph-calc-r" x="150" y="62" text-anchor="middle">= 2225</text>
+                    <text class="ph-calc-n" x="150" y="78" text-anchor="middle">n = 12 houses</text>
                     <g class="ph-calc-strip">
-                      <use href="#hs" transform="translate(22,96) scale(0.3)" />
-                      <use href="#hs" transform="translate(44,96) scale(0.3)" />
-                      <use href="#hs" transform="translate(66,96) scale(0.3)" />
-                      <use href="#hs" transform="translate(88,96) scale(0.3)" />
-                      <use href="#hs" transform="translate(110,96) scale(0.3)" />
-                      <use href="#hs" transform="translate(132,96) scale(0.3)" />
-                      <use href="#hs" transform="translate(154,96) scale(0.3)" />
-                      <use href="#hs" transform="translate(176,96) scale(0.3)" />
-                      <use href="#hs" transform="translate(198,96) scale(0.3)" />
-                      <use href="#hs" transform="translate(220,96) scale(0.3)" />
-                      <use href="#hs" transform="translate(242,96) scale(0.3)" />
-                      <use href="#hs" transform="translate(264,96) scale(0.3)" />
+                      <use href="#hs" transform="translate(22,100) scale(0.3)" />
+                      <use href="#hs" transform="translate(44,100) scale(0.3)" />
+                      <use href="#hs" transform="translate(66,100) scale(0.3)" />
+                      <use href="#hs" transform="translate(88,100) scale(0.3)" />
+                      <use href="#hs" transform="translate(110,100) scale(0.3)" />
+                      <use href="#hs" transform="translate(132,100) scale(0.3)" />
+                      <use href="#hs" transform="translate(154,100) scale(0.3)" />
+                      <use href="#hs" transform="translate(176,100) scale(0.3)" />
+                      <use href="#hs" transform="translate(198,100) scale(0.3)" />
+                      <use href="#hs" transform="translate(220,100) scale(0.3)" />
+                      <use href="#hs" transform="translate(242,100) scale(0.3)" />
+                      <use href="#hs" transform="translate(264,100) scale(0.3)" />
                     </g>
-                    <text class="ph-calc-c" x="150" y="112" text-anchor="middle">12 of 12 read</text>
+                    <text class="ph-calc-c" x="150" y="120" text-anchor="middle">12 of 12 read</text>
                   </svg>
                 </div>
               </article>
@@ -2202,27 +2461,28 @@
                   </dl>
                 </div>
                 <div class="ph-panel-pick">
-                  <svg class="ph-calc" viewBox="0 0 300 118" fill="none" role="img"
-                    aria-label="Median of all 12 houses: 1885 square feet, the average of the two middle houses. Houses 6 and 7 in the strip are read.">
-                    <text class="ph-calc-f" x="150" y="10" text-anchor="middle">=MEDIUM(1235,1300,1365,1520,1600,1680,</text>
-                    <text class="ph-calc-f" x="150" y="22" text-anchor="middle">2090,2200,2310,3610,3800,3990)</text>
-                    <text class="ph-calc-r" x="150" y="48" text-anchor="middle">= 1885</text>
-                    <text class="ph-calc-n" x="150" y="70" text-anchor="middle">n = 12 houses</text>
+                  <svg class="ph-calc" viewBox="0 0 300 128" fill="none" role="img"
+                    aria-label="Median of all 12 houses: 1885 square feet, the average of the two middle houses. One column is read, living area, and only houses 6 and 7 of it.">
+                    <text class="ph-calc-f" x="150" y="10" text-anchor="middle">one column, the middle of it</text>
+                    <text class="ph-calc-f" x="150" y="26" text-anchor="middle">=MEDIUM(1235,1300,1365,1520,1600,1680,</text>
+                    <text class="ph-calc-f" x="150" y="38" text-anchor="middle">2090,2200,2310,3610,3800,3990)</text>
+                    <text class="ph-calc-r" x="150" y="62" text-anchor="middle">= 1885</text>
+                    <text class="ph-calc-n" x="150" y="78" text-anchor="middle">n = 12 houses</text>
                     <g class="ph-calc-strip">
-                      <use href="#hs" transform="translate(22,96) scale(0.3)" />
-                      <use href="#hs" transform="translate(44,96) scale(0.3)" />
-                      <use href="#hs" transform="translate(66,96) scale(0.3)" />
-                      <use href="#hs" transform="translate(88,96) scale(0.3)" />
-                      <use href="#hs" transform="translate(110,96) scale(0.3)" />
-                      <use href="#hs" transform="translate(132,96) scale(0.3)" />
-                      <use href="#hs" transform="translate(154,96) scale(0.3)" />
-                      <use href="#hs" transform="translate(176,96) scale(0.3)" />
-                      <use href="#hs" transform="translate(198,96) scale(0.3)" />
-                      <use href="#hs" transform="translate(220,96) scale(0.3)" />
-                      <use href="#hs" transform="translate(242,96) scale(0.3)" />
-                      <use href="#hs" transform="translate(264,96) scale(0.3)" />
+                      <use href="#hs" transform="translate(22,100) scale(0.3)" />
+                      <use href="#hs" transform="translate(44,100) scale(0.3)" />
+                      <use href="#hs" transform="translate(66,100) scale(0.3)" />
+                      <use href="#hs" transform="translate(88,100) scale(0.3)" />
+                      <use href="#hs" transform="translate(110,100) scale(0.3)" />
+                      <use href="#hs" transform="translate(132,100) scale(0.3)" />
+                      <use href="#hs" transform="translate(154,100) scale(0.3)" />
+                      <use href="#hs" transform="translate(176,100) scale(0.3)" />
+                      <use href="#hs" transform="translate(198,100) scale(0.3)" />
+                      <use href="#hs" transform="translate(220,100) scale(0.3)" />
+                      <use href="#hs" transform="translate(242,100) scale(0.3)" />
+                      <use href="#hs" transform="translate(264,100) scale(0.3)" />
                     </g>
-                    <text class="ph-calc-c" x="150" y="112" text-anchor="middle">2 of 12 read &#8212; the two middle</text>
+                    <text class="ph-calc-c" x="150" y="120" text-anchor="middle">2 of 12 read &#8212; the two middle</text>
                   </svg>
                 </div>
               </article>
@@ -2231,39 +2491,40 @@
                   <h3>Nearest Neighbor</h3>
                   <dl>
                     <dt>Steps</dt>
-                    <dd>2 steps</dd>
+                    <dd>2 steps: find, then fill</dd>
                     <dt>Reads</dt>
-                    <dd>Every column already filled in</dd>
+                    <dd>3 columns to find, 1 to fill</dd>
                     <dt>Chooses</dt>
-                    <dd>The 5 closest houses</dd>
+                    <dd>The 5 closest on lot size, bedrooms and bathrooms</dd>
                     <dt>Computes</dt>
-                    <dd>1 number: plain average of the 5</dd>
+                    <dd>1 number: plain average of their 5 sizes</dd>
                     <dt>Per house</dt>
                     <dd>The answer changes with the house</dd>
                   </dl>
                 </div>
                 <div class="ph-panel-pick">
-                  <svg class="ph-calc" viewBox="0 0 300 118" fill="none" role="img"
-                    aria-label="Average of the 5 closest houses with equal weight: 2802 square feet. Houses 7 to 11 in the strip are read.">
-                    <text class="ph-calc-f" x="150" y="10" text-anchor="middle">=AVERAGE(3800,3610,2310,2200,2090)</text>
-                    <text class="ph-calc-f" x="150" y="22" text-anchor="middle">each house counts the same</text>
-                    <text class="ph-calc-r" x="150" y="48" text-anchor="middle">= 2802</text>
-                    <text class="ph-calc-n" x="150" y="70" text-anchor="middle">n = 12 houses</text>
+                  <svg class="ph-calc" viewBox="0 0 300 128" fill="none" role="img"
+                    aria-label="Nearest Neighbor in two steps. Step one compares every house on lot size, bedrooms and bathrooms and keeps the five closest. Step two averages their living area: 2802.">
+                    <text class="ph-calc-f" x="150" y="10" text-anchor="middle">this listing: 5 bed, 3 bath, 9000 sqft lot</text>
+                    <text class="ph-calc-f" x="150" y="26" text-anchor="middle">12 compared on 3 columns, 5 kept</text>
+                    <text class="ph-calc-f" x="150" y="38" text-anchor="middle">=AVERAGE(3800,3610,2310,2200,2090)</text>
+                    <text class="ph-calc-r" x="150" y="62" text-anchor="middle">= 2802</text>
+                    <text class="ph-calc-n" x="150" y="78" text-anchor="middle">then one column is read</text>
                     <g class="ph-calc-strip">
-                      <use href="#hs" transform="translate(22,96) scale(0.3)" />
-                      <use href="#hs" transform="translate(44,96) scale(0.3)" />
-                      <use href="#hs" transform="translate(66,96) scale(0.3)" />
-                      <use href="#hs" transform="translate(88,96) scale(0.3)" />
-                      <use href="#hs" transform="translate(110,96) scale(0.3)" />
-                      <use href="#hs" transform="translate(132,96) scale(0.3)" />
-                      <use href="#hs" transform="translate(154,96) scale(0.3)" />
-                      <use href="#hs" transform="translate(176,96) scale(0.3)" />
-                      <use href="#hs" transform="translate(198,96) scale(0.3)" />
-                      <use href="#hs" transform="translate(220,96) scale(0.3)" />
-                      <use href="#hs" transform="translate(242,96) scale(0.3)" />
-                      <use href="#hs" transform="translate(264,96) scale(0.3)" />
+                      <use href="#hs" transform="translate(22,100) scale(0.3)" />
+                      <use href="#hs" transform="translate(44,100) scale(0.3)" />
+                      <use href="#hs" transform="translate(66,100) scale(0.3)" />
+                      <use href="#hs" transform="translate(88,100) scale(0.3)" />
+                      <use href="#hs" transform="translate(110,100) scale(0.3)" />
+                      <use href="#hs" transform="translate(132,100) scale(0.3)" />
+                      <use href="#hs" transform="translate(154,100) scale(0.3)" />
+                      <use href="#hs" transform="translate(176,100) scale(0.3)" />
+                      <use href="#hs" transform="translate(198,100) scale(0.3)" />
+                      <use href="#hs" transform="translate(220,100) scale(0.3)" />
+                      <use href="#hs" transform="translate(242,100) scale(0.3)" />
+                      <use href="#hs" transform="translate(264,100) scale(0.3)" />
                     </g>
-                    <text class="ph-calc-c" x="150" y="112" text-anchor="middle">5 of 12 read &#8212; the 5 closest</text>
+                    <text class="ph-calc-c" x="150" y="120" text-anchor="middle">5 of 12 read &#8212; closest on all three</text>
                   </svg>
                 </div>
               </article>
@@ -2272,39 +2533,40 @@
                   <h3>Scaled Nearest Neighbor</h3>
                   <dl>
                     <dt>Steps</dt>
-                    <dd>2 steps</dd>
+                    <dd>2 steps: find, then fill</dd>
                     <dt>Reads</dt>
-                    <dd>Every column already filled in</dd>
+                    <dd>3 columns to find, 1 to fill</dd>
                     <dt>Chooses</dt>
-                    <dd>The 5 closest houses</dd>
+                    <dd>The 5 closest on lot size, bedrooms and bathrooms</dd>
                     <dt>Computes</dt>
-                    <dd>1 number: weighted average of the 5</dd>
+                    <dd>1 number: weighted average of their 5 sizes</dd>
                     <dt>Per house</dt>
                     <dd>The answer changes with the house</dd>
                   </dl>
                 </div>
                 <div class="ph-panel-pick">
-                  <svg class="ph-calc" viewBox="0 0 300 118" fill="none" role="img"
-                    aria-label="Same 5 closest houses, weighted by closeness: 3468 square feet. Houses 7 to 11 in the strip are read, each weighted 1 over its distance.">
-                    <text class="ph-calc-f" x="150" y="10" text-anchor="middle">=SUMPRODUCT({3800;3610;2310;2200;2090},</text>
-                    <text class="ph-calc-f" x="150" y="22" text-anchor="middle">{1/190;1/380;1/1680;1/1790;1/1900}) &#247; SUM(w)</text>
-                    <text class="ph-calc-r" x="150" y="48" text-anchor="middle">= 3468</text>
-                    <text class="ph-calc-n" x="150" y="70" text-anchor="middle">n = 12 houses</text>
+                  <svg class="ph-calc" viewBox="0 0 300 128" fill="none" role="img"
+                    aria-label="Scaled Nearest Neighbor in two steps. Step one keeps the same five houses by the same three columns. Step two weights their living area by closeness: 3470.">
+                    <text class="ph-calc-f" x="150" y="10" text-anchor="middle">this listing: 5 bed, 3 bath, 9000 sqft lot</text>
+                    <text class="ph-calc-f" x="150" y="26" text-anchor="middle">=SUMPRODUCT({3800;3610;2310;2200;2090},</text>
+                    <text class="ph-calc-f" x="150" y="38" text-anchor="middle">{1/2;1/4;1/12;1/22;1/30}) &#247; SUM(w)</text>
+                    <text class="ph-calc-r" x="150" y="62" text-anchor="middle">= 3470</text>
+                    <text class="ph-calc-n" x="150" y="78" text-anchor="middle">n = 12 houses</text>
                     <g class="ph-calc-strip">
-                      <use href="#hs" transform="translate(22,96) scale(0.3)" />
-                      <use href="#hs" transform="translate(44,96) scale(0.3)" />
-                      <use href="#hs" transform="translate(66,96) scale(0.3)" />
-                      <use href="#hs" transform="translate(88,96) scale(0.3)" />
-                      <use href="#hs" transform="translate(110,96) scale(0.3)" />
-                      <use href="#hs" transform="translate(132,96) scale(0.3)" />
-                      <use href="#hs" transform="translate(154,96) scale(0.3)" />
-                      <use href="#hs" transform="translate(176,96) scale(0.3)" />
-                      <use href="#hs" transform="translate(198,96) scale(0.3)" />
-                      <use href="#hs" transform="translate(220,96) scale(0.3)" />
-                      <use href="#hs" transform="translate(242,96) scale(0.3)" />
-                      <use href="#hs" transform="translate(264,96) scale(0.3)" />
+                      <use href="#hs" transform="translate(22,100) scale(0.3)" />
+                      <use href="#hs" transform="translate(44,100) scale(0.3)" />
+                      <use href="#hs" transform="translate(66,100) scale(0.3)" />
+                      <use href="#hs" transform="translate(88,100) scale(0.3)" />
+                      <use href="#hs" transform="translate(110,100) scale(0.3)" />
+                      <use href="#hs" transform="translate(132,100) scale(0.3)" />
+                      <use href="#hs" transform="translate(154,100) scale(0.3)" />
+                      <use href="#hs" transform="translate(176,100) scale(0.3)" />
+                      <use href="#hs" transform="translate(198,100) scale(0.3)" />
+                      <use href="#hs" transform="translate(220,100) scale(0.3)" />
+                      <use href="#hs" transform="translate(242,100) scale(0.3)" />
+                      <use href="#hs" transform="translate(264,100) scale(0.3)" />
                     </g>
-                    <text class="ph-calc-c" x="150" y="112" text-anchor="middle">same 5, weighted by closeness</text>
+                    <text class="ph-calc-c" x="150" y="120" text-anchor="middle">same 5, closest counting most</text>
                   </svg>
                 </div>
               </article>
@@ -2314,19 +2576,21 @@
                   <ul>
                     <li>Average &#8212; one value for the whole column</li>
                     <li>Medium &#8212; the middle of that column</li>
-                    <li>Nearest Neighbor &#8212; a value per house, from its 5 closest</li>
-                    <li>Scaled NN &#8212; the same 5, weighted by closeness</li>
+                    <li>Nearest Neighbor &#8212; 5 closest on 3 columns, then their sizes</li>
+                    <li>Scaled NN &#8212; the same 5, closest counting most</li>
                   </ul>
                 </div>
                 <div class="ph-panel-pick">
                   <p class="ph-panel-nums">
-                    AVG 2225 &#183; MEDIUM 1885 &#183; NN(5) 2802 &#183; NN(5)w 3468
+                    AVG 2225 &#183; MEDIUM 1885 &#183; NN(5) 2802 &#183; NN(5)w 3470
                   </p>
                 </div>
               </article>
             </div>
           </div>
           <div class="s4-drivers" aria-hidden="true">
+            <span class="fragment ph-s4-go"></span>
+            <span class="fragment ph-s4-go"></span>
             <span class="fragment ph-s4-go"></span>
             <span class="fragment ph-s4-go"></span>
             <span class="fragment ph-s4-go"></span>
@@ -2713,6 +2977,9 @@
       </section>
 
       <!-- S7 Modernization base. -->
+      <!-- No data-markdown: this slide is pure HTML, and the markdown plugin's
+           de-indent and HTML-block rules turn indented markup and blank lines
+           into code blocks. Markdown here comes from .md-slot elements instead. -->
       <section id="s7-modernization" class="ph-caps ph-s7" aria-label="Modernization base">
         <header class="ph-head">
           <h2>Modernization base</h2>
@@ -2833,33 +3100,33 @@
               </article>
               <article class="fragment ph-s7-pane" data-fragment-index="0">
                 <h3>Type hints</h3>
-                <p>
-                  A type hint is a label that says what a piece of data should
-                  be. It is a note, not a rule, so Python runs the code either
-                  way. A type checker reads the note and catches a wrong value
-                  before the code runs. FastAPI reads the same note to write the
-                  API documentation, so the docs always match what the service
-                  actually does.
-                </p>
+<div class="md-slot"><template class="md-src">
+A type hint is a label that says what a piece of data should be. It is a **note**,
+not a rule, so Python runs the code either way. A type checker reads the note and
+catches a wrong value *before* the code runs. FastAPI reads the same note to
+write the API documentation, so the docs always match what the service actually
+does.
+</template></div>
                 <br>
                 <h4>From</h4>
-                <pre class="ph-code"><code class="language-python">def predict(home_features):</code></pre>
+                <pre class="ph-code"><code class="language-python"><span class="ph-kw">def</span> predict(home_features):</code></pre>
                 <br>
                 <h4>To</h4>
-                <pre class="ph-code"><code class="language-python">class HomeFeaturesV2(BaseModel):
-    bedrooms: int | None = Field(default=None, ge=0)
-    # ... six more nullable fields ...
-    zipcode: str = Field(pattern=r"^\d{5}$")
+                <pre class="ph-code"><code class="language-python"><span class="ph-kw">from</span> fastapi <span class="ph-kw">import</span> <span class="ph-ty">Request</span>
 
+<span class="ph-kw">class</span> <span class="ph-ty">HomeFeaturesV2</span>(<span class="ph-ty">BaseModel</span>):
+    bedrooms: <span class="ph-ty">int</span> | <span class="ph-ty">None</span> = Field(default=<span class="ph-ty">None</span>, ge=<span class="ph-n">0</span>)
+    <span class="ph-c"># ... six more nullable fields ...</span>
+    zipcode: <span class="ph-ty">str</span> = Field(pattern=<span class="ph-s">r"^\d{5}$"</span>)
 
-class PredictionResponse(BaseModel):
-    predicted_price: float = Field(examples=[394708.0])
+<span class="ph-kw">class</span> <span class="ph-ty">PredictionResponse</span>(<span class="ph-ty">BaseModel</span>):
+    predicted_price: <span class="ph-ty">float</span> = Field(examples=[<span class="ph-n">394708.0</span>])
 
-
-def predict_v2(
-    home_features: HomeFeaturesV2,
-    request: Request,
-) -&gt; PredictionResponse:</code></pre>
+<span class="ph-kw">def</span> predict_v2(
+    home_features: <span class="ph-ty">HomeFeaturesV2</span>,
+    request: <span class="ph-ty">Request</span>,
+) -&gt; <span class="ph-ty">PredictionResponse</span>:
+                </code></pre>
               </article>
               <article class="fragment ph-s7-pane" data-fragment-index="1">
                 <div class="ph-s7-validation">
@@ -2881,35 +3148,93 @@ def predict_v2(
                 <table class="ph-table">
                   <thead>
                     <tr>
-                      <th scope="col">Response</th>
+                      <th scope="col">Responses</th>
                       <th scope="col">From — /predict</th>
                       <th scope="col">To — /predict/v2</th>
+                    </tr>
+                      <tr>
+                      <th scope="col">Code</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr>
-                      <th scope="row">200 schema</th>
-                      <td>unnamed object, any number of keys</td>
-                      <td>named model <code>PredictionResponse</code></td>
+                      <th scope="row">200</th>
+                      <td>
+                        <div class="md-slot"><template class="md-src">
+                          ```json
+                          {
+                            "additionalProp1": 0,
+                            "additionalProp2": 0,
+                            "additionalProp3": 0
+                          }
+                          ```
+                        </template></div>
+                      </td>
+                      <td>
+                        <div class="md-slot"><template class="md-src">
+                          ```json
+                          {
+                            "predicted_price": 394708
+                          }
+                          ```
+                        </template></div>
+                      </td>
                     </tr>
+
                     <tr>
-                      <th scope="row">Declared fields</th>
-                      <td class="ph-muted">none</td>
-                      <td><code>predicted_price</code>: number, required</td>
+                      <th scope="row">404</th>
+                      <td class="ph-muted">-</td>
+                      <td>
+                        <div class="md-slot"><template class="md-src">
+                          ```json
+                          {
+                            "detail": "Unknown zipcode: 98009"
+                          }
+                          ```
+                        </template></div>
+                      </td>
                     </tr>
+  
                     <tr>
-                      <th scope="row">Example</th>
-                      <td class="ph-muted">none</td>
-                      <td>394708.0</td>
+                      <th scope="row">422</th>
+                      <td colspan="2">
+                        <div class="md-slot"><template class="md-src">
+                          ```
+                          {
+                            "detail": [
+                              {
+                                "loc": [
+                                  "string",
+                                  0
+                                ],
+                                "msg": "string",
+                                "type": "string",
+                                "input": "string",
+                                "ctx": {}
+                              }
+                            ]
+                          }
+                          ```
+                        </template></div>
+                      </td>
                     </tr>
+
                     <tr>
-                      <th scope="row">Errors</th>
-                      <td>422</td>
-                      <td>404, 500 &#8594; <code>ErrorDetail</code></td>
+                      <th scope="row">500</th>
+                       <td class="ph-muted">-</td>
+                      <td> 
+                        <div class="md-slot"><template class="md-src">
+                          ```json
+                            {
+                              "detail": "Prediction service unavailable - the office lights are still off."
+                            }
+                          ```
+                      </template></div>
+                      </td>
                     </tr>
                   </tbody>
                 </table>
-                <pre class="ph-code"><code>{"predicted_price": 394708.0}</code></pre>
+              
               </article>
             </div>
           </div>
@@ -3485,6 +3810,36 @@ def predict_v2(
       transition: "slide",
       plugins: [RevealMarkdown],
       backgroundTransition: "none",
+    }).then(() => {
+      /* Markdown slots.
+
+         Markdown inside a hand-built HTML slide cannot be done with a nested
+         <section data-markdown>. In a data-markdown slide it is impossible: a
+         <textarea> holds raw text, so the HTML parser closes the outer
+         <textarea> at the inner </textarea> and truncates the slide. And the
+         plugin de-indents the template by its first line's indent, so any
+         markup indented 4+ spaces becomes an indented code block - which is
+         why slide 7 carries no data-markdown at all.
+
+         Instead, declare a .md-slot carrying its source and render it here,
+         after Reveal has parsed the deck. Two carriers:
+
+           data-md="..."              single-line markdown
+           <template class="md-src">  multi-line, lists, fenced code
+
+         A <script type="text/markdown"> child also survives the parse but
+         marked() mis-renders it, leaking raw list tags, so it is not used.
+
+
+         Note RevealMarkdown is the plugin factory, not the plugin instance:
+         RevealMarkdown.marked is undefined, calling it yields the instance. */
+      const md = RevealMarkdown().marked;
+      document.querySelectorAll(".md-slot").forEach((slot) => {
+        const attr = slot.getAttribute("data-md");
+        const tpl = slot.querySelector("template.md-src");
+        const src = attr != null ? attr : tpl ? tpl.innerHTML : "";
+        slot.innerHTML = md(src.trim());
+      });
     });
 
 

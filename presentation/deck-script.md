@@ -441,22 +441,68 @@ of the record they use.
 
 ## S4 — Missing value approaches (`#s4-approaches`, `data-s4`)
 
-Layout: T-houses-staged. Fragments: 5 hidden `.ph-s4-go` drivers.
-**Staging is CSS only** — `section[data-s4]:has(.ph-s4-go:nth-of-type(N).visible)`
-selects stage N. There is no `setS4Stage`, no `is-stage-N` class, no
-`Reveal.slide(h,0,-1)` reset. Houses are STATIC (mist stroke, fixed
-transforms); markers, dashed boxes, subtitle and panel fade per stage.
+Layout: T-houses-staged. Fragments: 7 hidden `.ph-s4-go` drivers.
+**Staging is CSS only** — stage N is
+`:has(.ph-s4-go:nth-of-type(N).visible):not(:has(.ph-s4-go:nth-of-type(N+1).visible))`,
+because reveal only ever ADDS `.visible`: at stage N drivers 1..N are all
+visible, so a rule without the `:not()` guard fires for every stage at or after
+its own. Stage 7 is the one bare `:has(...7...)` rule, unique because driver 7
+exists nowhere else. There is no `setS4Stage`, no `is-stage-N` class, no
+`Reveal.slide(h,0,-1)` reset. House glyphs are STATIC (mist stroke, fixed transforms);
+markers, dashed boxes, subtitle, panel and attribute values change per stage.
 
 **Houses** — 12, in four groups of three sorted smallest to largest.
-`svg#houses-svg`, `viewBox="15 -80 1195 340"`, `color="#BCCCD4"`.
+`svg#houses-svg`, `viewBox="-30 -80 1240 380"`, `color="#BCCCD4"`.
 Baseline line `y=214` from `x=35` to `x=1188`.
 
-| Group | x | scale | sqft label (y=232) |
+| Group | x | scale | sqft_living (y=232) |
 |-------|---|-------|--------------------|
 | A | 54 / 98 / 142 | 0.76 / 0.8 / 0.84 | 1235 1300 1365 |
 | B | 241 / 297 / 353 | 0.95 / 1.0 / 1.05 | 1520 1600 1680 |
 | C | 551 / 619 / 687 | 1.1875 / 1.25 / 1.3125 | 2090 2200 2310 |
 | D | 984 / 1066 / 1148 | 1.484 / 1.5625 / 1.6406 | 3610 3800 3990 |
+
+**Attribute rows** — four rows below the baseline, twelve values each, keyed to
+the same twelve house `x` values. Row baselines 232 / 251 / 270 / 289; pitch
+19u. `sqft_living` at 14px, the other three at 13px. The left gutter (viewBox
+x = -30 to 35, house 1's left tip) carries one label per row, right-anchored
+at `x = 30`, `y = row + 3`, 11px. Labels carry NO opacity attribute - SVG group
+opacity would multiply with the CSS rest opacity.
+
+| Row | Class | Label | Values (houses 1-12) |
+|-----|-------|-------|-----------------------|
+| `sqft_living` | `.ar-row.ar-living` | `sqft_living` | 1235 1300 1365 1520 1600 1680 2090 2200 2310 3610 3800 3990 |
+| `sqft_lot` | `.ar-row.ar-lot` | `sqft_lot` | 4600 4900 5300 5600 6200 5900 7600 8000 8400 8800 9100 6400 |
+| `bedrooms` | `.ar-row.ar-bed` | `bedrooms` | 2 2 2 3 3 3 4 4 5 5 5 6 |
+| `bathrooms` | `.ar-row.ar-bath` | `bathrooms` | 1 1.5 1.5 1.5 1.5 2 2.5 2.5 3 3 3 4 |
+
+The four row labels are column names from `src/api/shared.py` `REQUEST_COLUMNS`
+(`bedrooms`, `bathrooms`, `sqft_living`, `sqft_lot`, `floors`, `sqft_above`,
+`sqft_basement`) - the slide must not show a field the service does not carry.
+`sqft_living` is the one that came back blank; the other three choose the
+neighbours. `floors`, `sqft_above` and `sqft_basement` are not shown because
+`sqft_above` and `sqft_basement` are derived from `sqft_living`, and using them
+to find neighbours would contradict the diagram dimming that row during the
+find. The VALUES are constructed for this example, not sampled from the
+dataset; only the column names are taken from the schema.
+
+The diagram describes one listing whose living area came back blank (5
+bedrooms, 3 bathrooms, a 9000 sq ft lot). Neighbour distance is
+`|sqft_lot-9000|/50 + |bedrooms-5| + 2*|bathrooms-3|`; the `/50` normalises a
+four-digit lot into the same range as the two counts, and the `2*` is because
+bathrooms move in half-steps, so one full mismatch is worth two bedroom
+mismatches. It ranks houses 11, 10, 9, 8, 7 as the five closest - the same five
+`.h-nn` already marks - at distances 2, 4, 12, 22, 30, which are distinct and
+monotonic in size, so the bigger house is the closer one. House 12, the largest
+on the slide, ranks sixth at 55 and is deliberately not a neighbour: it is a big
+house on a 6400 sq ft lot with 6 bedrooms and 4 bathrooms, a different kind of
+house rather than a closer one.
+
+Every value carries `.v`; houses 6 and 7 also carry `.h-mid`; houses 7-11 also
+carry `.h-nn`; house 7 carries both. A value that is not lit is a value the
+method did not read. Rest opacity 0.55, lit 1 at the method's colour, unused
+rows 0.22. Each stage's rule block states that stage's COMPLETE state, since the
+range guards mean only one stage's rules match at a time.
 
 All `translate(·,210)`. Intra-group gaps clear the roofs
 (44/56/68/82u); inter-group gaps are staggered 1:2:3 (99/198/297u);
@@ -465,14 +511,32 @@ both edges pinned to the baseline. `.h-nn` marks the five largest
 The `<g id="hs">` glyph strokes with `currentColor`, so `stroke` alone
 leaves every house grey.
 
-**Dashed input boxes** (`.bx`, `y=116`, `height=132`, `stroke-dasharray="8 5"`):
+**Dashed input boxes** (`.bx`, `y=116`, `stroke-dasharray="8 5"`). Horizontal
+extent answers *which houses*; height answers *which attributes*: 122 stops
+between the `sqft_living` row and the `sqft_lot` row, 180 reaches past
+`bathrooms`. No box at stage 7.
 
-| Id | x | width | Colour | Shown at stage |
-|----|---|-------|--------|----------------|
-| `bx-avg` | 16 | 1190 | `var(--av)` | 1 |
-| `bx-med` | 324 | 260 | `var(--md)` | 2 |
-| `bx-knn` | 584 | 611 | `var(--knn)` | 3 |
-| `bx-snn` | 584 | 611 | `var(--snn)` | 4 |
+| Id | x | width | height | right | bottom | Colour | Stage |
+|----|---|-------|--------|-------|--------|--------|-------|
+| `bx-avg` | 32 | 1164 | 122 | 1196 | 238 | `var(--av)` | 1 |
+| `bx-med` | 324 | 260 | 122 | 584 | 238 | `var(--md)` | 2 |
+| `bx-knn-pick` | 510 | 596 | 180 | 1106 | 296 | `var(--knn)` | 3 |
+| `bx-knn` | 510 | 596 | 122 | 1106 | 238 | `var(--knn)` | 4 |
+| `bx-snn-pick` | 510 | 596 | 180 | 1106 | 296 | `var(--snn)` | 5 |
+| `bx-snn` | 510 | 596 | 122 | 1106 | 238 | `var(--snn)` | 6 |
+
+Box bounds are not house centres. `#hs` spans `x - 25` to `x + 25`, so a house
+at `x` with `scale s` occupies `x - 25s` to `x + 25s`. The box table was derived
+from those spans so each box encloses exactly its stage's houses. House 11's
+right tip is 1105.1 and house 12's left tip is 1107.0 - a 1.9u gap - so
+`bx-knn`'s right edge at 1106 sits inside it and its dash touches house 12's roof.
+That is inherent to the load-bearing house spacing and is acceptable because the
+ATTRIBUTE LIGHTING, not the box, says which houses are read: house 12's values
+never light.
+
+The previous `bx-knn` was `x=584 width=611` and enclosed houses 8-12: it
+included house 12, the house this design deliberately excludes, and dropped
+house 7. Corrected to 510-1106.
 
 **Markers** (`.mk`) — floating house + name above + value below + a
 vertical leader with an arrowhead:
@@ -481,27 +545,32 @@ vertical leader with an arrowhead:
 |--------|----|-------------|--------------------|--------------------|--------|-----------|
 | Average | 634 | 1.264 | `Avg` | `2225` | y 44→108, `url(#arr-av)` | `arr-av` |
 | Medium | 452 | 1.119 | `Medium` | `1885` | y 44→108, `url(#arr-md)` | `arr-md` |
-| NN | 952 | 1.35 | `NN(5)` | `2802` | y 44→116, `url(#arr-knn)` | `arr-knn` |
-| NN weighted | 1150 | 1.465 | `NN(5)w` | `3468` | y 44→116, `url(#arr-snn)` | `arr-snn` |
+| NN | 760 | 1.35 | `NN(5)` | `2802` | y 44→116, `url(#arr-knn)` | `arr-knn` |
+| NN weighted | 940 | 1.465 | `NN(5)w` | `3470` | y 44→116, `url(#arr-snn)` | `arr-snn` |
 
 No extra scale or offset on either KNN marker: each base transform
-already encodes its own value — 2802 equal-weight, 3468 weighted — and the
+already encodes its own value — 2802 equal-weight, 3470 weighted — and the
 other two carry no transform either, so any override would break both the
-value sizing and the shared baseline. The two live side by side at stage 5;
-1150 puts the weighted house clear of the plain one at 952.
+value sizing and the shared baseline. The two live side by side at stage 7;
+940 puts the weighted house clear of the plain one at 760, and both sit inside
+the `bx-knn` box's 510-1106 span.
 
 **Corner subtitles** — `div.ph-subs`, a one-cell grid
-(`min-height:calc(var(--fs-sub) * 1.3)`) holding five stacked
+(`min-height:calc(var(--fs-sub) * 1.3)`) holding seven stacked
 `p.ph-subtitle.ph-s4-sub` at `opacity:0`; the active one fades to 1.
-Stage 5 shows all four markers and the summary panel.
+Stage 7 shows all four markers and the summary panel. Two subtitles share
+`ph-is-knn` and two share `ph-is-snn`, so the opacity rule keys off
+`.ph-s4-sub:nth-of-type(N)` and colour off `.ph-is-*`.
 
-| Stage | Subtitle | Class |
-|-------|----------|-------|
-| 1 | Average Value | `ph-is-av` (amber) |
-| 2 | Medium value | `ph-is-md` (blue) |
-| 3 | Nearest Neighbor | `ph-is-knn` (purple) |
-| 4 | Scaled Nearest Neighbor | `ph-is-snn` (fuchsia, `--snn`) |
-| 5 | Summary: similar homes win | `ph-is-sum` (`--ph-accent`) |
+| Stage | Subtitle | Class | Box | Marker | Rows lit |
+|-------|----------|-------|-----|--------|----------|
+| 1 | Average Value | `ph-is-av` | `bx-avg` | `mk-avg` | `sqft_living`, 12 houses |
+| 2 | Medium value | `ph-is-md` | `bx-med` | `mk-med` | `sqft_living`, houses 6-7 |
+| 3 | Nearest Neighbor — find the 5 closest | `ph-is-knn` | `bx-knn-pick` | — | `sqft_lot`/`bedrooms`/`bathrooms`, 5 houses |
+| 4 | Nearest Neighbor — read their size | `ph-is-knn` | `bx-knn` | `mk-knn` | `sqft_living`, 5 houses |
+| 5 | Scaled Nearest Neighbor — find the 5 closest | `ph-is-snn` | `bx-snn-pick` | — | `sqft_lot`/`bedrooms`/`bathrooms`, 5 houses |
+| 6 | Scaled Nearest Neighbor — read and weight | `ph-is-snn` | `bx-snn` | `mk-snn` | `sqft_living`, 5 houses |
+| 7 | Summary: similar homes win | `ph-is-sum` (`--ph-accent`) | — | all four | none |
 
 `--snn` is a hue of its own rather than a tint of `--knn`: the two panels
 are seen one after another and then compared on the summary stage, and a
@@ -517,7 +586,7 @@ above body. Hidden once driver 1 is visible.
 
 | Item | Content |
 |------|---------|
-| Hint | The diagram above is a data set of 12 houses with a single attribute: living area in square feet. |
+| Hint | The diagram above is 12 houses. Each carries four of the columns this API imputes — living area, lot size, bedrooms, bathrooms — and any one of them can be the one that came back blank. |
 
 **Bottom panels** — `.ph-stage-bottom` is `flex:0 0 0` until driver 1
 fires, then `flex:0 0 50%`. `.ph-panels` is a flex row; every
@@ -528,9 +597,13 @@ stage. Each panel is `ph-panel-words` (50%) + `ph-panel-pick` (50%).
 |-------|-----------|-------|-------|---------|----------|-----------|
 | 1 | Average Value | 1 step | 1 column — square feet | Nothing — all 12 houses | 1 number: the average of all 12 | Same answer for every blank |
 | 2 | Medium value | 1 step, or 2 on an even count | 1 column — square feet | The 1 middle house, or the 2 middle ones | 1 number: its value, or the average of 2 | Same answer for every blank |
-| 3 | Nearest Neighbor | 2 steps | Every column already filled in | The 5 closest houses | 1 number: plain average of the 5 | The answer changes with the house |
-| 4 | Scaled Nearest Neighbor | 2 steps | Every column already filled in | The 5 closest houses | 1 number: weighted average of the 5 | The answer changes with the house |
-| 5 | Summary: which value to fill | — (`ul` instead of `dl`) | — | — | — | See bullets below. |
+| 3, 4 | Nearest Neighbor / Scaled NN (each spans two stages) | 2 steps: find, then fill | 3 columns to find, 1 to fill | The 5 closest on lot size, bedrooms and bathrooms | 1 number: plain average of their 5 sizes (plain) / weighted average of their 5 sizes (scaled) | The answer changes with the house |
+| 7 | Summary: which value to fill | — (`ul` instead of `dl`) | — | — | — | See bullets below. |
+
+`Reads` counts the columns that decide **which houses**, not the columns read in
+total: it is 3, not 4, because square feet is what comes *out* of the find and
+the diagram dims that row during stages 3 and 5. The four-cell change for
+panels 3 and 4 is `Steps`, `Reads`, `Chooses` and `Computes`.
 
 **The four calculation panels are one template.** Same five `dt` labels in
 the same order in each, so a row means the same thing in every panel and the
@@ -548,13 +621,16 @@ markers, flex column):
 
 - Average — one value for the whole column
 - Medium — the middle of that column
-- Nearest Neighbor — a value per house, from its 5 closest
-- Scaled NN — the same 5, weighted by closeness
+- Nearest Neighbor — 5 closest on 3 columns, then their sizes
+- Scaled NN — the same 5, closest counting most
 
 **c-calc SVGs** — `svg.ph-calc`, one per calculation panel, identical shape:
-two formula lines, the result, `n = 12 houses`, a strip of twelve `#hs` at
-0.3 scale (x = 22 to 264 in steps of 22, baseline y=96), and a caption.
-`max-height:240px`, `width:100%`, `viewBox="0 0 300 118"`.
+a context line, one or two formula lines, the result, an `n` line, a strip of
+twelve `#hs` at 0.3 scale (x = 22 to 264 in steps of 22, baseline y=100), and a
+caption. `max-height:240px`, `width:100%`, `viewBox="0 0 300 128"`. The height
+is 128, not more: the panel cell measures ~548px wide, so the scale is ~1.83
+and 128 gives ~234px — under the 240px cap, and still width-capped rather than
+height-capped, so the text renders at full size.
 
 Every panel draws all twelve houses at the same positions; CSS lights the
 ones its method reads, which is what makes "nothing is chosen" and "5 of
@@ -564,20 +640,26 @@ ones its method reads, which is what makes "nothing is chosen" and "5 of
 |-------|-----------|---------|--------|
 | Average | all 12 | `=AVERAGE(1235,1300,1365,1520,1600,1680,` / `2090,2200,2310,3610,3800,3990)` | `= 2225` |
 | Medium | 6 and 7 — the two middle | `=MEDIUM(1235,1300,1365,1520,1600,1680,` / `2090,2200,2310,3610,3800,3990)` | `= 1885` |
-| KNN | 7-11 — the five closest | `=AVERAGE(3800,3610,2310,2200,2090)` / `each house counts the same` | `= 2802` |
-| Scaled NN | 7-11 — the same five | `=SUMPRODUCT({3800;3610;2310;2200;2090},` / `{1/190;1/380;1/1680;1/1790;1/1900}) ÷ SUM(w)` | `= 3468` |
+| KNN | 7-11 — the five closest | `this listing: 5 bed, 3 bath, 9000 sqft lot` / `12 compared on 3 columns, 5 kept` / `=AVERAGE(3800,3610,2310,2200,2090)` | `= 2802` |
+| Scaled NN | 7-11 — the same five | `this listing: 5 bed, 3 bath, 9000 sqft lot` / `=SUMPRODUCT({3800;3610;2310;2200;2090},` / `{1/2;1/4;1/12;1/22;1/30}) ÷ SUM(w)` | `= 3470` |
 
 The two KNN answers are 14010/5 = **2802** equal-weight and the same five
-weighted 1/d = **3468**. The deck previously printed 3468 for plain `NN(5)`,
-which is the weighted number: `src/api/shared.py` fits
+weighted by 1/d over three columns = **3470** — distances 2, 4, 12, 22, 30,
+reciprocated. House 12, the largest on the slide, is not among the five: at 55
+its distance ranks it sixth, so however big it is, it is not a neighbour — it
+is a big house on a 6400 sq ft lot with 6 bedrooms and 4 bathrooms.
+`src/api/shared.py` fits
 `KNNImputer(n_neighbors=5, weights="distance")`, so the service always runs
-the scaled variant. Splitting them is what makes the weighting visible.
-Summary: `p.ph-panel-nums`: `AVG 2225 · MEDIUM 1885 · NN(5) 2802 · NN(5)w 3468`
+the scaled variant.
+Summary: `p.ph-panel-nums`: `AVG 2225 · MEDIUM 1885 · NN(5) 2802 · NN(5)w 3470`
 
-- Say (per click): "City average — one number for every house." →
+- Say (per click): "City average — one column, one number for every house." →
   "Middle value — mansions stop skewing it, still one number." →
-  "Five similar homes, counted equally — each blank gets its own answer." →
-  "Same five, but the closest count most — this is the one that ships." →
+  "Find the five closest — and to find them it reads three columns, not one." →
+  "Now it averages their size. Three columns in, one column out." →
+  "Same five, found the same way." →
+  "Weighted by how close — the two closest carry the answer. This is the one
+  that ships." →
   "Summary: neighbours adapt, averages don't."
 - Sources: `notebooks/imputation_experiment.ipynb`,
   `notebooks/six_way_imputation_comparison.ipynb`,
@@ -926,10 +1008,23 @@ actually does.
 | Block | Content |
 |-------|---------|
 | `h4` From | `def predict(home_features):` |
-| `h4` To | `class HomeFeaturesV2(BaseModel):` / `    bedrooms: int \| None = Field(default=None, ge=0)` / `    # ... six more nullable fields ...` / `    zipcode: str = Field(pattern=r"^\d{5}$")` / (blank) (blank) / `class PredictionResponse(BaseModel):` / `    predicted_price: float = Field(examples=[394708.0])` / (blank) (blank) / `def predict_v2(` / `    home_features: HomeFeaturesV2,` / `    request: Request,` / `) -> PredictionResponse:` |
+| `h4` To | `from fastapi import Request` / `class HomeFeaturesV2(BaseModel):` / `    bedrooms: int \| None = Field(default=None, ge=0)` / `    # ... six more nullable fields ...` / `    zipcode: str = Field(pattern=r"^\d{5}$")` / (blank) (blank) / `class PredictionResponse(BaseModel):` / `    predicted_price: float = Field(examples=[394708.0])` / (blank) (blank) / `def predict_v2(` / `    home_features: HomeFeaturesV2,` / `    request: Request,` / `) -> PredictionResponse:` |
 
-The six middle fields are elided to fit the pane — the pane holds ~13
-code lines and the full class is 8 fields.
+The six middle fields are elided to fit the pane — the pane holds 15 code
+lines and the full class is 8 fields. Line 1 is the import that names
+`Request`, so the annotation in `predict_v2` has a visible source; the
+listing is 15 lines and `.ph-s7 .ph-code` drops to `line-height:1.25` to
+keep it inside the pane (13.5px of slack at the 1270x961 stage; at 1.35 the
+last line fell past the foot). Other `.ph-code` blocks keep 1.35.
+
+**Code syntax.** Both listings carry hand-tagged spans — no highlighter is
+loaded, and at 1 + 15 lines a runtime tokenizer would be more code than the
+markup it replaces. `.ph-kw` keyword (`--syn-kw` sky), `.ph-ty` type name
+(`--syn-ty` mint: the base class, a class named in an annotation, and the
+builtins `int`/`str`/`float`/`None`), `.ph-s` and `.ph-n` string and number
+literal (`--syn-lit` amber, the `--av` hue), `.ph-c` comment
+(`--syn-com`). Names, parameters, `Field(...)` calls and punctuation stay
+in `--ph-ink-on-dark`.
 
 **Pane 3 — Validation.** `div.ph-s7-validation > h3` plus
 `div.ph-shots` of two `figure.ph-shot`: `h4` From with
