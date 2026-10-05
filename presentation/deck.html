@@ -415,6 +415,15 @@
       color: var(--knn);
     }
 
+    /* The imputation arc's own colour, on the one cell that is the arc. It is a
+       cell and not a row because the S6 null-level table's Total column carries
+       the calculation as well as the imputation, and colouring that would claim
+       it for the imputation. */
+    .ph-table .ph-imp-val {
+      color: var(--imp);
+      font-weight: 600;
+    }
+
     /* S6 value table: figures read as measurements, so mono and right-aligned
        with the row label left. Scoped to ph-kpi so other tables are untouched. */
     .ph-table.ph-figures th,
@@ -801,8 +810,43 @@
 
     /* Header keeps the title treatment (mint), at item size, just bolder. */
     .ph-table thead th {
-      color: var(--ph-mint);
+      color: var(--ph-accent);
       font-weight: 600;
+    }
+
+#s6-performance table {
+  border-collapse: separate;
+
+  border-spacing: var(--sp-sm) 0;
+}
+    #s6-performance thead th {
+      border-bottom: 1px solid var(--ph-ink-muted);
+      padding:  0 34px 0 0 !important;
+    }
+
+    /* Row 2 holds two cards, so each table gets half a slide rather than the
+       whole of it, and the 34px figures-lg gutter stops fitting: "All null"
+       wraps, and a wrapped head drops that table's rows half a pitch out of
+       line with the card beside it. Shrink the gutter to a token and hold every
+       cell to one line - labels and figures are single tokens, so the numbers
+       take the slack and the row heights stay equal across both tables. */
+    #s6-performance .ph-cols:last-of-type .ph-table.ph-figures-lg th,
+    #s6-performance .ph-cols:last-of-type .ph-table.ph-figures-lg td {
+      padding-right: var(--sp-xs);
+      white-space: nowrap;
+    }
+
+    #s6-performance .ph-cols:last-of-type thead th {
+      padding-right: var(--sp-xs) !important;
+    }
+
+    /* The right card's first column is a percentage, not a label: `th` is
+       left-aligned by default and .ph-figures only right-aligns the cells
+       after the first. Right-align the head cell and the row headers together,
+       so the column reads as the figure it is. */
+    #s6-performance .ph-cols:last-of-type article:last-child thead th:first-child,
+    #s6-performance .ph-cols:last-of-type article:last-child tbody th {
+      text-align: right;
     }
 
     .ph-table tbody th {
@@ -837,7 +881,7 @@
     .ph-s7-chips .ph-s7-chip {
       flex: 0 0 auto;
       display: flex;
-      align-items: baseline;
+      align-items: center;
       justify-content: flex-start;
       gap: var(--gap-sm);
       padding-right: var(--gap-sm);
@@ -1013,6 +1057,7 @@
       display: flex;
       align-items: flex-start;
       justify-content: center;
+      margin-top: calc(-1 * ( var(--sp-sm) + var(--sp-sm)));
       gap: var(--ph-shot-gap, var(--gap-sm));
     }
 
@@ -1387,11 +1432,25 @@
     }
 
 
-    /* Footnote. */
-    .ph-foot {
-      font-size: var(--fs-caption);
-      opacity: 80%;
+    /* Footnote. It sits over the background motif rather than on a card, and
+       dimmed to 80% the motif's own lines ran straight through the words. Give
+       it the card fill and the card blur, with the accent rule down the left to
+       mark it as a note and not another panel, and carry the text at full
+       strength on that surface instead of dimming the paragraph.
+
+       No font-size here: `.reveal p` scores higher than a bare `.ph-foot`, so a
+       size declared on this rule never applied. `.ph-foot-sm` is what actually
+       owns the caption size. */
+    .reveal .ph-foot {
       margin: 0;
+      padding: var(--sp-xs) var(--gap-sm);
+      background-color: var(--ph-card-bg);
+      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px);
+      border: var(--line-sm) solid var(--ph-card-border-accent);
+      border-left-width: var(--line-md);
+      border-radius: var(--rad-card);
+      color: var(--ph-ink-muted);
     }
 
 
@@ -2304,7 +2363,7 @@
           </div>
           <div class="ph-cols">
             <article>
-              <h3>Metrics</h3>
+              <h3>From To Metrics - No Imputations</h3>
               <table class="ph-table ph-figures ph-figures-lg">
             <thead>
               <tr>
@@ -2339,11 +2398,49 @@
                 <td><span data-metric="cost.totalV2">9.4 ms</span></td>
                 <td><span data-metric="cost.totalDelta">&#8722;5.8 ms</span></td>
               </tr>
-              <tr class="ph-muted">
+              <!-- <tr class="ph-muted">
                 <th scope="row">Improvement</th>
                 <td><span class="ph-na">&#183;</span></td>
                 <td><span class="ph-na">&#183;</span></td>
                 <td><span data-metric="cost.improvement">38% faster</span></td>
+              </tr> -->
+            </tbody>
+              </table>
+            </article>
+            <article>
+              <h3>To Imputation Metrics</h3>
+              <table class="ph-table ph-figures ph-figures-lg">
+            <thead>
+              <tr>
+                <th scope="col">Null %</th>
+                <th scope="col">Time</th>
+                <th scope="col">Total</th>
+                <th scope="col">Delta</th>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row"><span data-metric="cost.nullPct10">10%</span></th>
+                <td><span class="ph-imp-val" data-metric="cost.imputeTime10">0.5 ms</span></td>
+                <td><span data-metric="cost.total10">10.0 ms</span></td>
+                <td><span data-metric="cost.totalDelta10">&#8722;5.2 ms</span></td>
+              </tr>
+              <tr>
+                <th scope="row"><span data-metric="cost.nullPct15">15%</span></th>
+                <td><span class="ph-imp-val" data-metric="cost.imputeTime15">0.8 ms</span></td>
+                <td><span data-metric="cost.total15">10.2 ms</span></td>
+                <td><span data-metric="cost.totalDelta15">&#8722;5.0 ms</span></td>
+              </tr>
+              <tr>
+                <th scope="row"><span data-metric="cost.nullPct20">20%</span></th>
+                <td><span class="ph-imp-val" data-metric="cost.imputeTime20">1.0 ms</span></td>
+                <td><span data-metric="cost.total20">10.5 ms</span></td>
+                <td><span data-metric="cost.totalDelta20">&#8722;4.7 ms</span></td>
+              </tr>
+              <tr>
+                <th scope="row"><span data-metric="cost.nullPct100">100%</span></th>
+                <td><span class="ph-imp-val" data-metric="cost.imputeTime100">5.1 ms</span></td>
+                <td><span data-metric="cost.total100">14.6 ms</span></td>
+                <td><span data-metric="cost.totalDelta100">&#8722;0.6 ms</span></td>
               </tr>
             </tbody>
               </table>
@@ -2367,15 +2464,15 @@
             <ol class="ph-scr ph-s7-chips">
               <li class="ph-s7-chip ph-is-base">
                 <span class="ph-num">1</span>
-                <span>Runtime</span>
+                <span>Python Environment</span>
               </li>
               <li class="ph-s7-chip fragment" data-fragment-index="0">
                 <span class="ph-num">2</span>
-                <span>Type hints</span>
+                <span>Python Type hints</span>
               </li>
               <li class="ph-s7-chip fragment" data-fragment-index="1">
                 <span class="ph-num">3</span>
-                <span>Validation</span>
+                <span>Input Parameter Validation</span>
               </li>
               <li class="ph-s7-chip fragment" data-fragment-index="2">
                 <span class="ph-num">4</span>
@@ -2486,8 +2583,10 @@
                   API documentation, so the docs always match what the service
                   actually does.
                 </p>
+                <br>
                 <h4>From</h4>
                 <pre class="ph-code"><code class="language-python">def predict(home_features):</code></pre>
+                <br>
                 <h4>To</h4>
                 <pre class="ph-code"><code class="language-python">class HomeFeaturesV2(BaseModel):
     bedrooms: int | None = Field(default=None, ge=0)
@@ -2602,6 +2701,25 @@ def predict_v2(
         calcDelta: "+5.2 ms",
         totalDelta: "−5.8 ms",
         improvement: "38% faster",
+        // Imputation cost per null level, matching the four rows of the chart's
+        // Imputed block: Time is the imputed slice, Total is that slice plus the
+        // fixed calculation, Delta is Total against the original route.
+        nullPct10: "10%",
+        nullPct15: "15%",
+        nullPct20: "20%",
+        nullPct100: "100%",
+        imputeTime10: "0.5 ms",
+        imputeTime15: "0.8 ms",
+        imputeTime20: "1.0 ms",
+        imputeTime100: "5.1 ms",
+        total10: "10.0 ms",
+        total15: "10.2 ms",
+        total20: "10.5 ms",
+        total100: "14.6 ms",
+        totalDelta10: "−5.2 ms",
+        totalDelta15: "−5.0 ms",
+        totalDelta20: "−4.7 ms",
+        totalDelta100: "−0.6 ms",
       },
       nnr: { recovered: "10–20%" },
     };
@@ -2822,9 +2940,11 @@ def predict_v2(
 
       // The Imputed block follows the same pattern as every other callout in the
       // deck: a coloured name, then its figures in the shared mono value style.
-      // The trailing figure is that level's own average - the imputed slice plus
-      // the fixed calculation, which never changes - so each row reads as what a
-      // request at that null level actually costs.
+      // The trailing figure is the imputed slice's share of that level's own
+      // call - slice / (slice + the fixed calculation), the same Total column
+      // the S6 table prints - so it answers "how much of this request is
+      // imputation" rather than repeating the milliseconds already on the ring.
+      // The 100% row's 35% is the share the ring itself draws.
       // Right-aligned on impMid, like every other callout in the deck - the From
       // chart's Debug code / Load / Calculation rows all share that edge.
       put(g, "text", { class: "ph-seg-name", x: impMid, y: IMP_Y, "text-anchor": "end", fill: "var(--imp)" }, "Imputed");
@@ -2832,7 +2952,7 @@ def predict_v2(
         const slice = (impute * pct) / 100;
         const withCalc = slice + calc;
         put(g, "text", { class: "ph-seg-val", x: impMid, y: IMP_Y + 24 + i * 24, "text-anchor": "end" },
-            `${slice.toFixed(1)} ms @ ${pct}% null · ${withCalc.toFixed(1)} ms Avg`);
+            `${slice.toFixed(1)} ms @ ${pct}% null · ${share(slice, withCalc)}`);
       }
 
       requestAnimationFrame(() => {

@@ -188,6 +188,17 @@ Class names, flex rules and fragment order verbatim from `deck.html`.
     `border-color:var(--ph-card-border-accent)` and its `h4` takes
     `var(--ph-accent)`: same spacing and scale, distinct colour, for the
     sub-boxes inside an S2 card.
+- **T-foot** — `p.ph-foot` (`deck.html:1424-1443`) is the deck's footnote,
+    on S5 and S6. It sits over the background motif rather than on a card, so
+    at `opacity:80%` the motif's own lines ran through the words. It now
+    carries the card surface — `background-color:var(--ph-card-bg)`,
+    `backdrop-filter:blur(10px)`,
+    `border:var(--line-sm) solid var(--ph-card-border-accent)` with
+    `border-left-width:var(--line-md)` (the accent rule marks it as a note,
+    not another panel), `border-radius:var(--rad-card)`,
+    `padding:var(--sp-xs) var(--gap-sm)`, `color:var(--ph-ink-muted)`.
+    No font-size on that rule: `.reveal p` outranks a bare `.ph-foot`, and
+    `.ph-foot-sm` is what owns the caption size.
 - **T-rowgrid** — S2 Performance only (`deck.html:340-364`).
     `.ph-cols.ph-rowgrid` is a 3-column grid with
     `column-gap:var(--gap-md)`, `row-gap:var(--sp-xs)`; each `article`
@@ -199,7 +210,7 @@ Class names, flex rules and fragment order verbatim from `deck.html`.
 - **T-houses-staged** — S4 only (`section[data-s4]`, `:has()` on the
     driver fragments). See §S4.
 - **T-figures-grid** — S5 only. Two tables rendered as CSS grids; see §S5.
-- **T-chart-costs** — S6 only. Donut SVG + cost table; see §S6.
+- **T-chart-costs** — S6 only. Donut SVG + two cost tables; see §S6.
 - **T-s7-split** — S7. `div.ph-s7` grid `minmax(0,0.62fr) minmax(0,2.38fr)`,
     `ol.ph-scr.ph-s7-chips` left, `div.ph-cols.ph-s7-panes` right. See §S7.
 - **T-appendix-hidden** — S8. `section[data-visibility="hidden"]`, never
@@ -522,7 +533,7 @@ Card 2 — `h3` **Quality**:
 - `p.ph-muted` — Normalized mean absolute error (NMAE), scaled by each field's own range. Lower is closer; the lowest figure per row is in mint.
 - `table.ph-table.ph-figures.ph-quality` — see below.
 
-**The grid-table treatment** (`deck.html:456-645`). A CSS `display:grid`
+**The grid-table treatment** (`deck.html:485-668`). A CSS `display:grid`
 replaces table layout, because 11 nowrap min-content columns overflowed
 the card and `table-layout` gave no control over which column gave way.
 - `thead`, `tbody`, `tr` all `display:contents`, so the grid sees one
@@ -604,6 +615,9 @@ the same number for every house, whatever else is known about it. Nearest
 neighbors answer thousands of times, and the answers track the range in
 the data. That is the difference between guessing and estimating.
 
+It carries the T-foot surface, so it renders at `--fs-body`: it has no
+`ph-foot-sm`, and `.reveal p` is what sizes it.
+
 - Say: "Neighbours answer per house; averages answer once. That is the difference between guessing and estimating."
 - Source: `test/quality/imputation_accuracy.csv` and the paired/
   summary CSVs alongside it.
@@ -611,10 +625,10 @@ the data. That is the difference between guessing and estimating.
 ## S6 — Performance (`#s6-performance`)
 
 Layout: T-chart-costs. **No fragments** — the whole slide is one frame.
-Three stacked blocks in `.ph-body`: a chart `.ph-cols`, a table
-`.ph-cols`, and a foot.
+Three stacked blocks in `.ph-body`: a chart `.ph-cols`, a two-card
+`.ph-cols` holding the two cost tables, and a foot.
 
-Cards are overridden here (`deck.html:718-722`) to
+Cards are overridden here (`deck.html:725-729`) to
 `background-color:rgba(12,20,46,0.93)` and `backdrop-filter:blur(14px)`
 — at the shared 2px/0.72 the background motif reads straight through
 the rings and the figures. Scoped to this slide so nothing else shifts.
@@ -685,18 +699,39 @@ slice plus the fixed calculation:
 
 | Row | Text |
 |-----|------|
-| 1 | `0.5 ms @ 10% null · 10.0 ms Avg` |
-| 2 | `0.8 ms @ 15% null · 10.2 ms Avg` |
-| 3 | `1.0 ms @ 20% null · 10.5 ms Avg` |
-| 4 | `5.1 ms @ 100% null · 14.6 ms Avg` |
+| 1 | `0.5 ms @ 10% null · 5%` |
+| 2 | `0.8 ms @ 15% null · 8%` |
+| 3 | `1.0 ms @ 20% null · 10%` |
+| 4 | `5.1 ms @ 100% null · 35%` |
 
-Row text is generated (`${slice} ms @ ${pct}% null · ${withCalc} ms Avg`);
-the table below is the rounded view.
+Row text is generated
+(`${slice} ms @ ${pct}% null · ${share(slice, withCalc)}`). The trailing
+figure is the imputed slice's share of that level's own call — the same
+Total the right table prints — not a second millisecond figure, which the
+ring beside it already carries. The 100% row's 35% is the share the ring
+itself draws, and the same number the SVG's `aria-label` states.
 
-**Table** — `table.ph-table.ph-figures.ph-figures-lg`, columns
-Stage / From / To / Delta. `ph-figures-lg` steps up to `--fs-lead` with
-`padding:7px 34px 7px 0` so the four columns read as four columns
-rather than a left-clumped block with Delta stranded at the far edge.
+**Tables** — two cards in the row, each
+`table.ph-table.ph-figures.ph-figures-lg`. Left card `h3` **Metrics**,
+columns Stage / From / To / Delta, reading the *From* and *To* rings.
+Right card `h3` **To Imputation Metrics**, columns Null % / Time / Total
+/ Delta: one row per null level, the rounded view of the four rows the
+chart's Imputed block prints beside the rings. Time is the imputed slice,
+Total is that slice plus the fixed 9.4 ms calculation, Delta is Total
+against the original route's 15.2 ms.
+
+`ph-figures-lg` steps up to `--fs-lead` with `padding:7px 34px 7px 0`,
+which sizes the columns for one full-width table. Each table here has half
+a slide, so `deck.html:831-838` re-scopes that gutter to `--sp-xs` and
+holds every cell to `white-space:nowrap`. Without it `All null` wraps,
+which makes the head two lines and drops the right table's rows half a
+pitch below the left table's; the labels (`Artifact loading`,
+`Share imputed`) wrap next, making those rows 77px against the 45px
+beside them. Both tables carry four body rows for the same reason — a
+fifth row in one card and four in the other puts the fourth rows 32px
+apart. Measured row centres now agree exactly across both cards.
+
+Left card (the From ring against the complete-data ring):
 
 | Row class | Stage | From | To | Delta |
 |-----------|-------|------|----|-------|
@@ -706,21 +741,46 @@ rather than a left-clumped block with Delta stranded at the far edge.
 | — | Total time | [cost.totalOrig] | [cost.totalV2] | [cost.totalDelta] |
 | `ph-muted` | Improvement | `·` | `·` | [cost.improvement] |
 
-Row colours map the table to the rings without a legend
-(`deck.html:407-416`, `679-683`): `ph-kpi-av`/`ph-kpi-knn` take their
-method colour; `ph-kpi-md` takes `--ph-accent` at weight 600 because
-artifact loading is the one stage the caching fix actually removes, and
-it is the smaller of the two costs. `.ph-na` is a muted dot at 0.45
-opacity — an absent value reads as "not applicable here", not as a minus.
+Right card (imputation cost per null level):
+
+| Null % | Time | Total | Delta |
+|--------|------|-------|-------|
+| [cost.nullPct10] | [cost.imputeTime10] | [cost.total10] | [cost.totalDelta10] |
+| [cost.nullPct15] | [cost.imputeTime15] | [cost.total15] | [cost.totalDelta15] |
+| [cost.nullPct20] | [cost.imputeTime20] | [cost.total20] | [cost.totalDelta20] |
+| [cost.nullPct100] | [cost.imputeTime100] | [cost.total100] | [cost.totalDelta100] |
+
+Time cells carry `.ph-imp-val` (`deck.html:418-424`), not a row class:
+Total carries the calculation as well as the imputation, so a row-wide
+`--imp` would claim it for the imputation.
+
+Total is `slice + 9.44` and Delta is `Total − 15.2`, both rounded from the
+measured constants and matching the chart's Imputed block — so the 10% row
+reads 10.0 ms, not the 9.9 that adding the already-rounded 0.5 and 9.4 would
+give. Total and Delta are the printed values, not exact ones.
+
+Row colours map the tables to the rings without a legend
+(`deck.html:405-424`, `685-690`): `ph-kpi-av`/`ph-kpi-knn` take the method
+colour of the segment their row names, `.ph-imp-val` takes `--imp`;
+`ph-kpi-md` takes `--ph-accent` at weight 600 because artifact loading is
+the one stage the caching fix actually removes, and it is the smaller of the
+two costs. `.ph-na` is a muted dot at 0.45 opacity — an absent value reads
+as "not applicable here", not as a minus.
+
+The Null % column is right-aligned in both its head cell and its row
+headers, so it reads as a figure rather than as a label
+(`deck.html:841-843`); `th` is left-aligned by default and
+`.ph-figures` only right-aligns the cells after the first.
 
 **Foot** (`p.ph-foot.ph-foot-sm`): Median of 5 runs × 1000 calls, one at
 a time, over the 201 examples published on `/docs`; costs priced by
 subtraction. Figures include the half of the examples v1 rejects with
 422.
 
-`ph-foot-sm` needs the `.reveal` prefix: a bare `.ph-foot` scores
-0,1,0 and loses to `.reveal p` at 0,1,1, so every footer renders at
-body size despite declaring caption.
+The foot carries the T-foot surface, which is what makes it readable over
+the motif; `ph-foot-sm` still needs the `.reveal` prefix to win `--fs-caption`
+from `.reveal p` (0,1,0 against 0,1,1). Its padding costs 20px of the body,
+so the card row above it sits 14px clear of the foot.
 
 - Say: "Before, every call paid for debug code and reloading artifacts. Now the service loads once — 15.2 ms to 9.4 ms."
 
