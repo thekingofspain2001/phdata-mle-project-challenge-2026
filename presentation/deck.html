@@ -8,6 +8,10 @@
     href="https://i0.wp.com/www.phdata.io/wp-content/uploads/2020/03/cropped-phData_color_dark_blue-01-1-32x32.png" />
   <title>Sound Realty — Valuation API Production Hardening</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4/dist/reveal.css" />
+  <!-- Syntax colours only. reveal.js ships just monokai and zenburn; atom-one-dark
+       comes from highlight.js' own CDN build. Its .hljs fill is cleared in the
+       stylesheet below so the listing keeps the deck's mint frame. -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/styles/atom-one-dark.min.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" />
   <style>
@@ -51,6 +55,7 @@
       --tint-av: color-mix(in srgb, var(--av) 22%, transparent);
       --tint-md: color-mix(in srgb, var(--md) 22%, transparent);
       --tint-knn: color-mix(in srgb, var(--knn) 22%, transparent);
+      --tint-snn: color-mix(in srgb, var(--snn) 22%, transparent);
 
       /* Type scale (slide px at 1270x961 design size; reveal scales uniformly). */
       --fs-brand: 16px;
@@ -88,6 +93,12 @@
       --rad-cell: 10px;
       --line-sm: 2px;
       --line-md: 3px;
+
+      /* Table heading rhythm. --row-gap is the vertical gap between two body
+         rows; each table declares its own and the heading rule below reads it,
+         so the space under a heading's underline is the same gap the rows use.
+         Default is s7's library table (3px cell padding top and bottom). */
+      --row-gap: 6px;
       --logo-size: 6vh;
 
       /* Motif at 50% size, pinned bottom-right. */
@@ -103,6 +114,43 @@
       margin: 0;
       overflow: hidden;
       background-color: var(--ph-navy);
+    }
+
+    /* Hold the deck back until reveal.js has parsed it.
+
+       reveal.css hides a non-present slide with `display: none`, but the slide
+       layout below deliberately overrides that with `display: flex !important`
+       - a slide is a flex column, and reveal's own rule would collapse it. That
+       override is what makes reveal fall back on `.past` / `.future` for
+       opacity, and those classes are only added by initialize(). So between
+       first paint and init, every section is displayed at full opacity and the
+       whole deck flashes past in one frame.
+
+       `.ready` is reveal's own signal for "setup finished": it is added to the
+       .reveal wrapper in a setTimeout inside start(), so waiting on it closes
+       that window without any JS here.
+
+       opacity, not visibility: the fragment panes set `visibility: visible` on
+       themselves, which re-opens an inherited `visibility: hidden`. Opacity has
+       no such escape hatch - a child cannot exceed its parent's opacity - and
+       unlike display:none it still leaves the tree laid out, which is what
+       reveal's own scale measurement and the .md-slot pass need on the way in. */
+    .reveal {
+      opacity: 0;
+    }
+
+    .reveal.ready {
+      opacity: 1;
+    }
+
+    /* While .reveal is held back the page shows <body>, and reveal.css paints
+       that white: `.reveal-viewport { background-color: #fff }`. It is a class
+       selector, so it outranks the `html, body` rule above and the hold-back
+       window flashed white against a deck that is navy everywhere else. Match
+       its weight so the held state is the deck's own colour. */
+    body.reveal-viewport {
+      background-color: var(--ph-navy);
+      color: var(--ph-ink-on-dark);
     }
 
     /* Fixed viewport background: solid navy + motif pinned bottom-right.
@@ -454,24 +502,20 @@
     .ph-table.ph-figures thead tr.ph-group th {
       text-align: center;
       padding-bottom: 0;
-      border-bottom: 1px solid var(--ph-ink-muted);
     }
 
     .ph-table.ph-figures thead tr.ph-group + tr th {
       padding-top: 1px;
     }
 
-    /* Column labels under a group title: muted so the group name leads. */
+    /* Column labels under a group title: muted so the group name leads. The
+       size is deliberately not set here - a caption-size sub-label made the top
+       card's head read one step smaller than the bottom card's, which has no
+       sub-label row and inherits the table size. Both cards now head at
+       --fs-body. */
     .ph-table.ph-figures thead tr.ph-group + tr th {
       color: var(--ph-ink-muted);
       font-weight: 400;
-      font-size: var(--fs-caption);
-    }
-
-    /* Row label and the data columns span two header rows; keep them out of
-       the grouping logic. */
-    .ph-table.ph-figures thead tr.ph-group th[rowspan] {
-      border-bottom: 1px solid var(--ph-ink-muted);
     }
 
     /* S5 figures table, as a grid.
@@ -498,14 +542,20 @@
        figures treatment both tables use. */
     #s5 .ph-table.ph-spread {
       display: grid;
-      /* A column gap, not justify-content:space-between: spreading the tracks
-         apart stranded each group title between its own sub-labels and made
-         the per-group border-bottom read as one rule across the grid.
-         1fr on the data tracks is what takes the card's full width. */
-      grid-template-columns: max-content repeat(15, minmax(max-content, 1fr));
+      /* Every track is max-content, so a column is exactly as wide as its widest
+         cell and no wider. The 1fr this replaced handed each column an equal
+         share of the slack, which is why the n column - one digit wide - was as
+         broad as a column of five-figure prices. Centre the tracks instead:
+         space-between stranded each group title between its own sub-labels. */
+      grid-template-columns: max-content repeat(15, max-content);
+      justify-content: center;
       column-gap: 9px;
       row-gap: 2px;
-      font-size: var(--fs-body);
+      font-size: 16px;
+      /* Both cards' tables share this size, one step under --fs-body. They were
+         already equal to each other, but at --fs-body the spread table's sixteen
+         columns read as a denser block than the quality table beside it rather
+         than as two halves of one table. */
       /* The card is taller than the table, so the rows take the slack rather
          than leaving a band of empty card below the last row. */
       flex: 1 1 auto;
@@ -516,6 +566,14 @@
     #s5 .ph-cols article:has(table) {
       display: flex;
       flex-direction: column;
+    }
+
+    /* Air between each card's lead-in paragraph and its table. The paragraph
+       carries no margin of its own, so without this the quality card's table
+       started flush under its text; the spread card only looked spaced because
+       its grid had slack to spread, which is not a gap anyone can rely on. */
+    #s5 .ph-cols article:has(table) > table {
+      margin-top: var(--sp-sm);
     }
 
     /* thead/tbody/tr only. The table itself must keep display:grid - a
@@ -530,8 +588,10 @@
 
     #s5 .ph-cols article th,
     #s5 .ph-cols article td {
-      white-space: nowrap;
-      padding: 1px 0;
+      /* Half a character of side padding, so neighbouring figures are held apart
+         without the track carrying the gap. Tracks are max-content, so this is
+         the only gutter a cell contributes. */
+      padding: 1px 0.5ch;
       /* The deck's 1.5 line-height is sized for prose. Two eight-row tables
          plus their captions share one slide, so the rows run at 1.2. */
       line-height: 1.2;
@@ -567,9 +627,11 @@
        treatment.
 
        The row's first child is the label, so each calculation's n/min/max
-       triple sits at 5-7 average, 8-10 median, 11-13 NN, 14-16 NN scaled. NN
-       scaled is NN, so the two share one tint. The sub-label row has no label
-       cell, so it sits one step left: 4-6, 7-9, 10-12, 13-15. The tints
+       triple sits at 5-7 average, 8-10 median, 11-13 NN, 14-16 NN scaled. Both
+       NN columns take S4's own two hues now, --knn for Nearest Neighbor and
+       --snn for Scaled Nearest Neighbor, so a method is one colour across S4
+       and S5 instead of sharing a single tint here. The sub-label row has no
+       label cell, so it sits one step left: 4-6, 7-9, 10-12, 13-15. The tints
        themselves are the --tint-* tokens. */
     #s5 .ph-table.ph-spread thead tr.ph-group th:nth-child(3) {
       color: var(--av);
@@ -579,9 +641,12 @@
       color: var(--md);
     }
 
-    #s5 .ph-table.ph-spread thead tr.ph-group th:nth-child(5),
-    #s5 .ph-table.ph-spread thead tr.ph-group th:nth-child(6) {
+    #s5 .ph-table.ph-spread thead tr.ph-group th:nth-child(5) {
       color: var(--knn);
+    }
+
+    #s5 .ph-table.ph-spread thead tr.ph-group th:nth-child(6) {
+      color: var(--snn);
     }
 
     #s5 .ph-table.ph-spread thead tr.ph-group + tr th:nth-child(n+4):nth-child(-n+6),
@@ -594,30 +659,36 @@
       background-color: var(--tint-md);
     }
 
-    #s5 .ph-table.ph-spread thead tr.ph-group + tr th:nth-child(n+10):nth-child(-n+15),
-    #s5 .ph-table.ph-spread tbody td:nth-child(n+11):nth-child(-n+16) {
+    #s5 .ph-table.ph-spread thead tr.ph-group + tr th:nth-child(n+10):nth-child(-n+12),
+    #s5 .ph-table.ph-spread tbody td:nth-child(n+11):nth-child(-n+13) {
       background-color: var(--tint-knn);
     }
 
+    #s5 .ph-table.ph-spread thead tr.ph-group + tr th:nth-child(n+13):nth-child(-n+15),
+    #s5 .ph-table.ph-spread tbody td:nth-child(n+14):nth-child(-n+16) {
+      background-color: var(--tint-snn);
+    }
+
     /* n, min and max are the same measurement in the same ink - the colour
-       belongs to the calculation's block, not to one figure inside it. Only
-       the weight still marks the max as the end of the range. */
+       belongs to the calculation's block, not to one figure inside it. The max
+       column carries no extra weight either: a bold figure next to four plain
+       ones reads as a different kind of number, and it is the same kind. */
     #s5 .ph-table.ph-spread tbody td {
       color: var(--ph-ink-muted);
     }
 
-    #s5 .ph-table.ph-spread tbody td:nth-child(3n + 1) {
-      font-weight: 600;
-    }
 
     /* The quality table: one figure per method, so five tracks and no second
        header row. The label is child 1, so the methods sit at 2-5. */
     #s5 .ph-table.ph-quality {
       display: grid;
-      grid-template-columns: max-content repeat(4, minmax(max-content, 1fr));
+      /* Content-sized tracks here too, for the same reason as the spread table:
+         an equal share of the slack is not a column width. */
+      grid-template-columns: max-content repeat(4, max-content);
+      justify-content: center;
       column-gap: 9px;
       row-gap: 2px;
-      font-size: var(--fs-body);
+      font-size: 16px;
       flex: 1 1 auto;
       align-content: space-between;
     }
@@ -643,9 +714,12 @@
       color: var(--md);
     }
 
-    #s5 .ph-table.ph-quality thead th:nth-child(4),
-    #s5 .ph-table.ph-quality thead th:nth-child(5) {
+    #s5 .ph-table.ph-quality thead th:nth-child(4) {
       color: var(--knn);
+    }
+
+    #s5 .ph-table.ph-quality thead th:nth-child(5) {
+      color: var(--snn);
     }
 
     #s5 .ph-table.ph-quality tbody td:nth-child(2) {
@@ -656,9 +730,12 @@
       background-color: var(--tint-md);
     }
 
-    #s5 .ph-table.ph-quality tbody td:nth-child(4),
-    #s5 .ph-table.ph-quality tbody td:nth-child(5) {
+    #s5 .ph-table.ph-quality tbody td:nth-child(4) {
       background-color: var(--tint-knn);
+    }
+
+    #s5 .ph-table.ph-quality tbody td:nth-child(5) {
+      background-color: var(--tint-snn);
     }
 
     #s5 .ph-table.ph-quality tbody td {
@@ -826,13 +903,49 @@
       font-weight: 600;
     }
 
+    /* Every table heading carries a rule, and the gap under that rule is the
+       table's own row gap. Applied to the LAST header row so a two-tier head
+       (s5's group titles over their sub-labels) is underlined once, beneath the
+       sub-labels, instead of once per tier. */
+    .ph-table thead tr:last-child > th {
+      border-bottom: 1px solid var(--ph-ink-muted);
+      padding-bottom: var(--row-gap);
+    }
+
+    /* Per-table row gaps, each the gap that table's rows already use, so a
+       heading rule sits the same distance above the first row as one row sits
+       below the next. s5 packs seven rows into a card and s6 spaces its figures
+       for reading, hence 2px and 14px rather than one shared value. */
+    #s5 .ph-table.ph-figures {
+      --row-gap: 2px;
+    }
+
+    /* s5 sets every cell's padding with an id selector, which outranks the
+       shared heading rule; restate it here at the same weight so its heading
+       gets the row gap too. */
+    #s5 .ph-table thead tr:last-child > th {
+      padding-bottom: var(--row-gap);
+    }
+
+    #s6 .ph-table.ph-figures-lg {
+      --row-gap: 14px;
+    }
+
+    /* s7's swagger rows are spaced by the listing's own bottom margin, not by
+       cell padding, so its heading gap matches that margin. */
+    #s7 .ph-swagger {
+      --row-gap: var(--gap-md);
+    }
+
     #s6 table {
       border-collapse: separate;
       border-spacing: var(--sp-sm) 0;
     }
+    /* padding-bottom carries the row gap, so the heading rule sits one row-gap
+       above the first row like any other table. Top stays zero: the head is
+       flush with the card. */
     #s6 thead th {
-      border-bottom: 1px solid var(--ph-ink-muted);
-      padding:  0 34px 0 0 !important;
+      padding: 0 34px var(--row-gap) 0 !important;
     }
 
     /* Row 2 holds two cards, so each table gets half a slide rather than the
@@ -1195,8 +1308,74 @@
       overflow-x: auto;
     }
 
+    /* highlightBlock() adds .hljs, and monokai.css fills that class with its own
+       olive (rgb(39,40,34)). Left alone it repaints the interior of every
+       listing and reads as a second box inside the frame drawn here. The frame
+       on the pre is the only box the slide should show. */
     .md-slot pre code {
       font: inherit;
+      background-color: transparent;
+    }
+
+    /* Swagger response bodies, slide 7. A <pre> never breaks a line, so under
+       the default table-layout: auto each block's longest line became its
+       column's min-content width and the table grew to 1731px inside an
+       860px pane, pushing the To column off the slide. Percentage widths on
+       the cells cap the columns under the same auto layout, and the blocks
+       wrap inside them. Caption size: at body size the four listings stand
+       1322px tall, the pane is 959px.
+
+       Scoped to .ph-swagger: slide 7 carries two tables, and a bare
+       #s7 .ph-table matched the Library one as well. */
+    #s7 .ph-swagger tbody th:first-child {
+      width: 8%;
+    }
+
+    #s7 .ph-swagger tbody td {
+      width: 46%;
+      padding: 0 var(--gap-md) 0 0;
+      vertical-align: top;
+    }
+
+    /* Row and body cells start at the top of their listing so the code number
+       reads level with the first line of the body beside it, not centred
+       against the block. */
+    #s7 .ph-swagger tbody th {
+      padding-top: 0;
+      vertical-align: top;
+    }
+
+    /* The gap between rows comes from the block's bottom margin. --sp-sm
+       (15px) left the four listings crowding each other, so it steps up to
+       --gap-md (25px), the column gutter this table already uses.
+       The gap the reader saw inside the frame was the inner padding, so that
+       is what goes: the code now sits flush against its own border.
+
+       The frame keeps the deck's normal --ph-card-border from the .md-slot pre
+       rule; only the fill is cleared, so no second box shows inside it. An
+       opaque --ph-mint here made these five blocks read as part of the syntax
+       highlighting rather than as ordinary framed listings. */
+    #s7 .ph-swagger .md-slot pre {
+      margin-bottom: var(--gap-md);
+      padding: 0;
+      background-color: transparent;
+    }
+
+    /* The not-applicable dash centres in the space the missing listing would
+       have filled, so it reads as absent rather than as a left-aligned cell. */
+    #s7 .ph-swagger tbody td.ph-muted {
+      padding-right: var(--gap-md);
+      text-align: center;
+      vertical-align: middle;
+    }
+
+    #s7 .md-slot pre {
+      padding: 4px 6px;
+      font-size: var(--fs-caption);
+      line-height: 1.2;
+      white-space: pre-wrap;
+      overflow-wrap: break-word;
+      overflow-x: hidden;
     }
 
     /* marked() wraps loose prose in <p>, which reveal's base stylesheet margins
@@ -1368,6 +1547,18 @@
     #s4:has(.ph-step:nth-of-type(5).visible):not(:has(.ph-step:nth-of-type(6).visible)) .ph-subs>*:nth-of-type(5),
     #s4:has(.ph-step:nth-of-type(6).visible):not(:has(.ph-step:nth-of-type(7).visible)) .ph-subs>*:nth-of-type(6),
     #s4:has(.ph-step:nth-of-type(7).visible) .ph-subs>*:nth-of-type(7) {
+      opacity: 1;
+    }
+
+    /* S7 staged subs: same shape as S4, but the drivers are the numbered chips
+       in the rail rather than .ph-step. Chip 1 is the base pane and is never a
+       fragment, so it carries no .visible and driver 1 is the only bare :has()
+       rule - the pattern S4 uses for its last stage. The text is the chip label
+       without its .ph-num, so the number shows once, in the rail. */
+    #s7:not(:has(.ph-chip.visible)) .ph-subs>*:nth-of-type(1),
+    #s7:has(.ph-chip[data-fragment-index="0"].visible):not(:has(.ph-chip[data-fragment-index="1"].visible)) .ph-subs>*:nth-of-type(2),
+    #s7:has(.ph-chip[data-fragment-index="1"].visible):not(:has(.ph-chip[data-fragment-index="2"].visible)) .ph-subs>*:nth-of-type(3),
+    #s7:has(.ph-chip[data-fragment-index="2"].visible) .ph-subs>*:nth-of-type(4) {
       opacity: 1;
     }
 
@@ -1576,8 +1767,12 @@
       overflow: hidden;
     }
 
+    /* The panel row is a read, not a diagram: five short rows of words and a
+       calculation beside them. At half the body it crowded the house diagram,
+       which needs the room - the attribute rows below the baseline gained a
+       step and a half of leading, so the diagram grew taller, not shorter. */
     #s4:has(.ph-step:nth-of-type(1).visible) .ph-stage-bottom {
-      flex: 0 0 50%;
+      flex: 0 0 42%;
       overflow: hidden;
     }
 
@@ -2186,7 +2381,7 @@
         </header>
         <div class="ph-body ph-houses">
           <div class="ph-houses-top">
-            <svg id="houses-svg" class="houses-svg" viewBox="-30 -80 1240 380" fill="none" color="#BCCCD4" role="img"
+            <svg id="houses-svg" class="houses-svg" viewBox="-30 -80 1240 424" fill="none" color="#BCCCD4" role="img"
               aria-label="Twelve houses in four groups of three, sorted smallest to largest. Under each house, four attribute values in four rows: square feet, year built, grade, and bedrooms.">
               <defs>
                 <g id="hs" stroke="currentColor" stroke-width="3">
@@ -2251,87 +2446,93 @@
               <g class="h" transform="translate(1148,210) scale(1.6406)">
                 <use href="#hs" />
               </g>
-              <!-- Sorted-size baseline -->
-              <line x1="35" y1="214" x2="1188" y2="214" stroke="#BCCCD4" stroke-width="1" opacity="0.4" />
+              <!-- Sorted-size baseline. Sits clear below the houses (they are drawn
+                   at y=210 with the roof up to -48*scale, so the body bottoms at
+                   210) and takes the house colour itself - currentColor, not a
+                   literal - so it never drifts from the outline above it. -->
+              <line x1="35" y1="222" x2="1188" y2="222" stroke="currentColor" stroke-width="1" opacity="0.75" />
               <!-- Attribute rows: one line per attribute, one value per house, twelve values
                    per row. Which rows light, and which values inside them, is stage-driven
                    CSS - see the .ar-living / .ar-lot / .ar-bed / .ar-bath rules. -->
-              <g class="ar-lab" font-size="11" fill="#BCCCD4" text-anchor="end">
-                <text class="al al-living" x="30" y="235">sqft_living</text>
-                <text class="al al-lot" x="30" y="254">sqft_lot</text>
-                <text class="al al-bed" x="30" y="273">bedrooms</text>
-                <text class="al al-bath" x="30" y="292">bathrooms</text>
+              <!-- Attribute names, abbreviated so they clear the first value
+                   column: at the value size the widest name ran into it. Labels
+                   share each row's y, so name and number sit on one baseline. -->
+              <g class="ar-lab" font-size="12" fill="#BCCCD4" text-anchor="end">
+                <text class="al al-living" x="28" y="264">sqft_liv</text>
+                <text class="al al-lot" x="28" y="288">sqft_lot</text>
+                <text class="al al-bed" x="28" y="312">beds</text>
+                <text class="al al-bath" x="28" y="336">baths</text>
               </g>
-              <g class="ar-row ar-living" font-size="14" fill="#BCCCD4" text-anchor="middle">
-                <text class="v" x="54" y="232">1235</text>
-                <text class="v" x="98" y="232">1300</text>
-                <text class="v" x="142" y="232">1365</text>
-                <text class="v" x="241" y="232">1520</text>
-                <text class="v" x="297" y="232">1600</text>
-                <text class="v h-mid" x="353" y="232">1680</text>
-                <text class="v h-mid h-nn" x="551" y="232">2090</text>
-                <text class="v h-nn" x="619" y="232">2200</text>
-                <text class="v h-nn" x="687" y="232">2310</text>
-                <text class="v h-nn" x="984" y="232">3610</text>
-                <text class="v h-nn" x="1066" y="232">3800</text>
-                <text class="v" x="1148" y="232">3990</text>
+              <g class="ar-row ar-living" font-size="15" fill="#BCCCD4" text-anchor="middle">
+                <text class="v" x="54" y="264">1235</text>
+                <text class="v" x="98" y="264">1300</text>
+                <text class="v" x="142" y="264">1365</text>
+                <text class="v" x="241" y="264">1520</text>
+                <text class="v" x="297" y="264">1600</text>
+                <text class="v h-mid" x="353" y="264">1680</text>
+                <text class="v h-mid h-nn" x="551" y="264">2090</text>
+                <text class="v h-nn" x="619" y="264">2200</text>
+                <text class="v h-nn" x="687" y="264">2310</text>
+                <text class="v h-nn" x="984" y="264">3610</text>
+                <text class="v h-nn" x="1066" y="264">3800</text>
+                <text class="v" x="1148" y="264">3990</text>
               </g>
-              <g class="ar-row ar-lot" font-size="13" fill="#BCCCD4" text-anchor="middle">
-                <text class="v" x="54" y="251">4600</text>
-                <text class="v" x="98" y="251">4900</text>
-                <text class="v" x="142" y="251">5300</text>
-                <text class="v" x="241" y="251">5600</text>
-                <text class="v" x="297" y="251">6200</text>
-                <text class="v" x="353" y="251">5900</text>
-                <text class="v h-nn" x="551" y="251">7600</text>
-                <text class="v h-nn" x="619" y="251">8000</text>
-                <text class="v h-nn" x="687" y="251">8400</text>
-                <text class="v h-nn" x="984" y="251">8800</text>
-                <text class="v h-nn" x="1066" y="251">9100</text>
-                <text class="v" x="1148" y="251">6400</text>
+              <g class="ar-row ar-lot" font-size="15" fill="#BCCCD4" text-anchor="middle">
+                <text class="v" x="54" y="288">4600</text>
+                <text class="v" x="98" y="288">4900</text>
+                <text class="v" x="142" y="288">5300</text>
+                <text class="v" x="241" y="288">5600</text>
+                <text class="v" x="297" y="288">6200</text>
+                <text class="v" x="353" y="288">5900</text>
+                <text class="v h-nn" x="551" y="288">7600</text>
+                <text class="v h-nn" x="619" y="288">8000</text>
+                <text class="v h-nn" x="687" y="288">8400</text>
+                <text class="v h-nn" x="984" y="288">8800</text>
+                <text class="v h-nn" x="1066" y="288">9100</text>
+                <text class="v" x="1148" y="288">6400</text>
               </g>
-              <g class="ar-row ar-bed" font-size="13" fill="#BCCCD4" text-anchor="middle">
-                <text class="v" x="54" y="270">2</text>
-                <text class="v" x="98" y="270">2</text>
-                <text class="v" x="142" y="270">2</text>
-                <text class="v" x="241" y="270">3</text>
-                <text class="v" x="297" y="270">3</text>
-                <text class="v" x="353" y="270">3</text>
-                <text class="v h-nn" x="551" y="270">4</text>
-                <text class="v h-nn" x="619" y="270">4</text>
-                <text class="v h-nn" x="687" y="270">5</text>
-                <text class="v h-nn" x="984" y="270">5</text>
-                <text class="v h-nn" x="1066" y="270">5</text>
-                <text class="v" x="1148" y="270">6</text>
+              <g class="ar-row ar-bed" font-size="15" fill="#BCCCD4" text-anchor="middle">
+                <text class="v" x="54" y="312">2</text>
+                <text class="v" x="98" y="312">2</text>
+                <text class="v" x="142" y="312">2</text>
+                <text class="v" x="241" y="312">3</text>
+                <text class="v" x="297" y="312">3</text>
+                <text class="v" x="353" y="312">3</text>
+                <text class="v h-nn" x="551" y="312">4</text>
+                <text class="v h-nn" x="619" y="312">4</text>
+                <text class="v h-nn" x="687" y="312">5</text>
+                <text class="v h-nn" x="984" y="312">5</text>
+                <text class="v h-nn" x="1066" y="312">5</text>
+                <text class="v" x="1148" y="312">6</text>
               </g>
-              <g class="ar-row ar-bath" font-size="13" fill="#BCCCD4" text-anchor="middle">
-                <text class="v" x="54" y="289">1</text>
-                <text class="v" x="98" y="289">1.5</text>
-                <text class="v" x="142" y="289">1.5</text>
-                <text class="v" x="241" y="289">1.5</text>
-                <text class="v" x="297" y="289">1.5</text>
-                <text class="v" x="353" y="289">2</text>
-                <text class="v h-nn" x="551" y="289">2.5</text>
-                <text class="v h-nn" x="619" y="289">2.5</text>
-                <text class="v h-nn" x="687" y="289">3</text>
-                <text class="v h-nn" x="984" y="289">3</text>
-                <text class="v h-nn" x="1066" y="289">3</text>
-                <text class="v" x="1148" y="289">4</text>
+              <g class="ar-row ar-bath" font-size="15" fill="#BCCCD4" text-anchor="middle">
+                <text class="v" x="54" y="336">1</text>
+                <text class="v" x="98" y="336">1.5</text>
+                <text class="v" x="142" y="336">1.5</text>
+                <text class="v" x="241" y="336">1.5</text>
+                <text class="v" x="297" y="336">1.5</text>
+                <text class="v" x="353" y="336">2</text>
+                <text class="v h-nn" x="551" y="336">2.5</text>
+                <text class="v h-nn" x="619" y="336">2.5</text>
+                <text class="v h-nn" x="687" y="336">3</text>
+                <text class="v h-nn" x="984" y="336">3</text>
+                <text class="v h-nn" x="1066" y="336">3</text>
+                <text class="v" x="1148" y="336">4</text>
               </g>
               <!-- Input boxes: dashed. Horizontal extent = which houses the method reads.
-                   Vertical extent = which attributes it reads: height 122 stops between the
-                   sqft_living row and the sqft_lot row, height 180 reaches past the bathrooms row. -->
-              <rect id="bx-avg" class="bx" x="32" y="116" width="1164" height="122" fill="none" stroke="var(--av)"
+                   Vertical extent = which attributes it reads: height 204 stops just past
+                   the bedrooms row, height 228 reaches past the bathrooms row. -->
+              <rect id="bx-avg" class="bx" x="32" y="116" width="1164" height="204" fill="none" stroke="var(--av)"
                 stroke-width="2" stroke-dasharray="8 5" />
-              <rect id="bx-med" class="bx" x="324" y="116" width="260" height="122" fill="none" stroke="var(--md)"
+              <rect id="bx-med" class="bx" x="324" y="116" width="260" height="204" fill="none" stroke="var(--md)"
                 stroke-width="2" stroke-dasharray="8 5" />
-              <rect id="bx-knn-pick" class="bx" x="510" y="116" width="596" height="180" fill="none" stroke="var(--knn)"
+              <rect id="bx-knn-pick" class="bx" x="510" y="116" width="596" height="228" fill="none" stroke="var(--knn)"
                 stroke-width="2" stroke-dasharray="8 5" />
-              <rect id="bx-knn" class="bx" x="510" y="116" width="596" height="122" fill="none" stroke="var(--knn)"
+              <rect id="bx-knn" class="bx" x="510" y="116" width="596" height="204" fill="none" stroke="var(--knn)"
                 stroke-width="2" stroke-dasharray="8 5" />
-              <rect id="bx-snn-pick" class="bx" x="510" y="116" width="596" height="180" fill="none" stroke="var(--snn)"
+              <rect id="bx-snn-pick" class="bx" x="510" y="116" width="596" height="228" fill="none" stroke="var(--snn)"
                 stroke-width="2" stroke-dasharray="8 5" />
-              <rect id="bx-snn" class="bx" x="510" y="116" width="596" height="122" fill="none" stroke="var(--snn)"
+              <rect id="bx-snn" class="bx" x="510" y="116" width="596" height="204" fill="none" stroke="var(--snn)"
                 stroke-width="2" stroke-dasharray="8 5" />
               <!-- Average marker: house lifted clear; equal text gaps; down arrow to box -->
               <!-- color: #hs strokes with currentColor, which follows the CSS
@@ -2633,8 +2834,8 @@
                     <th scope="colgroup" colspan="3" role="columnheader">Data</th>
                     <th scope="colgroup" colspan="3" role="columnheader">Average</th>
                     <th scope="colgroup" colspan="3" role="columnheader">Median</th>
-                    <th scope="colgroup" colspan="3" role="columnheader">NN</th>
-                    <th scope="colgroup" colspan="3" role="columnheader">NN scaled</th>
+                    <th scope="colgroup" colspan="3" role="columnheader">Nearest Neighbor</th>
+                    <th scope="colgroup" colspan="3" role="columnheader">Scaled Nearest Neighbor</th>
                   </tr>
                   <tr role="row">
                     <th scope="col">n</th>
@@ -2803,8 +3004,8 @@
                     <th scope="col" role="columnheader">Field</th>
                     <th scope="col" role="columnheader">Average</th>
                     <th scope="col" role="columnheader">Median</th>
-                    <th scope="col" role="columnheader">NN</th>
-                    <th scope="col" role="columnheader">NN scaled</th>
+                    <th scope="col" role="columnheader">Nearest Neighbor</th>
+                    <th scope="col" role="columnheader">Scaled Nearest Neighbor</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -2985,6 +3186,12 @@
       <section id="s7" class="ph-split" aria-label="Modernization">
         <header class="ph-head">
           <h2>Modernization</h2>
+          <div class="ph-subs" aria-live="off">
+            <p class="ph-subtitle">Python Environment</p>
+            <p class="ph-subtitle">Python Type hints</p>
+            <p class="ph-subtitle">Input Parameter Validation</p>
+            <p class="ph-subtitle">Swagger</p>
+          </div>
         </header>
         <div class="ph-body">
           <div class="ph-split">
@@ -3101,7 +3308,6 @@
                 </table>
               </article>
               <article class="fragment ph-pane" data-fragment-index="0">
-                <h3>Type hints</h3>
 <div class="md-slot"><template class="md-src">
 A type hint is a label that says what a piece of data should be. It is a **note**,
 not a rule, so Python runs the code either way. A type checker reads the note and
@@ -3111,28 +3317,34 @@ does.
 </template></div>
              
                 <h4>From</h4>
-                <pre class="ph-code"><code class="language-python"><span class="ph-kw">def</span> predict(home_features):</code></pre>
+<div class="md-slot"><template class="md-src">
+```python
+def predict(home_features):
+```
+</template></div>
                 
                 <h4>To</h4>
-                <pre class="ph-code"><code class="language-python"><span class="ph-kw">from</span> fastapi <span class="ph-kw">import</span> <span class="ph-ty">Request</span>
+<div class="md-slot"><template class="md-src">
+```python
+from fastapi import Request
 
-<span class="ph-kw">class</span> <span class="ph-ty">HomeFeaturesV2</span>(<span class="ph-ty">BaseModel</span>):
-    bedrooms: <span class="ph-ty">int</span> | <span class="ph-ty">None</span> = Field(default=<span class="ph-ty">None</span>, ge=<span class="ph-n">0</span>)
-    <span class="ph-c"># ... six more nullable fields ...</span>
-    zipcode: <span class="ph-ty">str</span> = Field(pattern=<span class="ph-s">r"^\d{5}$"</span>)
+class HomeFeaturesV2(BaseModel):
+    bedrooms: int | None = Field(default=None, ge=0)
+    # ... six more nullable fields ...
+    zipcode: str = Field(pattern=r"^\d{5}$")
 
-<span class="ph-kw">class</span> <span class="ph-ty">PredictionResponse</span>(<span class="ph-ty">BaseModel</span>):
-    predicted_price: <span class="ph-ty">float</span> = Field(examples=[<span class="ph-n">394708.0</span>])
+class PredictionResponse(BaseModel):
+    predicted_price: float = Field(examples=[394708.0])
 
-<span class="ph-kw">def</span> predict_v2(
-    home_features: <span class="ph-ty">HomeFeaturesV2</span>,
-    request: <span class="ph-ty">Request</span>,
-) -&gt; <span class="ph-ty">PredictionResponse</span>:
-                </code></pre>
+def predict_v2(
+    home_features: HomeFeaturesV2,
+    request: Request,
+) -> PredictionResponse:
+```
+</template></div>
               </article>
               <article class="fragment ph-pane" data-fragment-index="1">
                 <div class="ph-captures">
-                  <h3>Validation</h3>
                   <div class="ph-shots">
                     <figure class="ph-shot">
                       <h4>From</h4>
@@ -3146,16 +3358,12 @@ does.
                 </div>
               </article>
               <article class="fragment ph-pane" data-fragment-index="2">
-                <h3>Swagger</h3>
-                <table class="ph-table">
+                <table class="ph-table ph-swagger">
                   <thead>
                     <tr>
-                      <th scope="col">Responses</th>
-                      <th scope="col">From — /predict</th>
-                      <th scope="col">To — /predict/v2</th>
-                    </tr>
-                      <tr>
-                      <th scope="col">Code</th>
+                      <th scope="col">Response Code</th>
+                      <th scope="col">From &#8212; /predict</th>
+                      <th scope="col">To &#8212; /predict/v2</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -3176,7 +3384,7 @@ does.
                         <div class="md-slot"><template class="md-src">
                           ```json
                           {
-                            "predicted_price": 394708
+                            "predicted_price": 394708.0
                           }
                           ```
                         </template></div>
@@ -3201,18 +3409,13 @@ does.
                       <th scope="row">422</th>
                       <td colspan="2">
                         <div class="md-slot"><template class="md-src">
-                          ```
+                          ```json
                           {
                             "detail": [
                               {
-                                "loc": [
-                                  "string",
-                                  0
-                                ],
-                                "msg": "string",
-                                "type": "string",
-                                "input": "string",
-                                "ctx": {}
+                                "loc": ["body", "zipcode"],
+                                "msg": "Field required",
+                                "type": "missing"
                               }
                             ]
                           }
@@ -3227,9 +3430,9 @@ does.
                       <td> 
                         <div class="md-slot"><template class="md-src">
                           ```json
-                            {
-                              "detail": "Prediction service unavailable - the office lights are still off."
-                            }
+                          {
+                            "detail": "Prediction service unavailable"
+                          }
                           ```
                       </template></div>
                       </td>
@@ -3267,6 +3470,7 @@ does.
   </div>
   <script src="https://cdn.jsdelivr.net/npm/reveal.js@4/dist/reveal.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/reveal.js@4/plugin/markdown/markdown.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@4/plugin/highlight/highlight.js"></script>
   <script>
     /* Single source for every number on the slides. Edit here, all renders update. */
     const DECK_METRICS = {
@@ -3628,18 +3832,22 @@ does.
         // part of it, so only the remainder is reserved under the capture; the
         // capture grows into everything else.
         const pane = wrap.closest(".ph-pane");
+        // The pane title is optional: slide 7's panes are labelled by the
+        // staged subtitle in .ph-head instead, so none of them carry an h3.
+        // With no title there is nothing above the captures, so the space
+        // above is zero and the block it would have reserved is zero.
         const title = pane.querySelector("h3");
         const pcs = getComputedStyle(pane);
         const paneRect = pane.getBoundingClientRect();
         const deck = pane.clientWidth / paneRect.width || 1;
-        const above = (title.getBoundingClientRect().top - paneRect.top) / deck;
+        const above = title ? (title.getBoundingClientRect().top - paneRect.top) / deck : 0;
         const below = parseFloat(pcs.paddingBottom) + parseFloat(pcs.borderBottomWidth);
         const pad = Math.max(0, above - below);
         wrap.style.setProperty("--ph-shot-pad", `${pad.toFixed(2)}px`);
         // Room under the pane title for a label plus the taller of the two,
         // less the margin now reserved under it.
         const room = wrap.clientHeight - parseFloat(wcs.paddingTop)
-          - parseFloat(wcs.paddingBottom) - block(title)
+          - parseFloat(wcs.paddingBottom) - (title ? block(title) : 0)
           - Math.max(...heads.map(block)) - pad;
         const n = heads.length;
         // Each picture is w / ar tall, so the taller one - the smallest ratio -
@@ -3810,7 +4018,7 @@ does.
       slideNumber: true,
       controlsLayout: "edges",
       transition: "slide",
-      plugins: [RevealMarkdown],
+      plugins: [RevealMarkdown, RevealHighlight],
       backgroundTransition: "none",
     }).then(() => {
       /* Markdown slots.
@@ -3832,15 +4040,38 @@ does.
          A <script type="text/markdown"> child also survives the parse but
          marked() mis-renders it, leaking raw list tags, so it is not used.
 
+         A <template> sits wherever the markup needs it, so its source arrives
+         indented to match the surrounding HTML. marked() only treats a fence
+         as a code block when the ``` starts within 3 columns, and trim()
+         clears the first line alone - so a deeply indented fence fell through
+         to the inline code-span rule and the listing collapsed onto one line.
+         dedent() strips the block's common leading whitespace first.
+
+         Fenced code needs the highlight plugin too: without it marked() emits
+         a bare <pre><code> and the block renders as plain text. The plugin
+         scans pre code during initialize(), which runs before this callback,
+         so each slot is passed to highlightBlock() as it is written.
 
          Note RevealMarkdown is the plugin factory, not the plugin instance:
          RevealMarkdown.marked is undefined, calling it yields the instance. */
       const md = RevealMarkdown().marked;
+      const dedent = (s) => {
+        const lines = s.replace(/\r\n?/g, "\n").split("\n");
+        let n = Infinity;
+        for (const l of lines) {
+          if (!l.trim()) continue;
+          n = Math.min(n, l.length - l.trimStart().length);
+        }
+        if (!isFinite(n) || n === 0) return s;
+        return lines.map((l) => l.slice(Math.min(n, l.length - l.trimStart().length))).join("\n");
+      };
+      const hl = Reveal.getPlugin("highlight");
       document.querySelectorAll(".md-slot").forEach((slot) => {
         const attr = slot.getAttribute("data-md");
         const tpl = slot.querySelector("template.md-src");
         const src = attr != null ? attr : tpl ? tpl.innerHTML : "";
-        slot.innerHTML = md(src.trim());
+        slot.innerHTML = md(dedent(src).trim());
+        slot.querySelectorAll("pre code").forEach((code) => hl.highlightBlock(code));
       });
     });
 
