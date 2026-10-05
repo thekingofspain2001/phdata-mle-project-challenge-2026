@@ -358,7 +358,22 @@ Card 3 — `h3` **Modernization**, then a nested `.ph-cols` of four sub-boxes:
 ## S3 — Opportunity (`#s3-problem`, `data-s3`)
 
 Layout: T-stack, two cards. Fragments: 2, both `fragment custom`, so both
-cards are visible from load while each still holds one step.
+cards are visible from load while each still holds one step. Each outer
+card takes the full width; vertical space is content-driven, not 50/50 —
+`#s3-problem .ph-cols.ph-is-stack>article` is `flex:0 1 auto` (the case
+keeps its needed height, shrinkable) and the solution card is
+`flex:1 1 auto` (grows into the slack). Method `h4`s wear their
+calculation colours via `article.ph-is-av/md/knn` (`var(--av/md/knn)`),
+as on S4–S6.
+
+Every `p` inside `.ph-cols` is `margin:0` (`deck.html:385-387`), so the
+only spacing these cards carry is their `h3`'s bottom margin. The
+solution card's lead-in paragraph therefore ran flush into the three
+approach boxes; `deck.html:1197-1203` restores the deck's normal block
+gap with `#s3-problem .ph-cols.ph-is-stack>article>p+.ph-cols {
+margin-top:var(--sp-sm) }`. The two paragraphs inside that card still
+share one another's baseline — they are one thought split in two, and
+carry no gap by design.
 
 The `h2` is the **chapter** and is fixed for every slide in the deck that
 talks about this topic — it does not change per slide. The `p.ph-subtitle`
@@ -370,27 +385,33 @@ S4 does; it is a single static line here, not a staged `.ph-subs` stack.
 | h2 (chapter) | Opportunity |
 | Subtitle | The approach |
 
-Card 1 — `h3` **The case**, four labelled lines, no prose paragraph:
+Card 1 — `h3` **The case**, then a nested `.ph-cols` of three sub-boxes in
+S2 style (`h4` + `p`, no fragments inside) — a 1×3 row:
 
-| Label | Line |
-|-------|------|
+| Sub-head | Content |
+|----------|---------|
 | Problem | The service requires all fields. |
 | Issue | 15% of requests fail because one or more fields is missing. |
 | Impact | The cost of finding the actual data, or the inaccuracy of the service output when a made-up input is supplied. |
-| Solution | Approximate the value of the missing field from the data already held. |
 
-Card 2 — `h3` **The method**, one lead line then three named entries, each
-two sentences following the same pattern (how the figure is derived, then
-what it corresponds to):
+Card 2 — `h3` **Solution**, broker-language description then a nested
+`.ph-cols` of three sub-boxes in S2 style (`h4` + `p`, no fragments
+inside) — a 1×3 row of approaches. Terms match S4/S5: **Average Value**,
+**Medium value**, **Nearest Neighbor** (S5 tables shorten these to Average
+/ Median / NN / NN scaled).
 
-Lead: The three standard ways of estimating a missing value, differing only
-in how much of the rest of the record they use.
+Description: When a listing arrives with a blank, fill it from what is
+already on file — estimate the missing detail from the library of past
+sales, the way an agent prices a home off comparable sales (comps).
 
-| Name | Derivation | Corresponds to |
-|------|------------|---------------|
-| `The average` | the values of all items in the group added together and divided by the size of the group | no item in the group; it exists only as a calculation |
-| `The middle value` | the value of the item sitting in the middle of the group once it is ordered | one known item in the group, whichever that happens to be |
-| `Nearest comparables` | the values of the items in the group closest to this one on the remaining fields | a small set of known items, the closest counting most |
+Approaches lead: Three approaches, differing only in how much of the rest
+of the record they use.
+
+| Sub-head | Content |
+|----------|---------|
+| Average Value | The values of all items in the group added together and divided by the size of the group. It corresponds to no item in the group; it exists only as a calculation. |
+| Medium value | The value of the item sitting in the middle of the group once it is ordered. It corresponds to one known item in the group, whichever that happens to be. |
+| Nearest Neighbor | The values of the items in the group closest to this one on the remaining fields. They correspond to a small set of known items, the closest counting most. |
 
 **Content rules for this slide:**
 
@@ -401,7 +422,7 @@ in how much of the rest of the record they use.
 - The three candidates are named, not ranked, and not shown working. S4
   stages them and picks the winner.
 - No figures. The dataset profile was cut from this slide.
-- The `15%` in Card 1 sits inside the `10% to 20%` already on S2, so the two
+- The `15%` in the case card sits inside the `10% to 20%` already on S2, so the two
   slides do not contradict each other.
 
 - Say: "One missing field fails the request. We fill it from what the record
@@ -472,12 +493,15 @@ Stage 4 shows all three markers and the summary panel.
 
 `p.ph-stage-hint` is `position:absolute` **below** the top row
 (`top:100%`), not in flow — in flow it added ~19px that the 50% flex
-basis absorbed, nudging the houses down on load only. Hidden once driver
-1 is visible.
+basis absorbed, nudging the houses down on load only. Its rule is
+`.reveal .ph-stage-hint`, not a bare `.ph-stage-hint`: `.reveal p` scores
+0,1,1 against 0,1,0, so a size declared on that rule alone never applies.
+The hint is the slide's lead-in, so it runs at `--fs-lead` (22px), one step
+above body. Hidden once driver 1 is visible.
 
 | Item | Content |
 |------|---------|
-| Hint | Twelve homes, four groups of three. Each group runs 25% bigger than the last; labels are living area in sq ft. Click for each approach. |
+| Hint | The diagram above is a data set of 12 houses with a single attribute: living area in square feet. |
 
 **Bottom panels** — `.ph-stage-bottom` is `flex:0 0 0` until driver 1
 fires, then `flex:0 0 50%`. `.ph-panels` is a flex row; every

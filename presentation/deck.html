@@ -1168,6 +1168,40 @@
       flex-direction: column;
     }
 
+    /* S3: outer cards size from content, not 50/50. The case keeps its
+       needed height (shrinkable); the solution grows into the slack, so
+       the top box carries no empty space and the bottom box is not
+       jammed. Basis auto = needed height; grow/shrink distribute the rest. */
+    #s3-problem .ph-cols.ph-is-stack>article {
+      flex: 0 1 auto;
+    }
+
+    #s3-problem .ph-cols.ph-is-stack>article:last-child {
+      flex: 1 1 auto;
+    }
+
+    /* S3 method titles wear their calculation colours, as on S4-S6:
+       average amber, medium blue, nearest-neighbour purple. */
+    #s3-problem article.ph-is-av h4 {
+      color: var(--av);
+    }
+
+    #s3-problem article.ph-is-md h4 {
+      color: var(--md);
+    }
+
+    #s3-problem article.ph-is-knn h4 {
+      color: var(--knn);
+    }
+
+    /* S3 Solution: the lead-in paragraph ("Three approaches...") runs flush
+       into the three approach boxes - every p inside .ph-cols is margin:0
+       (deck.html:385-387), so the h3's bottom margin is the only spacing the
+       card has. Give the row the deck's normal block gap. */
+    #s3-problem .ph-cols.ph-is-stack>article>p+.ph-cols {
+      margin-top: var(--sp-sm);
+    }
+
     .ph-houses-top {
       position: relative;
       flex: 0 0 50%;
@@ -1252,13 +1286,18 @@
        names the stage. Panels keep their own per-approach accents. */
 
     /* Positioned outside the row's box: in flow the hint added ~19px that the
-       50% basis absorbed, nudging the houses down on load only. */
-    .ph-stage-hint {
+       50% basis absorbed, nudging the houses down on load only.
+
+       Needs .reveal in the selector, like .ph-foot-sm: bare .ph-stage-hint
+       scores 0,1,0 and loses to `.reveal p` at 0,1,1, so a size declared on
+       that rule alone never applies here. It reads as the slide's lead-in, so
+       it sits a step above body rather than at it. */
+    .reveal .ph-stage-hint {
       position: absolute;
       top: 100%;
       left: 0;
       right: 0;
-      font-size: var(--fs-caption);
+      font-size: var(--fs-lead);
       margin: 0;
     }
 
@@ -1739,33 +1778,62 @@
       </section>
 
       <!-- S3 Opportunity. -->
-      <section id="s3-problem" aria-label="Opportunity">
+      <section id="s3-problem" data-s3 aria-label="Opportunity">
         <header class="ph-head">
           <h2>Opportunity</h2>
+          <p class="ph-subtitle">The approach</p>
         </header>
         <div class="ph-body">
-          <div class="ph-cols">
+          <div class="ph-cols ph-is-stack">
             <article class="fragment custom">
-              <h3>Problem</h3>
-              <p>
-                The predict API can only be called when all input parameters are known.
-                Requests with incomplete inputs return a 422 HTTP error.
-              </p>
+              <h3>The case</h3>
+              <div class="ph-cols">
+                <article>
+                  <h4>Problem</h4>
+                  <p>
+                    The service requires all fields.
+                  </p>
+                </article>
+                <article>
+                  <h4>Issue</h4>
+                  <p>15% of requests fail because one or more fields is missing.</p>
+                </article>
+                <article>
+                  <h4>Impact</h4>
+                  <p>
+                    The cost of finding the actual data, or the inaccuracy of the service output when a made-up input is supplied.
+                  </p>
+                </article>
+              </div>
             </article>
             <article class="fragment custom">
-              <h3>Impact</h3>
+              <h3>Solution</h3>
               <p>
-                <span data-metric="nnr.recovered">10–20%</span> of live
-                requests cannot be processed. The agent phones back, the
-                seller waits, the valuation queue stops.
+                When a listing arrives with a blank, fill it from what is already on file — estimate the missing detail from the library of past sales, the way an agent prices a home off comparable sales (comps).
               </p>
-            </article>
-            <article class="fragment custom">
-              <h3>Cost</h3>
               <p>
-                Every rejected listing is a conversation restarted and a deal
-                delayed. Coverage, not accuracy, is what leaks.
+                Three approaches, differing only in how much of the rest of the record they use:
               </p>
+              <div class="ph-cols">
+                <article class="ph-is-av">
+                  <h4>Average Value</h4>
+                  <p>
+                    The values of all items in the group added together and divided by the size of the group. It corresponds to no item in the group; it exists only as a calculation.
+                  </p>
+                </article>
+                <article class="ph-is-md">
+                  <h4>Medium value</h4>
+                  <p>
+                    The value of the item sitting in the middle of the group once it is ordered. It corresponds to one known item in the group, whichever that happens to be.
+                  </p>
+                </article>
+                <article class="ph-is-knn">
+                  <h4>Nearest Neighbor</h4>
+                  <p>
+                    The values of the items in the group closest to this one on the remaining fields. They correspond to a small set of known items, the closest counting most.
+                  </p>
+                </article>
+              </div>
             </article>
           </div>
         </div>
@@ -1933,9 +2001,8 @@
                 <line x1="952" y1="44" x2="952" y2="116" stroke-width="2" marker-end="url(#arr-knn)" />
               </g>
               <p class="ph-stage-hint">
-                Twelve homes, four groups of three. Each group runs 25% bigger
-                than the last; labels are living area in sq ft. Click for each
-                approach.
+                The diagram above is a data set of 12 houses with a single
+                attribute: living area in square feet.
               </p>
           </div>
           <div class="ph-stage-bottom">
