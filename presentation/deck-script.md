@@ -160,8 +160,9 @@ cost is a subtraction — `dev = original − noprint`,
 `uv run python test/benchmark/benchmake.py` (`test/benchmark/benchmake.py`).
 
 Note: S2's Opportunity/Impact cell hardcodes "10% to 20%" as plain text
-rather than a `[nnr.recovered]` span. Only S3 uses the metric. Keep that
-as-is unless both are being changed together.
+rather than a `[nnr.recovered]` span, and S3 restates the same gap as a
+flat `15%`. Three copies of one business estimate. If it ever moves, move
+all three together.
 
 ## Templates
 
@@ -171,10 +172,11 @@ Class names, flex rules and fragment order verbatim from `deck.html`.
     `align-items:center`, `text-align:center`, `padding:0`). Single `h1`,
     `margin:auto`, `max-width:20ch`, `line-height:1.15`. No fragments,
     no metrics.
-- **T-stack** — S2, S5. `div.ph-cols.ph-is-stack`
+- **T-stack** — S2, S3, S5. `div.ph-cols.ph-is-stack`
     (`flex-direction:column`) of full-width `article.fragment.custom`.
-    Cards take the shared `.ph-cols article` fill (below).
-- **T-cols-n** — S3, and the inner rows of S2. `div.ph-cols`
+    Cards take the shared `.ph-cols article` fill (below). S3 runs two
+    cards rather than three and carries a subtitle.
+- **T-cols-n** — the inner rows of S2. `div.ph-cols`
     (`flex:1 1 auto`, `min-height:0`, flex row, `gap:var(--gap-md)`).
     Shared card surface for `.ph-cols article` and `.ph-panel`
     (`deck.html:312-321`): `background-color:var(--ph-card-bg)`,
@@ -342,20 +344,61 @@ Card 3 — `h3` **Modernization**, then a nested `.ph-cols` of four sub-boxes:
 - Sources: per-request `load_artifacts()` in `src/api/endpoints.py` vs
   load-once in `src/api/lifespan.py`.
 
-## S3 — Opportunity (`#s3-problem`)
+## S3 — Opportunity (`#s3-problem`, `data-s3`)
 
-Layout: T-cols-3. Fragments: 3.
+Layout: T-stack, two cards. Fragments: 2, both `fragment custom`, so both
+cards are visible from load while each still holds one step.
+
+The `h2` is the **chapter** and is fixed for every slide in the deck that
+talks about this topic — it does not change per slide. The `p.ph-subtitle`
+under it names what THIS slide covers. Reuse `.reveal .ph-subtitle` as
+S4 does; it is a single static line here, not a staged `.ph-subs` stack.
 
 | Item | Content |
 |------|---------|
-| Card 1 h3 | Problem |
-| Card 1 body | The predict API can only be called when all input parameters are known. Requests with incomplete inputs return a 422 HTTP error. |
-| Card 2 h3 | Impact |
-| Card 2 body | [nnr.recovered] of live requests cannot be processed. The agent phones back, the seller waits, the valuation queue stops. |
-| Card 3 h3 | Cost |
-| Card 3 body | Every rejected listing is a conversation restarted and a deal delayed. Coverage, not accuracy, is what leaks. |
+| h2 (chapter) | Opportunity |
+| Subtitle | The approach |
 
-- Say: "A missing bathroom field used to kill the whole valuation."
+Card 1 — `h3` **The case**, four labelled lines, no prose paragraph:
+
+| Label | Line |
+|-------|------|
+| Problem | The service requires all fields. |
+| Issue | 15% of requests fail because one or more fields is missing. |
+| Impact | The cost of finding the actual data, or the inaccuracy of the service output when a made-up input is supplied. |
+| Solution | Approximate the value of the missing field from the data already held. |
+
+Card 2 — `h3` **The method**, one lead line then three named entries, each
+two sentences following the same pattern (how the figure is derived, then
+what it corresponds to):
+
+Lead: The three standard ways of estimating a missing value, differing only
+in how much of the rest of the record they use.
+
+| Name | Derivation | Corresponds to |
+|------|------------|---------------|
+| `The average` | the values of all items in the group added together and divided by the size of the group | no item in the group; it exists only as a calculation |
+| `The middle value` | the value of the item sitting in the middle of the group once it is ordered | one known item in the group, whichever that happens to be |
+| `Nearest comparables` | the values of the items in the group closest to this one on the remaining fields | a small set of known items, the closest counting most |
+
+**Content rules for this slide:**
+
+- Missing data only. No property values, prices or valuations — the problem
+  is that the service requires all fields, nothing more.
+- No statistics from the research notebooks. S4 carries the arithmetic and
+  S5 the results; this slide carries the argument.
+- The three candidates are named, not ranked, and not shown working. S4
+  stages them and picks the winner.
+- No figures. The dataset profile was cut from this slide.
+- The `15%` in Card 1 sits inside the `10% to 20%` already on S2, so the two
+  slides do not contradict each other.
+
+- Say: "One missing field fails the request. We fill it from what the record
+  already tells us — these are the three ways, and here is how we chose."
+- Sources: imputation method families per the Statistics Canada quality
+  guidelines (mean, ratio/regression and nearest-neighbour deterministic
+  imputation; the stated principle is to use available auxiliary
+  information, choosing by strength of association between fields).
 
 ## S4 — Missing value approaches (`#s4-approaches`, `data-s4`)
 
