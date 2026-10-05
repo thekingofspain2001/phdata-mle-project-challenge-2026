@@ -198,6 +198,52 @@ curl -s -X POST http://127.0.0.1:8000/predict \
   -d '{"bedrooms": 3, "bathrooms": 2.0, "sqft_living": 1500.0, "floors": 1.0, "sqft_above": 1200.0, "sqft_basement": 300.0, "zipcode": "98042"}'
 ```
 
+### Viewing the Deck Locally
+
+`presentation/deck.html` is a single self-contained file, but it needs to be served over HTTP for the fonts and
+reveal.js CDN assets to resolve. A small FastAPI server ships with it and reloads the browser on every save.
+
+**Start it:**
+
+```bash
+uv run python presentation/serve.py
+```
+
+Then open <http://127.0.0.1:8001/>. Leave that terminal open for the life of the server.
+
+**Stop it:** press `Ctrl+C` in the terminal running it. Uvicorn catches the interrupt, cancels the file watcher and
+prints `Application shutdown complete`.
+
+If you backgrounded it and lost the terminal, kill it by pattern:
+
+```bash
+pkill -f 'presentation/serve.py'
+```
+
+That command also matches its own command line and terminates itself, so it exits quietly — check with
+`curl -m 3 http://127.0.0.1:8001/ || echo stopped` rather than reading the silence as failure. Do not narrow it to
+`pkill -f serve.py`; the pattern is too broad.
+
+#### Why port 8001
+
+The API owns 8000 (`Dockerfile:30`, `docker-compose.test.yml:9`), so the deck server defaults to 8001 and the two run
+side by side. If you still hit `[Errno 98] address already in use`, an older deck server is already running on that
+port — find it with `ss -ltnp 'sport = :8001'` and stop that PID.
+
+#### What the server does
+
+- Serves `deck.html` at `/` and `/deck.html` with `Cache-Control: no-store`, so a reload never renders a cached copy.
+- Injects a reload client into the **served copy only**, immediately before `</body>`. `deck.html` on disk is never
+  modified and still opens directly from `file://`.
+- Streams reload signals over server-sent events at `/__reload`; the browser re-renders on each one. SSE rather than
+  a WebSocket because it needs no `websockets` extra — `fastapi` and `uvicorn` are already dependencies.
+- Polls `presentation/` every 200ms for changed `.html`, `.css`, `.js` and `.md` files.
+- Reveal is initialised with `hash: true`, so the current slide lives in the URL hash and a reload returns you to the
+  slide you were editing rather than slide 0.
+
+The server binds `127.0.0.1` only. It has no authentication and will serve anything in `presentation/` to anything
+that can reach it, so do not move it to `0.0.0.0`.
+
 [^logging]: Domain events (`prediction_complete`, `imputing_null_features`, `unknown_zipcode`, `validation_failed`) are
     emitted by `/predict/v2` and `/health/v2` only. The legacy `/predict` and `/health` paths produce just the middleware
     `request` line — no `prediction_complete`, and their 404 carries no zipcode. `artifact_loaded` is startup and is shared
