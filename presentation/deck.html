@@ -496,7 +496,7 @@
     /* Two tables on this slide, so the rules that depend on column count are
        scoped to ph-spread (the 16-track one). ph-figures stays the shared
        figures treatment both tables use. */
-    #s5-results .ph-table.ph-spread {
+    #s5 .ph-table.ph-spread {
       display: grid;
       /* A column gap, not justify-content:space-between: spreading the tracks
          apart stranded each group title between its own sub-labels and made
@@ -513,7 +513,7 @@
     }
 
     /* Both cards hold a table and nothing else that needs the height. */
-    #s5-results .ph-cols article:has(table) {
+    #s5 .ph-cols article:has(table) {
       display: flex;
       flex-direction: column;
     }
@@ -522,14 +522,14 @@
        `> table` selector here outranks the grid rule on specificity and the
        whole table collapses onto one line. These hang off the table, not off
        the article: thead and tbody are children of table, tr of those. */
-    #s5-results .ph-cols article table > thead,
-    #s5-results .ph-cols article table > tbody,
-    #s5-results .ph-cols article table tr {
+    #s5 .ph-cols article table > thead,
+    #s5 .ph-cols article table > tbody,
+    #s5 .ph-cols article table tr {
       display: contents;
     }
 
-    #s5-results .ph-cols article th,
-    #s5-results .ph-cols article td {
+    #s5 .ph-cols article th,
+    #s5 .ph-cols article td {
       white-space: nowrap;
       padding: 1px 0;
       /* The deck's 1.5 line-height is sized for prose. Two eight-row tables
@@ -540,11 +540,11 @@
     /* Group title spans the three columns it titles; Field spans both header
        rows. In place of the colSpan and rowSpan attributes, which a grid
        ignores. */
-    #s5-results .ph-table.ph-spread thead tr.ph-group th[scope="colgroup"] {
+    #s5 .ph-table.ph-spread thead tr.ph-group th[scope="colgroup"] {
       grid-column: span 3;
     }
 
-    #s5-results .ph-table.ph-spread thead tr.ph-group th[rowspan] {
+    #s5 .ph-table.ph-spread thead tr.ph-group th[rowspan] {
       grid-row: span 2;
       align-self: start;
     }
@@ -553,7 +553,7 @@
        (--ph-accent) in bold and reads as one band above the figures. It also
        takes the max column's tint with it: two blues on one row would say
        nothing, and the header's job here is to label, not to emphasise. */
-    #s5-results .ph-table.ph-spread thead tr.ph-group + tr th {
+    #s5 .ph-table.ph-spread thead tr.ph-group + tr th {
       text-align: right;
       color: var(--ph-accent);
       font-weight: 600;
@@ -571,48 +571,48 @@
        scaled is NN, so the two share one tint. The sub-label row has no label
        cell, so it sits one step left: 4-6, 7-9, 10-12, 13-15. The tints
        themselves are the --tint-* tokens. */
-    #s5-results .ph-table.ph-spread thead tr.ph-group th:nth-child(3) {
+    #s5 .ph-table.ph-spread thead tr.ph-group th:nth-child(3) {
       color: var(--av);
     }
 
-    #s5-results .ph-table.ph-spread thead tr.ph-group th:nth-child(4) {
+    #s5 .ph-table.ph-spread thead tr.ph-group th:nth-child(4) {
       color: var(--md);
     }
 
-    #s5-results .ph-table.ph-spread thead tr.ph-group th:nth-child(5),
-    #s5-results .ph-table.ph-spread thead tr.ph-group th:nth-child(6) {
+    #s5 .ph-table.ph-spread thead tr.ph-group th:nth-child(5),
+    #s5 .ph-table.ph-spread thead tr.ph-group th:nth-child(6) {
       color: var(--knn);
     }
 
-    #s5-results .ph-table.ph-spread thead tr.ph-group + tr th:nth-child(n+4):nth-child(-n+6),
-    #s5-results .ph-table.ph-spread tbody td:nth-child(n+5):nth-child(-n+7) {
+    #s5 .ph-table.ph-spread thead tr.ph-group + tr th:nth-child(n+4):nth-child(-n+6),
+    #s5 .ph-table.ph-spread tbody td:nth-child(n+5):nth-child(-n+7) {
       background-color: var(--tint-av);
     }
 
-    #s5-results .ph-table.ph-spread thead tr.ph-group + tr th:nth-child(n+7):nth-child(-n+9),
-    #s5-results .ph-table.ph-spread tbody td:nth-child(n+8):nth-child(-n+10) {
+    #s5 .ph-table.ph-spread thead tr.ph-group + tr th:nth-child(n+7):nth-child(-n+9),
+    #s5 .ph-table.ph-spread tbody td:nth-child(n+8):nth-child(-n+10) {
       background-color: var(--tint-md);
     }
 
-    #s5-results .ph-table.ph-spread thead tr.ph-group + tr th:nth-child(n+10):nth-child(-n+15),
-    #s5-results .ph-table.ph-spread tbody td:nth-child(n+11):nth-child(-n+16) {
+    #s5 .ph-table.ph-spread thead tr.ph-group + tr th:nth-child(n+10):nth-child(-n+15),
+    #s5 .ph-table.ph-spread tbody td:nth-child(n+11):nth-child(-n+16) {
       background-color: var(--tint-knn);
     }
 
     /* n, min and max are the same measurement in the same ink - the colour
        belongs to the calculation's block, not to one figure inside it. Only
        the weight still marks the max as the end of the range. */
-    #s5-results .ph-table.ph-spread tbody td {
+    #s5 .ph-table.ph-spread tbody td {
       color: var(--ph-ink-muted);
     }
 
-    #s5-results .ph-table.ph-spread tbody td:nth-child(3n + 1) {
+    #s5 .ph-table.ph-spread tbody td:nth-child(3n + 1) {
       font-weight: 600;
     }
 
     /* The quality table: one figure per method, so five tracks and no second
        header row. The label is child 1, so the methods sit at 2-5. */
-    #s5-results .ph-table.ph-quality {
+    #s5 .ph-table.ph-quality {
       display: grid;
       grid-template-columns: max-content repeat(4, minmax(max-content, 1fr));
       column-gap: 9px;
@@ -622,46 +622,46 @@
       align-content: space-between;
     }
 
-    #s5-results .ph-table.ph-quality thead th,
-    #s5-results .ph-table.ph-quality tbody td {
+    #s5 .ph-table.ph-quality thead th,
+    #s5 .ph-table.ph-quality tbody td {
       text-align: right;
     }
 
-    #s5-results .ph-table.ph-quality thead th:first-child,
-    #s5-results .ph-table.ph-quality tbody th {
+    #s5 .ph-table.ph-quality thead th:first-child,
+    #s5 .ph-table.ph-quality tbody th {
       text-align: left;
     }
 
     /* Header carries the method colour, the figures stay default ink - same rule
        as the spread table: the tint says which method, the ink says it is a
        measurement. */
-    #s5-results .ph-table.ph-quality thead th:nth-child(2) {
+    #s5 .ph-table.ph-quality thead th:nth-child(2) {
       color: var(--av);
     }
 
-    #s5-results .ph-table.ph-quality thead th:nth-child(3) {
+    #s5 .ph-table.ph-quality thead th:nth-child(3) {
       color: var(--md);
     }
 
-    #s5-results .ph-table.ph-quality thead th:nth-child(4),
-    #s5-results .ph-table.ph-quality thead th:nth-child(5) {
+    #s5 .ph-table.ph-quality thead th:nth-child(4),
+    #s5 .ph-table.ph-quality thead th:nth-child(5) {
       color: var(--knn);
     }
 
-    #s5-results .ph-table.ph-quality tbody td:nth-child(2) {
+    #s5 .ph-table.ph-quality tbody td:nth-child(2) {
       background-color: var(--tint-av);
     }
 
-    #s5-results .ph-table.ph-quality tbody td:nth-child(3) {
+    #s5 .ph-table.ph-quality tbody td:nth-child(3) {
       background-color: var(--tint-md);
     }
 
-    #s5-results .ph-table.ph-quality tbody td:nth-child(4),
-    #s5-results .ph-table.ph-quality tbody td:nth-child(5) {
+    #s5 .ph-table.ph-quality tbody td:nth-child(4),
+    #s5 .ph-table.ph-quality tbody td:nth-child(5) {
       background-color: var(--tint-knn);
     }
 
-    #s5-results .ph-table.ph-quality tbody td {
+    #s5 .ph-table.ph-quality tbody td {
       color: var(--ph-ink-muted);
     }
 
@@ -676,7 +676,7 @@
        beats both NN variants there, because plot size is the one field where
        the unscaled NN is worse than the median and scaling does not recover
        it. `min()` cannot compare across cells, so the class is the record. */
-    #s5-results .ph-table.ph-quality tbody td.ph-is-best {
+    #s5 .ph-table.ph-quality tbody td.ph-is-best {
       color: var(--ph-mint);
       font-weight: 700;
     }
@@ -736,7 +736,7 @@
        cards blur harder and fill more opaquely than the shared 2px/0.72 used
        elsewhere - at the default the pattern reads straight through the rings
        and the figures. Scoped so no other slide shifts. */
-    #s6-performance .ph-cols article {
+    #s6 .ph-cols article {
       background-color: rgba(12, 20, 46, 0.93);
       -webkit-backdrop-filter: blur(14px);
       backdrop-filter: blur(14px);
@@ -800,7 +800,7 @@
        the slide: at full row width the svg wants 516px tall inside a 456px row
        and spills over the metrics table below. The cap holds the ratio, so the
        chart narrows and centres rather than overflowing. */
-    #s6-performance .ph-cols:first-of-type .ph-chart svg {
+    #s6 .ph-cols:first-of-type .ph-chart svg {
       /* The generator measures the content and sets the real ratio per render;
          this only bounds it. */
       aspect-ratio: auto;
@@ -814,7 +814,7 @@
        carry the argument on their own, and the chrome was costing 30px of
        padding and border plus a title line the metrics table underneath makes
        redundant. */
-    #s6-performance .ph-cols:first-of-type > .ph-chart-card {
+    #s6 .ph-cols:first-of-type > .ph-chart-card {
       background-color: transparent;
       border: 0;
       padding: 0;
@@ -826,12 +826,11 @@
       font-weight: 600;
     }
 
-#s6-performance table {
-  border-collapse: separate;
-
-  border-spacing: var(--sp-sm) 0;
-}
-    #s6-performance thead th {
+    #s6 table {
+      border-collapse: separate;
+      border-spacing: var(--sp-sm) 0;
+    }
+    #s6 thead th {
       border-bottom: 1px solid var(--ph-ink-muted);
       padding:  0 34px 0 0 !important;
     }
@@ -842,13 +841,13 @@
        line with the card beside it. Shrink the gutter to a token and hold every
        cell to one line - labels and figures are single tokens, so the numbers
        take the slack and the row heights stay equal across both tables. */
-    #s6-performance .ph-cols:last-of-type .ph-table.ph-figures-lg th,
-    #s6-performance .ph-cols:last-of-type .ph-table.ph-figures-lg td {
+    #s6 .ph-cols:last-of-type .ph-table.ph-figures-lg th,
+    #s6 .ph-cols:last-of-type .ph-table.ph-figures-lg td {
       padding-right: var(--sp-xs);
       white-space: nowrap;
     }
 
-    #s6-performance .ph-cols:last-of-type thead th {
+    #s6 .ph-cols:last-of-type thead th {
       padding-right: var(--sp-xs) !important;
     }
 
@@ -856,8 +855,8 @@
        left-aligned by default and .ph-figures only right-aligns the cells
        after the first. Right-align the head cell and the row headers together,
        so the column reads as the figure it is. */
-    #s6-performance .ph-cols:last-of-type article:last-child thead th:first-child,
-    #s6-performance .ph-cols:last-of-type article:last-child tbody th {
+    #s6 .ph-cols:last-of-type article:last-child thead th:first-child,
+    #s6 .ph-cols:last-of-type article:last-child tbody th {
       text-align: right;
     }
 
@@ -869,9 +868,9 @@
       color: var(--ph-ink-muted);
     }
 
-    /* S7 split: chips pick the pane. Layout + fragment state only; card
-       fills, borders and type come from .ph-scr / .ph-cols. */
-    .ph-s7 {
+    /* Split slide: a chip rail picks the pane. Layout + fragment state only;
+       card fills, borders and type come from .ph-scr / .ph-cols. */
+    .ph-split {
       flex: 1 1 auto;
       min-height: 0;
       display: grid;
@@ -882,7 +881,7 @@
     /* Left column is treated like the cover: it fills the body height and its
        contents sit centred in it, so the slide reads as a starting point
        rather than a list hanging from the top. */
-    .ph-s7-chips {
+    .ph-chips {
       flex-wrap: nowrap;
       flex-direction: column;
       justify-content: center;
@@ -890,7 +889,7 @@
       gap: var(--sp-sm);
     }
 
-    .ph-s7-chips .ph-s7-chip {
+    .ph-chips .ph-chip {
       flex: 0 0 auto;
       display: flex;
       align-items: center;
@@ -901,13 +900,13 @@
 
     /* Digits dominate, label supports: the number is the step, the words are
        the caption, mirroring the cover's one-large / one-small hierarchy. */
-    .ph-s7-chips .ph-s7-chip .ph-num {
+    .ph-chips .ph-chip .ph-num {
       font-size: var(--fs-h1);
       line-height: 1;
       flex: 0 0 auto;
     }
 
-    .ph-s7-chips .ph-s7-chip > span:last-child {
+    .ph-chips .ph-chip > span:last-child {
       font-size: var(--fs-body);
       text-align: left;
       overflow-wrap: break-word;
@@ -930,7 +929,7 @@
     /* The runtime table is the slide's opening frame, so it sits centred in the
        pane both ways: the column stacks vertically, and the table's own
        max-width + margin-inline: auto (below) does the horizontal half. */
-    .ph-caps .ph-s7 .ph-s7-pane.ph-is-base {
+    .ph-split .ph-pane.ph-is-base {
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -939,14 +938,16 @@
     /* While it is the resting pane the base pane is the current card, so it
        wears the same border + glow `article.current-fragment` gives the other
        three; it never holds that class itself. */
-    .ph-caps .ph-s7 .ph-s7-panes:not(:has(.ph-s7-pane.fragment.visible))
-      .ph-s7-pane.ph-is-base {
+    .ph-split .ph-panes:not(:has(.ph-pane.fragment.visible)) .ph-pane.ph-is-base {
       border-color: var(--ph-mint);
       box-shadow: 0 0 24px rgba(165, 254, 202, 0.25);
     }
 
-    /* Chips stay listed through every step; current one reads as selected. */
-    .ph-caps .ph-s7 .ph-s7-chip.fragment {
+    /* Chips stay listed through every step; current one reads as selected.
+       Needs .ph-split in the selector: bare .ph-chip.fragment ties
+       `.reveal .fragment:not(.custom)` at 0,3,0, and reveal's own rule wins
+       on order alone, hiding every chip that is not current. */
+    .ph-split .ph-chip.fragment {
       opacity: 1;
       visibility: visible;
     }
@@ -958,8 +959,8 @@
        lands on it without a click (reveal exposes no attribute to start a slide
        mid-fragment - upstream #2560). It holds the selected fill until the
        first step fragment fires, then hands it over like any other chip. */
-    .ph-caps .ph-s7 .ph-s7-chip.ph-is-base,
-    .ph-caps .ph-s7 .ph-s7-chip.current-fragment {
+    .ph-split .ph-chip.ph-is-base,
+    .ph-split .ph-chip.current-fragment {
       background-color: rgba(165, 254, 202, 0.12);
       border-left-color: var(--ph-mint);
     }
@@ -967,15 +968,14 @@
     /* Past the base step chip 01 is an ordinary listed chip again: it keeps its
        row so the column stays a stable index, and drops back to the resting
        fill .ph-scr li gives every chip. */
-    .ph-caps .ph-s7 .ph-s7-chips:has(.ph-s7-chip.fragment.visible)
-      .ph-s7-chip.ph-is-base {
+    .ph-chips:has(.ph-chip.fragment.visible) .ph-chip.ph-is-base {
       background-color: var(--ph-card-bg);
       border-left-color: var(--ph-card-border);
     }
 
     /* Panes stack in one cell. Reveal keeps .visible on past fragments, so
        only the current one is painted. */
-    .ph-s7-panes {
+    .ph-panes {
       display: grid;
       min-height: 0;
     }
@@ -983,13 +983,13 @@
     /* min-height:0 lets the pane shrink to the row it is given instead of
        being stretched by its tallest sibling - all four share one grid cell, so
        chip 03's tall capture was pushing the other three past the slide. */
-    .ph-s7-panes .ph-s7-pane {
+    .ph-panes .ph-pane {
       grid-area: 1 / 1;
       min-width: 0;
       min-height: 0;
     }
 
-    /* .ph-shots layout lives below, with the rest of the S7 input block. */
+    /* .ph-shots layout lives below, with the rest of the capture block. */
     /* Runtime table: three equal columns so the whitespace between them is the
        same everywhere.
 
@@ -1010,20 +1010,20 @@
 
        Scoped to .ph-is-base so the Swagger table on 7.4 keeps the width it had
        and only the runtime table moves. */
-    .ph-s7-panes .ph-table {
+    .ph-panes .ph-table {
       max-width: 62ch;
       margin-inline: auto;
       /* table-layout: fixed; */
       font-size: var(--fs-lead);
     }
 
-    .ph-s7-pane.ph-is-base .ph-table {
+    .ph-pane.ph-is-base .ph-table {
       width: 100%;
       max-width: 788px;
     }
 
-    .ph-s7-panes .ph-table th,
-    .ph-s7-panes .ph-table td {
+    .ph-panes .ph-table th,
+    .ph-panes .ph-table td {
       /* width: 33.333%; */
       padding: 3px var(--gap-md) 3px 0;
       text-align: left;
@@ -1031,24 +1031,24 @@
 
     /* Symmetric inset: the trailing gutter matches the leading one so the
        block is optically centred inside the card. */
-    .ph-s7-panes .ph-table tr > :last-child {
+    .ph-panes .ph-table tr > :last-child {
       padding-right: 0;
     }
 
     /* From and To read as one pair in the deck accent, the same treatment the
-       pane labels and the two shot captions carry (see .ph-s7-pane h4 below).
+       pane labels and the two shot captions carry (see .ph-pane h4 below).
        Library keeps the mint header treatment: it names the column, it is not
        one half of a before/after pair. Scoped to the runtime table so the
        Swagger table's own headers are untouched. */
-    .ph-s7-pane.ph-is-base .ph-table thead th:nth-child(2),
-    .ph-s7-pane.ph-is-base .ph-table thead th:nth-child(3) {
+    .ph-pane.ph-is-base .ph-table thead th:nth-child(2),
+    .ph-pane.ph-is-base .ph-table thead th:nth-child(3) {
       color: var(--ph-accent);
     }
 
     /* Label and capture are one item: the label rides hard against its own
        picture and the pair centres in the pane, so a capture never floats in
        slack with its label dropped down the box to meet it. */
-    .ph-s7-validation {
+    .ph-captures {
       flex: 1 1 auto;
       min-height: 0;
       display: flex;
@@ -1063,7 +1063,7 @@
        and the gap that spreads whatever is left over into three equal parts -
        outside the pair and between it - so the pair is centred with an even
        margin on every side. */
-    .ph-s7-validation .ph-shots {
+    .ph-captures .ph-shots {
       flex: 1 1 auto;
       min-height: 0;
       display: flex;
@@ -1083,7 +1083,7 @@
        the capture into the dialog for the duration, and a content-sized
        figure would collapse to its bare label, re-centring the row and
        dragging the other capture sideways. */
-    .ph-s7-validation .ph-shot {
+    .ph-captures .ph-shot {
       flex: 0 0 auto;
       width: var(--ph-shot-w, 100%);
       min-width: 0;
@@ -1130,17 +1130,19 @@
 
        Pane 01 carries no .fragment, so it is never .current-fragment and
        cannot ride that rule - it needs its own two, keyed on whether any step
-       fragment has fired. */
-    .ph-caps .ph-s7 .ph-s7-pane.fragment,
-    .ph-caps .ph-s7 .ph-s7-panes:has(.ph-s7-pane.fragment.visible)
-      .ph-s7-pane.ph-is-base {
+       fragment has fired.
+
+       Every rule here needs .ph-split in the selector. Bare .ph-pane.fragment
+       scores 0,2,0 and loses to reveal's `.reveal .fragment:not(.custom)` at
+       0,3,0, which leaves every past pane painted on top of the current one. */
+    .ph-split .ph-pane.fragment,
+    .ph-split .ph-panes:has(.ph-pane.fragment.visible) .ph-pane.ph-is-base {
       opacity: 0;
       visibility: hidden;
     }
 
-    .ph-caps .ph-s7 .ph-s7-panes:not(:has(.ph-s7-pane.fragment.visible))
-      .ph-s7-pane.ph-is-base,
-    .ph-caps .ph-s7 .ph-s7-pane.fragment.current-fragment {
+    .ph-split .ph-panes:not(:has(.ph-pane.fragment.visible)) .ph-pane.ph-is-base,
+    .ph-split .ph-pane.fragment.current-fragment {
       opacity: 1;
       visibility: visible;
     }
@@ -1164,7 +1166,7 @@
     /* Pane subheading: below the h3 in size, tight to its block, one rhythm
        for every From/To pair across all four panes. The pair labels carry the
        deck accent so a reader can tell them from the pane title. */
-    .ph-s7-pane h4 {
+    .ph-pane h4 {
       color: var(--ph-accent);
       font-size: var(--fs-body);
       font-weight: 600;
@@ -1237,7 +1239,7 @@
        last line fell past the foot; at 1.25 it ends 2.7px above where the
        14-line block used to end, leaving 13.5px clear. Scoped to the slide,
        so every other .ph-code block keeps 1.35. */
-    .ph-s7 .ph-code {
+    #s7 .ph-code {
       line-height: 1.25;
     }
 
@@ -1250,25 +1252,25 @@
        needed height (shrinkable); the solution grows into the slack, so
        the top box carries no empty space and the bottom box is not
        jammed. Basis auto = needed height; grow/shrink distribute the rest. */
-    #s3-problem .ph-cols.ph-is-stack>article {
+    #s3 .ph-cols.ph-is-stack>article {
       flex: 0 1 auto;
     }
 
-    #s3-problem .ph-cols.ph-is-stack>article:last-child {
+    #s3 .ph-cols.ph-is-stack>article:last-child {
       flex: 1 1 auto;
     }
 
     /* S3 method titles wear their calculation colours, as on S4-S6:
        average amber, medium blue, nearest-neighbour purple. */
-    #s3-problem article.ph-is-av h4 {
+    #s3 article.ph-is-av h4 {
       color: var(--av);
     }
 
-    #s3-problem article.ph-is-md h4 {
+    #s3 article.ph-is-md h4 {
       color: var(--md);
     }
 
-    #s3-problem article.ph-is-knn h4 {
+    #s3 article.ph-is-knn h4 {
       color: var(--knn);
     }
 
@@ -1276,7 +1278,7 @@
        into the three approach boxes - every p inside .ph-cols is margin:0
        (deck.html:385-387), so the h3's bottom margin is the only spacing the
        card has. Give the row the deck's normal block gap. */
-    #s3-problem .ph-cols.ph-is-stack>article>p+.ph-cols {
+    #s3 .ph-cols.ph-is-stack>article>p+.ph-cols {
       margin-top: var(--sp-sm);
     }
 
@@ -1325,6 +1327,8 @@
 
     .ph-subs>* {
       grid-area: 1 / 1;
+      opacity: 0;
+      transition: opacity var(--ph-t-slide) var(--ph-ease);
     }
 
     /* All four subs stack in one grid cell; the active one fades up. display
@@ -1333,41 +1337,37 @@
     /* Each S4 subtitle wears the colour of the equation it names, the same
        token its marker, dashed box and panel border already use, so the
        stage label and the thing it describes are one colour. */
-    .ph-s4-sub.ph-is-av {
+    .ph-subs>.ph-is-av {
       color: var(--av);
     }
 
-    .ph-s4-sub.ph-is-md {
+    .ph-subs>.ph-is-md {
       color: var(--md);
     }
 
-    .ph-s4-sub.ph-is-knn {
+    .ph-subs>.ph-is-knn {
       color: var(--knn);
     }
 
-    .ph-s4-sub.ph-is-snn {
+    .ph-subs>.ph-is-snn {
       color: var(--snn);
     }
 
-    .ph-s4-sub.ph-is-sum {
+    .ph-subs>.ph-is-sum {
       color: var(--ph-accent);
-    }
-    .ph-s4-sub {
-      opacity: 0;
-      transition: opacity var(--ph-t-slide) var(--ph-ease);
     }
 
     /* Reveal only ever ADDS .visible, so at stage N drivers 1..N are all visible.
        The :not() guard is what makes each rule match at exactly one stage; drop it
        and every earlier stage's rules fire at once. Stage 7 is the one bare
        :has() rule, unique because driver 7 exists nowhere else. */
-    section[data-s4]:has(.ph-s4-go:nth-of-type(1).visible):not(:has(.ph-s4-go:nth-of-type(2).visible)) .ph-s4-sub:nth-of-type(1),
-    section[data-s4]:has(.ph-s4-go:nth-of-type(2).visible):not(:has(.ph-s4-go:nth-of-type(3).visible)) .ph-s4-sub:nth-of-type(2),
-    section[data-s4]:has(.ph-s4-go:nth-of-type(3).visible):not(:has(.ph-s4-go:nth-of-type(4).visible)) .ph-s4-sub:nth-of-type(3),
-    section[data-s4]:has(.ph-s4-go:nth-of-type(4).visible):not(:has(.ph-s4-go:nth-of-type(5).visible)) .ph-s4-sub:nth-of-type(4),
-    section[data-s4]:has(.ph-s4-go:nth-of-type(5).visible):not(:has(.ph-s4-go:nth-of-type(6).visible)) .ph-s4-sub:nth-of-type(5),
-    section[data-s4]:has(.ph-s4-go:nth-of-type(6).visible):not(:has(.ph-s4-go:nth-of-type(7).visible)) .ph-s4-sub:nth-of-type(6),
-    section[data-s4]:has(.ph-s4-go:nth-of-type(7).visible) .ph-s4-sub:nth-of-type(7) {
+    #s4:has(.ph-step:nth-of-type(1).visible):not(:has(.ph-step:nth-of-type(2).visible)) .ph-subs>*:nth-of-type(1),
+    #s4:has(.ph-step:nth-of-type(2).visible):not(:has(.ph-step:nth-of-type(3).visible)) .ph-subs>*:nth-of-type(2),
+    #s4:has(.ph-step:nth-of-type(3).visible):not(:has(.ph-step:nth-of-type(4).visible)) .ph-subs>*:nth-of-type(3),
+    #s4:has(.ph-step:nth-of-type(4).visible):not(:has(.ph-step:nth-of-type(5).visible)) .ph-subs>*:nth-of-type(4),
+    #s4:has(.ph-step:nth-of-type(5).visible):not(:has(.ph-step:nth-of-type(6).visible)) .ph-subs>*:nth-of-type(5),
+    #s4:has(.ph-step:nth-of-type(6).visible):not(:has(.ph-step:nth-of-type(7).visible)) .ph-subs>*:nth-of-type(6),
+    #s4:has(.ph-step:nth-of-type(7).visible) .ph-subs>*:nth-of-type(7) {
       opacity: 1;
     }
 
@@ -1390,7 +1390,7 @@
       margin: 0;
     }
 
-    section[data-s4]:has(.ph-s4-go:nth-of-type(1).visible) .ph-stage-hint {
+    #s4:has(.ph-step:nth-of-type(1).visible) .ph-stage-hint {
       display: none;
     }
 
@@ -1432,109 +1432,109 @@
        inherited from the stage before and nothing has to be undone after. */
 
     /* Stage 1 - Average: one column, every house. */
-    section[data-s4]:has(.ph-s4-go:nth-of-type(1).visible):not(:has(.ph-s4-go:nth-of-type(2).visible)) .ar-living .v,
-    section[data-s4]:has(.ph-s4-go:nth-of-type(1).visible):not(:has(.ph-s4-go:nth-of-type(2).visible)) .al-living {
+    #s4:has(.ph-step:nth-of-type(1).visible):not(:has(.ph-step:nth-of-type(2).visible)) .ar-living .v,
+    #s4:has(.ph-step:nth-of-type(1).visible):not(:has(.ph-step:nth-of-type(2).visible)) .al-living {
       fill: var(--av);
       opacity: 1;
     }
 
-    section[data-s4]:has(.ph-s4-go:nth-of-type(1).visible):not(:has(.ph-s4-go:nth-of-type(2).visible)) .ar-lot .v,
-    section[data-s4]:has(.ph-s4-go:nth-of-type(1).visible):not(:has(.ph-s4-go:nth-of-type(2).visible)) .ar-bed .v,
-    section[data-s4]:has(.ph-s4-go:nth-of-type(1).visible):not(:has(.ph-s4-go:nth-of-type(2).visible)) .ar-bath .v,
-    section[data-s4]:has(.ph-s4-go:nth-of-type(1).visible):not(:has(.ph-s4-go:nth-of-type(2).visible)) .al-lot,
-    section[data-s4]:has(.ph-s4-go:nth-of-type(1).visible):not(:has(.ph-s4-go:nth-of-type(2).visible)) .al-bed,
-    section[data-s4]:has(.ph-s4-go:nth-of-type(1).visible):not(:has(.ph-s4-go:nth-of-type(2).visible)) .al-bath {
+    #s4:has(.ph-step:nth-of-type(1).visible):not(:has(.ph-step:nth-of-type(2).visible)) .ar-lot .v,
+    #s4:has(.ph-step:nth-of-type(1).visible):not(:has(.ph-step:nth-of-type(2).visible)) .ar-bed .v,
+    #s4:has(.ph-step:nth-of-type(1).visible):not(:has(.ph-step:nth-of-type(2).visible)) .ar-bath .v,
+    #s4:has(.ph-step:nth-of-type(1).visible):not(:has(.ph-step:nth-of-type(2).visible)) .al-lot,
+    #s4:has(.ph-step:nth-of-type(1).visible):not(:has(.ph-step:nth-of-type(2).visible)) .al-bed,
+    #s4:has(.ph-step:nth-of-type(1).visible):not(:has(.ph-step:nth-of-type(2).visible)) .al-bath {
       opacity: 0.22;
     }
 
     /* Stage 2 - Medium: the same one column, only the two middle houses. */
-    section[data-s4]:has(.ph-s4-go:nth-of-type(2).visible):not(:has(.ph-s4-go:nth-of-type(3).visible)) .ar-living .v.h-mid,
-    section[data-s4]:has(.ph-s4-go:nth-of-type(2).visible):not(:has(.ph-s4-go:nth-of-type(3).visible)) .al-living {
+    #s4:has(.ph-step:nth-of-type(2).visible):not(:has(.ph-step:nth-of-type(3).visible)) .ar-living .v.h-mid,
+    #s4:has(.ph-step:nth-of-type(2).visible):not(:has(.ph-step:nth-of-type(3).visible)) .al-living {
       fill: var(--md);
       opacity: 1;
     }
 
-    section[data-s4]:has(.ph-s4-go:nth-of-type(2).visible):not(:has(.ph-s4-go:nth-of-type(3).visible)) .ar-living .v:not(.h-mid),
-    section[data-s4]:has(.ph-s4-go:nth-of-type(2).visible):not(:has(.ph-s4-go:nth-of-type(3).visible)) .ar-lot .v,
-    section[data-s4]:has(.ph-s4-go:nth-of-type(2).visible):not(:has(.ph-s4-go:nth-of-type(3).visible)) .ar-bed .v,
-    section[data-s4]:has(.ph-s4-go:nth-of-type(2).visible):not(:has(.ph-s4-go:nth-of-type(3).visible)) .ar-bath .v,
-    section[data-s4]:has(.ph-s4-go:nth-of-type(2).visible):not(:has(.ph-s4-go:nth-of-type(3).visible)) .al-lot,
-    section[data-s4]:has(.ph-s4-go:nth-of-type(2).visible):not(:has(.ph-s4-go:nth-of-type(3).visible)) .al-bed,
-    section[data-s4]:has(.ph-s4-go:nth-of-type(2).visible):not(:has(.ph-s4-go:nth-of-type(3).visible)) .al-bath {
+    #s4:has(.ph-step:nth-of-type(2).visible):not(:has(.ph-step:nth-of-type(3).visible)) .ar-living .v:not(.h-mid),
+    #s4:has(.ph-step:nth-of-type(2).visible):not(:has(.ph-step:nth-of-type(3).visible)) .ar-lot .v,
+    #s4:has(.ph-step:nth-of-type(2).visible):not(:has(.ph-step:nth-of-type(3).visible)) .ar-bed .v,
+    #s4:has(.ph-step:nth-of-type(2).visible):not(:has(.ph-step:nth-of-type(3).visible)) .ar-bath .v,
+    #s4:has(.ph-step:nth-of-type(2).visible):not(:has(.ph-step:nth-of-type(3).visible)) .al-lot,
+    #s4:has(.ph-step:nth-of-type(2).visible):not(:has(.ph-step:nth-of-type(3).visible)) .al-bed,
+    #s4:has(.ph-step:nth-of-type(2).visible):not(:has(.ph-step:nth-of-type(3).visible)) .al-bath {
       opacity: 0.22;
     }
 
     /* Stage 3 - Nearest Neighbor, step 1: three columns decide which houses are
        close. All twelve are compared; the five that win are the only ones lit. */
-    section[data-s4]:has(.ph-s4-go:nth-of-type(3).visible):not(:has(.ph-s4-go:nth-of-type(4).visible)) .ar-lot .v.h-nn,
-    section[data-s4]:has(.ph-s4-go:nth-of-type(3).visible):not(:has(.ph-s4-go:nth-of-type(4).visible)) .ar-bed .v.h-nn,
-    section[data-s4]:has(.ph-s4-go:nth-of-type(3).visible):not(:has(.ph-s4-go:nth-of-type(4).visible)) .ar-bath .v.h-nn,
-    section[data-s4]:has(.ph-s4-go:nth-of-type(3).visible):not(:has(.ph-s4-go:nth-of-type(4).visible)) .al-lot,
-    section[data-s4]:has(.ph-s4-go:nth-of-type(3).visible):not(:has(.ph-s4-go:nth-of-type(4).visible)) .al-bed,
-    section[data-s4]:has(.ph-s4-go:nth-of-type(3).visible):not(:has(.ph-s4-go:nth-of-type(4).visible)) .al-bath {
+    #s4:has(.ph-step:nth-of-type(3).visible):not(:has(.ph-step:nth-of-type(4).visible)) .ar-lot .v.h-nn,
+    #s4:has(.ph-step:nth-of-type(3).visible):not(:has(.ph-step:nth-of-type(4).visible)) .ar-bed .v.h-nn,
+    #s4:has(.ph-step:nth-of-type(3).visible):not(:has(.ph-step:nth-of-type(4).visible)) .ar-bath .v.h-nn,
+    #s4:has(.ph-step:nth-of-type(3).visible):not(:has(.ph-step:nth-of-type(4).visible)) .al-lot,
+    #s4:has(.ph-step:nth-of-type(3).visible):not(:has(.ph-step:nth-of-type(4).visible)) .al-bed,
+    #s4:has(.ph-step:nth-of-type(3).visible):not(:has(.ph-step:nth-of-type(4).visible)) .al-bath {
       fill: var(--knn);
       opacity: 1;
     }
 
-    section[data-s4]:has(.ph-s4-go:nth-of-type(3).visible):not(:has(.ph-s4-go:nth-of-type(4).visible)) .ar-living .v,
-    section[data-s4]:has(.ph-s4-go:nth-of-type(3).visible):not(:has(.ph-s4-go:nth-of-type(4).visible)) .ar-lot .v:not(.h-nn),
-    section[data-s4]:has(.ph-s4-go:nth-of-type(3).visible):not(:has(.ph-s4-go:nth-of-type(4).visible)) .ar-bed .v:not(.h-nn),
-    section[data-s4]:has(.ph-s4-go:nth-of-type(3).visible):not(:has(.ph-s4-go:nth-of-type(4).visible)) .ar-bath .v:not(.h-nn),
-    section[data-s4]:has(.ph-s4-go:nth-of-type(3).visible):not(:has(.ph-s4-go:nth-of-type(4).visible)) .al-living {
+    #s4:has(.ph-step:nth-of-type(3).visible):not(:has(.ph-step:nth-of-type(4).visible)) .ar-living .v,
+    #s4:has(.ph-step:nth-of-type(3).visible):not(:has(.ph-step:nth-of-type(4).visible)) .ar-lot .v:not(.h-nn),
+    #s4:has(.ph-step:nth-of-type(3).visible):not(:has(.ph-step:nth-of-type(4).visible)) .ar-bed .v:not(.h-nn),
+    #s4:has(.ph-step:nth-of-type(3).visible):not(:has(.ph-step:nth-of-type(4).visible)) .ar-bath .v:not(.h-nn),
+    #s4:has(.ph-step:nth-of-type(3).visible):not(:has(.ph-step:nth-of-type(4).visible)) .al-living {
       opacity: 0.22;
     }
 
     /* Stage 4 - Nearest Neighbor, step 2: the three comparison columns go quiet and
        the one column that gets averaged comes up. */
-    section[data-s4]:has(.ph-s4-go:nth-of-type(4).visible):not(:has(.ph-s4-go:nth-of-type(5).visible)) .ar-living .v.h-nn,
-    section[data-s4]:has(.ph-s4-go:nth-of-type(4).visible):not(:has(.ph-s4-go:nth-of-type(5).visible)) .al-living {
+    #s4:has(.ph-step:nth-of-type(4).visible):not(:has(.ph-step:nth-of-type(5).visible)) .ar-living .v.h-nn,
+    #s4:has(.ph-step:nth-of-type(4).visible):not(:has(.ph-step:nth-of-type(5).visible)) .al-living {
       fill: var(--knn);
       opacity: 1;
     }
 
-    section[data-s4]:has(.ph-s4-go:nth-of-type(4).visible):not(:has(.ph-s4-go:nth-of-type(5).visible)) .ar-living .v:not(.h-nn),
-    section[data-s4]:has(.ph-s4-go:nth-of-type(4).visible):not(:has(.ph-s4-go:nth-of-type(5).visible)) .ar-lot .v,
-    section[data-s4]:has(.ph-s4-go:nth-of-type(4).visible):not(:has(.ph-s4-go:nth-of-type(5).visible)) .ar-bed .v,
-    section[data-s4]:has(.ph-s4-go:nth-of-type(4).visible):not(:has(.ph-s4-go:nth-of-type(5).visible)) .ar-bath .v,
-    section[data-s4]:has(.ph-s4-go:nth-of-type(4).visible):not(:has(.ph-s4-go:nth-of-type(5).visible)) .al-lot,
-    section[data-s4]:has(.ph-s4-go:nth-of-type(4).visible):not(:has(.ph-s4-go:nth-of-type(5).visible)) .al-bed,
-    section[data-s4]:has(.ph-s4-go:nth-of-type(4).visible):not(:has(.ph-s4-go:nth-of-type(5).visible)) .al-bath {
+    #s4:has(.ph-step:nth-of-type(4).visible):not(:has(.ph-step:nth-of-type(5).visible)) .ar-living .v:not(.h-nn),
+    #s4:has(.ph-step:nth-of-type(4).visible):not(:has(.ph-step:nth-of-type(5).visible)) .ar-lot .v,
+    #s4:has(.ph-step:nth-of-type(4).visible):not(:has(.ph-step:nth-of-type(5).visible)) .ar-bed .v,
+    #s4:has(.ph-step:nth-of-type(4).visible):not(:has(.ph-step:nth-of-type(5).visible)) .ar-bath .v,
+    #s4:has(.ph-step:nth-of-type(4).visible):not(:has(.ph-step:nth-of-type(5).visible)) .al-lot,
+    #s4:has(.ph-step:nth-of-type(4).visible):not(:has(.ph-step:nth-of-type(5).visible)) .al-bed,
+    #s4:has(.ph-step:nth-of-type(4).visible):not(:has(.ph-step:nth-of-type(5).visible)) .al-bath {
       opacity: 0.22;
     }
 
     /* Stage 5 - Scaled NN, step 1: stage 3 again, in the scaled colour. */
-    section[data-s4]:has(.ph-s4-go:nth-of-type(5).visible):not(:has(.ph-s4-go:nth-of-type(6).visible)) .ar-lot .v.h-nn,
-    section[data-s4]:has(.ph-s4-go:nth-of-type(5).visible):not(:has(.ph-s4-go:nth-of-type(6).visible)) .ar-bed .v.h-nn,
-    section[data-s4]:has(.ph-s4-go:nth-of-type(5).visible):not(:has(.ph-s4-go:nth-of-type(6).visible)) .ar-bath .v.h-nn,
-    section[data-s4]:has(.ph-s4-go:nth-of-type(5).visible):not(:has(.ph-s4-go:nth-of-type(6).visible)) .al-lot,
-    section[data-s4]:has(.ph-s4-go:nth-of-type(5).visible):not(:has(.ph-s4-go:nth-of-type(6).visible)) .al-bed,
-    section[data-s4]:has(.ph-s4-go:nth-of-type(5).visible):not(:has(.ph-s4-go:nth-of-type(6).visible)) .al-bath {
+    #s4:has(.ph-step:nth-of-type(5).visible):not(:has(.ph-step:nth-of-type(6).visible)) .ar-lot .v.h-nn,
+    #s4:has(.ph-step:nth-of-type(5).visible):not(:has(.ph-step:nth-of-type(6).visible)) .ar-bed .v.h-nn,
+    #s4:has(.ph-step:nth-of-type(5).visible):not(:has(.ph-step:nth-of-type(6).visible)) .ar-bath .v.h-nn,
+    #s4:has(.ph-step:nth-of-type(5).visible):not(:has(.ph-step:nth-of-type(6).visible)) .al-lot,
+    #s4:has(.ph-step:nth-of-type(5).visible):not(:has(.ph-step:nth-of-type(6).visible)) .al-bed,
+    #s4:has(.ph-step:nth-of-type(5).visible):not(:has(.ph-step:nth-of-type(6).visible)) .al-bath {
       fill: var(--snn);
       opacity: 1;
     }
 
-    section[data-s4]:has(.ph-s4-go:nth-of-type(5).visible):not(:has(.ph-s4-go:nth-of-type(6).visible)) .ar-living .v,
-    section[data-s4]:has(.ph-s4-go:nth-of-type(5).visible):not(:has(.ph-s4-go:nth-of-type(6).visible)) .ar-lot .v:not(.h-nn),
-    section[data-s4]:has(.ph-s4-go:nth-of-type(5).visible):not(:has(.ph-s4-go:nth-of-type(6).visible)) .ar-bed .v:not(.h-nn),
-    section[data-s4]:has(.ph-s4-go:nth-of-type(5).visible):not(:has(.ph-s4-go:nth-of-type(6).visible)) .ar-bath .v:not(.h-nn),
-    section[data-s4]:has(.ph-s4-go:nth-of-type(5).visible):not(:has(.ph-s4-go:nth-of-type(6).visible)) .al-living {
+    #s4:has(.ph-step:nth-of-type(5).visible):not(:has(.ph-step:nth-of-type(6).visible)) .ar-living .v,
+    #s4:has(.ph-step:nth-of-type(5).visible):not(:has(.ph-step:nth-of-type(6).visible)) .ar-lot .v:not(.h-nn),
+    #s4:has(.ph-step:nth-of-type(5).visible):not(:has(.ph-step:nth-of-type(6).visible)) .ar-bed .v:not(.h-nn),
+    #s4:has(.ph-step:nth-of-type(5).visible):not(:has(.ph-step:nth-of-type(6).visible)) .ar-bath .v:not(.h-nn),
+    #s4:has(.ph-step:nth-of-type(5).visible):not(:has(.ph-step:nth-of-type(6).visible)) .al-living {
       opacity: 0.22;
     }
 
     /* Stage 6 - Scaled NN, step 2: stage 4 again, in the scaled colour. */
-    section[data-s4]:has(.ph-s4-go:nth-of-type(6).visible):not(:has(.ph-s4-go:nth-of-type(7).visible)) .ar-living .v.h-nn,
-    section[data-s4]:has(.ph-s4-go:nth-of-type(6).visible):not(:has(.ph-s4-go:nth-of-type(7).visible)) .al-living {
+    #s4:has(.ph-step:nth-of-type(6).visible):not(:has(.ph-step:nth-of-type(7).visible)) .ar-living .v.h-nn,
+    #s4:has(.ph-step:nth-of-type(6).visible):not(:has(.ph-step:nth-of-type(7).visible)) .al-living {
       fill: var(--snn);
       opacity: 1;
     }
 
-    section[data-s4]:has(.ph-s4-go:nth-of-type(6).visible):not(:has(.ph-s4-go:nth-of-type(7).visible)) .ar-living .v:not(.h-nn),
-    section[data-s4]:has(.ph-s4-go:nth-of-type(6).visible):not(:has(.ph-s4-go:nth-of-type(7).visible)) .ar-lot .v,
-    section[data-s4]:has(.ph-s4-go:nth-of-type(6).visible):not(:has(.ph-s4-go:nth-of-type(7).visible)) .ar-bed .v,
-    section[data-s4]:has(.ph-s4-go:nth-of-type(6).visible):not(:has(.ph-s4-go:nth-of-type(7).visible)) .ar-bath .v,
-    section[data-s4]:has(.ph-s4-go:nth-of-type(6).visible):not(:has(.ph-s4-go:nth-of-type(7).visible)) .al-lot,
-    section[data-s4]:has(.ph-s4-go:nth-of-type(6).visible):not(:has(.ph-s4-go:nth-of-type(7).visible)) .al-bed,
-    section[data-s4]:has(.ph-s4-go:nth-of-type(6).visible):not(:has(.ph-s4-go:nth-of-type(7).visible)) .al-bath {
+    #s4:has(.ph-step:nth-of-type(6).visible):not(:has(.ph-step:nth-of-type(7).visible)) .ar-living .v:not(.h-nn),
+    #s4:has(.ph-step:nth-of-type(6).visible):not(:has(.ph-step:nth-of-type(7).visible)) .ar-lot .v,
+    #s4:has(.ph-step:nth-of-type(6).visible):not(:has(.ph-step:nth-of-type(7).visible)) .ar-bed .v,
+    #s4:has(.ph-step:nth-of-type(6).visible):not(:has(.ph-step:nth-of-type(7).visible)) .ar-bath .v,
+    #s4:has(.ph-step:nth-of-type(6).visible):not(:has(.ph-step:nth-of-type(7).visible)) .al-lot,
+    #s4:has(.ph-step:nth-of-type(6).visible):not(:has(.ph-step:nth-of-type(7).visible)) .al-bed,
+    #s4:has(.ph-step:nth-of-type(6).visible):not(:has(.ph-step:nth-of-type(7).visible)) .al-bath {
       opacity: 0.22;
     }
 
@@ -1543,25 +1543,25 @@
 
     /* Per-stage eq houses + input boxes. Stages 3 and 5 have no marker: nothing
        has been computed yet. Stage 7 shows all four. */
-    section[data-s4]:has(.ph-s4-go:nth-of-type(1).visible):not(:has(.ph-s4-go:nth-of-type(2).visible)) #mk-avg,
-    section[data-s4]:has(.ph-s4-go:nth-of-type(2).visible):not(:has(.ph-s4-go:nth-of-type(3).visible)) #mk-med,
-    section[data-s4]:has(.ph-s4-go:nth-of-type(4).visible):not(:has(.ph-s4-go:nth-of-type(5).visible)) #mk-knn,
-    section[data-s4]:has(.ph-s4-go:nth-of-type(6).visible):not(:has(.ph-s4-go:nth-of-type(7).visible)) #mk-snn,
-    section[data-s4]:has(.ph-s4-go:nth-of-type(7).visible) #mk-avg,
-    section[data-s4]:has(.ph-s4-go:nth-of-type(7).visible) #mk-med,
-    section[data-s4]:has(.ph-s4-go:nth-of-type(7).visible) #mk-knn,
-    section[data-s4]:has(.ph-s4-go:nth-of-type(7).visible) #mk-snn {
+    #s4:has(.ph-step:nth-of-type(1).visible):not(:has(.ph-step:nth-of-type(2).visible)) #mk-avg,
+    #s4:has(.ph-step:nth-of-type(2).visible):not(:has(.ph-step:nth-of-type(3).visible)) #mk-med,
+    #s4:has(.ph-step:nth-of-type(4).visible):not(:has(.ph-step:nth-of-type(5).visible)) #mk-knn,
+    #s4:has(.ph-step:nth-of-type(6).visible):not(:has(.ph-step:nth-of-type(7).visible)) #mk-snn,
+    #s4:has(.ph-step:nth-of-type(7).visible) #mk-avg,
+    #s4:has(.ph-step:nth-of-type(7).visible) #mk-med,
+    #s4:has(.ph-step:nth-of-type(7).visible) #mk-knn,
+    #s4:has(.ph-step:nth-of-type(7).visible) #mk-snn {
       opacity: 1;
     }
 
     /* Box height is half the encoding: 122 stops between the sqft_living row and
        the sqft_lot row, 180 reaches past bathrooms. No box at stage 7. */
-    section[data-s4]:has(.ph-s4-go:nth-of-type(1).visible):not(:has(.ph-s4-go:nth-of-type(2).visible)) #bx-avg,
-    section[data-s4]:has(.ph-s4-go:nth-of-type(2).visible):not(:has(.ph-s4-go:nth-of-type(3).visible)) #bx-med,
-    section[data-s4]:has(.ph-s4-go:nth-of-type(3).visible):not(:has(.ph-s4-go:nth-of-type(4).visible)) #bx-knn-pick,
-    section[data-s4]:has(.ph-s4-go:nth-of-type(4).visible):not(:has(.ph-s4-go:nth-of-type(5).visible)) #bx-knn,
-    section[data-s4]:has(.ph-s4-go:nth-of-type(5).visible):not(:has(.ph-s4-go:nth-of-type(6).visible)) #bx-snn-pick,
-    section[data-s4]:has(.ph-s4-go:nth-of-type(6).visible):not(:has(.ph-s4-go:nth-of-type(7).visible)) #bx-snn {
+    #s4:has(.ph-step:nth-of-type(1).visible):not(:has(.ph-step:nth-of-type(2).visible)) #bx-avg,
+    #s4:has(.ph-step:nth-of-type(2).visible):not(:has(.ph-step:nth-of-type(3).visible)) #bx-med,
+    #s4:has(.ph-step:nth-of-type(3).visible):not(:has(.ph-step:nth-of-type(4).visible)) #bx-knn-pick,
+    #s4:has(.ph-step:nth-of-type(4).visible):not(:has(.ph-step:nth-of-type(5).visible)) #bx-knn,
+    #s4:has(.ph-step:nth-of-type(5).visible):not(:has(.ph-step:nth-of-type(6).visible)) #bx-snn-pick,
+    #s4:has(.ph-step:nth-of-type(6).visible):not(:has(.ph-step:nth-of-type(7).visible)) #bx-snn {
       opacity: 1;
     }
 
@@ -1576,7 +1576,7 @@
       overflow: hidden;
     }
 
-    section[data-s4]:has(.ph-s4-go:nth-of-type(1).visible) .ph-stage-bottom {
+    #s4:has(.ph-step:nth-of-type(1).visible) .ph-stage-bottom {
       flex: 0 0 50%;
       overflow: hidden;
     }
@@ -1594,7 +1594,7 @@
       overflow: hidden;
     }
 
-    section[data-s4] .ph-panel {
+    #s4 .ph-panel {
       display: none;
     }
 
@@ -1602,11 +1602,11 @@
        Scaled NN spans 5-6, so each guard stops at the stage after its LAST stage.
        ph-is-snn guards on driver 7, not 6 - guarding on 6 would leave stage 6 with
        no panel at all. */
-    section[data-s4]:has(.ph-s4-go:nth-of-type(1).visible):not(:has(.ph-s4-go:nth-of-type(2).visible)) .ph-panel.ph-is-av,
-    section[data-s4]:has(.ph-s4-go:nth-of-type(2).visible):not(:has(.ph-s4-go:nth-of-type(3).visible)) .ph-panel.ph-is-md,
-    section[data-s4]:has(.ph-s4-go:nth-of-type(3).visible):not(:has(.ph-s4-go:nth-of-type(5).visible)) .ph-panel.ph-is-knn,
-    section[data-s4]:has(.ph-s4-go:nth-of-type(5).visible):not(:has(.ph-s4-go:nth-of-type(7).visible)) .ph-panel.ph-is-snn,
-    section[data-s4]:has(.ph-s4-go:nth-of-type(7).visible) .ph-panel.ph-is-sum {
+    #s4:has(.ph-step:nth-of-type(1).visible):not(:has(.ph-step:nth-of-type(2).visible)) .ph-panel.ph-is-av,
+    #s4:has(.ph-step:nth-of-type(2).visible):not(:has(.ph-step:nth-of-type(3).visible)) .ph-panel.ph-is-md,
+    #s4:has(.ph-step:nth-of-type(3).visible):not(:has(.ph-step:nth-of-type(5).visible)) .ph-panel.ph-is-knn,
+    #s4:has(.ph-step:nth-of-type(5).visible):not(:has(.ph-step:nth-of-type(7).visible)) .ph-panel.ph-is-snn,
+    #s4:has(.ph-step:nth-of-type(7).visible) .ph-panel.ph-is-sum {
       display: flex;
     }
 
@@ -1792,7 +1792,7 @@
       opacity: 1;
     }
 
-    #s4 .drivers {
+    .ph-steps {
       position: absolute;
       width: 0;
       height: 0;
@@ -1919,7 +1919,6 @@
       box-shadow: 0 0 0 var(--line-sm) var(--ph-mint), 0 12px 28px rgba(0, 0, 0, 0.45);
     }
 
-    .ph-s7 
 
     /* The dialog is the top layer: the picture and its caption live in it, so
        they are opaque and above everything for the whole flight. Only the dim
@@ -1978,7 +1977,7 @@
     }
 
     /* The caption is the slide's own <h4> lifted out of the shot, so it keeps
-       that label's type exactly: .ph-s7-pane h4 size, weight and accent. */
+       that label's type exactly: .ph-pane h4 size, weight and accent. */
     .ph-zoom-cap {
       font-size: var(--fs-body);
       font-weight: 600;
@@ -2110,7 +2109,7 @@
       </section>
 
       <!-- S3 Opportunity. -->
-      <section id="s3" data-s3 aria-label="Opportunity">
+      <section id="s3" aria-label="Opportunity">
         <header class="ph-head">
           <h2>Opportunity</h2>
           <p class="ph-subtitle">The approach</p>
@@ -2172,17 +2171,17 @@
       </section>
 
       <!-- S4 Three options: 12 houses, staged detail. -->
-      <section id="s4" data-s4 aria-label="Missing value approaches">
+      <section id="s4" aria-label="Missing value approaches">
         <header class="ph-head">
           <h2>Missing value approaches</h2>
           <div class="ph-subs" aria-live="off">
-            <p class="ph-subtitle ph-s4-sub ph-is-av">Average Value</p>
-            <p class="ph-subtitle ph-s4-sub ph-is-md">Medium value</p>
-            <p class="ph-subtitle ph-s4-sub ph-is-knn">Nearest Neighbor &#8212; find the 5 closest</p>
-            <p class="ph-subtitle ph-s4-sub ph-is-knn">Nearest Neighbor &#8212; read their size</p>
-            <p class="ph-subtitle ph-s4-sub ph-is-snn">Scaled Nearest Neighbor &#8212; find the 5 closest</p>
-            <p class="ph-subtitle ph-s4-sub ph-is-snn">Scaled Nearest Neighbor &#8212; read and weight</p>
-            <p class="ph-subtitle ph-s4-sub ph-is-sum">Summary: similar homes win</p>
+            <p class="ph-subtitle ph-is-av">Average Value</p>
+            <p class="ph-subtitle ph-is-md">Medium value</p>
+            <p class="ph-subtitle ph-is-knn">Nearest Neighbor &#8212; find the 5 closest</p>
+            <p class="ph-subtitle ph-is-knn">Nearest Neighbor &#8212; read their size</p>
+            <p class="ph-subtitle ph-is-snn">Scaled Nearest Neighbor &#8212; find the 5 closest</p>
+            <p class="ph-subtitle ph-is-snn">Scaled Nearest Neighbor &#8212; read and weight</p>
+            <p class="ph-subtitle ph-is-sum">Summary: similar homes win</p>
           </div>
         </header>
         <div class="ph-body ph-houses">
@@ -2591,14 +2590,14 @@
               </article>
             </div>
           </div>
-          <div class="drivers" aria-hidden="true">
-            <span class="fragment ph-s4-go"></span>
-            <span class="fragment ph-s4-go"></span>
-            <span class="fragment ph-s4-go"></span>
-            <span class="fragment ph-s4-go"></span>
-            <span class="fragment ph-s4-go"></span>
-            <span class="fragment ph-s4-go"></span>
-            <span class="fragment ph-s4-go"></span>
+          <div class="ph-steps" aria-hidden="true">
+            <span class="fragment ph-step"></span>
+            <span class="fragment ph-step"></span>
+            <span class="fragment ph-step"></span>
+            <span class="fragment ph-step"></span>
+            <span class="fragment ph-step"></span>
+            <span class="fragment ph-step"></span>
+            <span class="fragment ph-step"></span>
           </div>
         </div>
       </section>
@@ -2983,32 +2982,32 @@
       <!-- No data-markdown: this slide is pure HTML, and the markdown plugin's
            de-indent and HTML-block rules turn indented markup and blank lines
            into code blocks. Markdown here comes from .md-slot elements instead. -->
-      <section id="s7" class="ph-caps ph-s7" aria-label="Modernization">
+      <section id="s7" class="ph-split" aria-label="Modernization">
         <header class="ph-head">
           <h2>Modernization</h2>
         </header>
         <div class="ph-body">
-          <div class="ph-s7">
-            <ol class="ph-scr ph-s7-chips">
-              <li class="ph-s7-chip ph-is-base">
+          <div class="ph-split">
+            <ol class="ph-scr ph-chips">
+              <li class="ph-chip ph-is-base">
                 <span class="ph-num">1</span>
                 <span>Python Environment</span>
               </li>
-              <li class="ph-s7-chip fragment" data-fragment-index="0">
+              <li class="ph-chip fragment" data-fragment-index="0">
                 <span class="ph-num">2</span>
                 <span>Python Type hints</span>
               </li>
-              <li class="ph-s7-chip fragment" data-fragment-index="1">
+              <li class="ph-chip fragment" data-fragment-index="1">
                 <span class="ph-num">3</span>
                 <span>Input Parameter Validation</span>
               </li>
-              <li class="ph-s7-chip fragment" data-fragment-index="2">
+              <li class="ph-chip fragment" data-fragment-index="2">
                 <span class="ph-num">4</span>
                 <span>Swagger</span>
               </li>
             </ol>
-            <div class="ph-cols ph-s7-panes">
-              <article class="ph-s7-pane ph-is-base">
+            <div class="ph-cols ph-panes">
+              <article class="ph-pane ph-is-base">
                 <table class="ph-table">
                   <thead>
                     <tr>
@@ -3101,7 +3100,7 @@
                   </tbody>
                 </table>
               </article>
-              <article class="fragment ph-s7-pane" data-fragment-index="0">
+              <article class="fragment ph-pane" data-fragment-index="0">
                 <h3>Type hints</h3>
 <div class="md-slot"><template class="md-src">
 A type hint is a label that says what a piece of data should be. It is a **note**,
@@ -3131,8 +3130,8 @@ does.
 ) -&gt; <span class="ph-ty">PredictionResponse</span>:
                 </code></pre>
               </article>
-              <article class="fragment ph-s7-pane" data-fragment-index="1">
-                <div class="ph-s7-validation">
+              <article class="fragment ph-pane" data-fragment-index="1">
+                <div class="ph-captures">
                   <h3>Validation</h3>
                   <div class="ph-shots">
                     <figure class="ph-shot">
@@ -3146,7 +3145,7 @@ does.
                   </div>
                 </div>
               </article>
-              <article class="fragment ph-s7-pane" data-fragment-index="2">
+              <article class="fragment ph-pane" data-fragment-index="2">
                 <h3>Swagger</h3>
                 <table class="ph-table">
                   <thead>
@@ -3571,7 +3570,7 @@ does.
        transform cannot clip it and Esc, the backdrop and the focus ring come
        from the platform. */
     (() => {
-      const shots = document.querySelectorAll(".ph-s7-validation .ph-validation");
+      const shots = document.querySelectorAll(".ph-captures .ph-validation");
       if (!shots.length) return;
 
       // The move runs on the deck's slide timing, read once from the token so
@@ -3607,7 +3606,7 @@ does.
       // everywhere. Everything read here is layout px and independent of what
       // is written, so one pass settles it and no resize hook is needed.
       const fit = () => {
-        const wrap = shots[0].closest(".ph-s7-validation");
+        const wrap = shots[0].closest(".ph-captures");
         const row = wrap.querySelector(".ph-shots");
         const ars = [...shots].map((el) => +el.dataset.shotAr);
         if (ars.some((ar) => !ar)) return;
@@ -3628,7 +3627,7 @@ does.
         // is actually rendered. The pane's own bottom padding already covers
         // part of it, so only the remainder is reserved under the capture; the
         // capture grows into everything else.
-        const pane = wrap.closest(".ph-s7-pane");
+        const pane = wrap.closest(".ph-pane");
         const title = pane.querySelector("h3");
         const pcs = getComputedStyle(pane);
         const paneRect = pane.getBoundingClientRect();
