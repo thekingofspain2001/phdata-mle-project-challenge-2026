@@ -37,7 +37,19 @@
 
       /* Approach colors: one per fill-in method, reused in S4 detail + S5. */
       --av: #e8b04b;
-      --md: #7fb6d9;
+      /* Medium: spring green (#6ee7b7). The steel blue sat 5 degrees off the
+         deck accent, and its teal-400 replacement sat right between the accent
+         and the mint slide titles while claiming to be distinct from both -
+         it popped on navy but clashed with everything the deck frames. Hue 156
+         sits 11 degrees inside the mint band (145), so Medium blends with the
+         titles and frames it shares a slide with, while staying unmistakably
+         a method colour: still green-family like the frame, none of the
+         sky-blue of the accent. It keeps 40+ degrees from the accent, the
+         ambers, and both NN purples, which stay the closest pair on the
+         slide. 10.76:1 on the navy body, AA as text and AAA at the sizes the
+         SVG and calc numbers use; its 22% tint reads on the card fill. Red
+         excluded outright: error connotation, and nothing else needs it. */
+      --md: #6ee7b7;
       --knn: #c792ea;
       /* Scaled (distance-weighted) KNN: the same method as --knn with a weight
          per neighbour, so on S4 it is a panel of its own and needs its own hue.
@@ -1682,10 +1694,13 @@
 
     /* Stage 3 - Medium, step 2: the living row is still the row step 1 read, so
        its values stay white like they were under the wash - except the two the
-       step picked, which tint blue. The blue matches the step-1 label, not the
-       old dashed-box blue, so the selected pair reads as chosen by the step
-       above it. Everything off that row dims as before. */
-    #s4:has(.ph-step:nth-of-type(3).visible):not(:has(.ph-step:nth-of-type(4).visible)) .ar-living .v.h-mid,
+       step picked, which take the method colour. The label stays accent per
+       the deck-wide rule; only the pair carries the method hue. */
+    #s4:has(.ph-step:nth-of-type(3).visible):not(:has(.ph-step:nth-of-type(4).visible)) .ar-living .v.h-mid {
+      fill: var(--md);
+      opacity: 1;
+    }
+
     #s4:has(.ph-step:nth-of-type(3).visible):not(:has(.ph-step:nth-of-type(4).visible)) .al-living {
       opacity: 1;
     }
