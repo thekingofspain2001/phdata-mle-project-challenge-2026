@@ -1640,25 +1640,6 @@
       fill: var(--ph-accent);
     }
 
-    /* The unknown marker: one circled ? reused wherever the slide names the
-       blank column. In the SVG it rides on the living label's classes so it
-       inherits that label's fill and opacity per stage - no separate rules. In
-       the S5 tables the span carries no stage driver, so it sits in the row
-       colour by default. Sized off the font, not a literal, so it follows the
-       table or label type around it. */
-    .ph-unk {
-      display: inline-block;
-      width: 1.1em;
-      height: 1.1em;
-      line-height: 1.1em;
-      border: 0.12em solid currentColor;
-      border-radius: 50%;
-      text-align: center;
-      font-style: normal;
-      font-size: 0.85em;
-      vertical-align: baseline;
-    }
-
     /* One stage at a time matches, so each block states that stage's COMPLETE
        state - every row explicitly lit or explicitly dimmed. Nothing is
        inherited from the stage before and nothing has to be undone after. */
@@ -2554,11 +2535,7 @@
                    column: at the value size the widest name ran into it. Labels
                    share each row's y, so name and number sit on one baseline. -->
               <g class="ar-lab" font-size="15" fill="#BCCCD4" text-anchor="end">
-                <!-- The unknown marker rides inside the living label as a ? tspan:
-                     it inherits the label's fill and opacity per stage, so no
-                     separate lit rules. Table headings carry the same icon via
-                     the .ph-unk span, so row and heading speak one language. -->
-                <text class="al al-living" x="20" y="264">sqft_liv <tspan font-size="13" dx="3">?</tspan></text>
+                <text class="al al-living" x="20" y="264">sqft_liv</text>
                 <text class="al al-lot" x="20" y="288">sqft_lot</text>
                 <text class="al al-bed" x="20" y="312">beds</text>
                 <text class="al al-bath" x="20" y="336">baths</text>
@@ -3027,7 +3004,7 @@
                     <td>5.2</td>
                   </tr>
                   <tr>
-                    <th scope="row">Living area <span class="ph-unk" aria-hidden="true">?</span></th>
+                    <th scope="row">Living area</th>
                     <td>1,038</td>
                     <td>290</td>
                     <td>13,540</td>
@@ -3153,7 +3130,7 @@
                     <td class="ph-is-best">0.435</td>
                   </tr>
                   <tr>
-                    <th scope="row">Living area <span class="ph-unk" aria-hidden="true">?</span></th>
+                    <th scope="row">Living area</th>
                     <td>0.768</td>
                     <td>0.755</td>
                     <td>0.073</td>
