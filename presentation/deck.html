@@ -1552,8 +1552,8 @@
 
     /* Reveal only ever ADDS .visible, so at stage N drivers 1..N are all visible.
        The :not() guard is what makes each rule match at exactly one stage; drop it
-       and every earlier stage's rules fire at once. Stage 7 is the one bare
-       :has() rule, unique because driver 7 exists nowhere else. */
+       and every earlier stage's rules fire at once. Stage 12 is the one bare
+       :has() rule, unique because driver 12 exists nowhere else. */
     #s4:has(.ph-step:nth-of-type(1).visible):not(:has(.ph-step:nth-of-type(2).visible)) .ph-subs>*:nth-of-type(1),
     #s4:has(.ph-step:nth-of-type(2).visible):not(:has(.ph-step:nth-of-type(3).visible)) .ph-subs>*:nth-of-type(2),
     #s4:has(.ph-step:nth-of-type(3).visible):not(:has(.ph-step:nth-of-type(4).visible)) .ph-subs>*:nth-of-type(3),
@@ -1561,7 +1561,11 @@
     #s4:has(.ph-step:nth-of-type(5).visible):not(:has(.ph-step:nth-of-type(6).visible)) .ph-subs>*:nth-of-type(5),
     #s4:has(.ph-step:nth-of-type(6).visible):not(:has(.ph-step:nth-of-type(7).visible)) .ph-subs>*:nth-of-type(6),
     #s4:has(.ph-step:nth-of-type(7).visible):not(:has(.ph-step:nth-of-type(8).visible)) .ph-subs>*:nth-of-type(7),
-    #s4:has(.ph-step:nth-of-type(8).visible) .ph-subs>*:nth-of-type(8) {
+    #s4:has(.ph-step:nth-of-type(8).visible):not(:has(.ph-step:nth-of-type(9).visible)) .ph-subs>*:nth-of-type(8),
+    #s4:has(.ph-step:nth-of-type(9).visible):not(:has(.ph-step:nth-of-type(10).visible)) .ph-subs>*:nth-of-type(9),
+    #s4:has(.ph-step:nth-of-type(10).visible):not(:has(.ph-step:nth-of-type(11).visible)) .ph-subs>*:nth-of-type(10),
+    #s4:has(.ph-step:nth-of-type(11).visible):not(:has(.ph-step:nth-of-type(12).visible)) .ph-subs>*:nth-of-type(11),
+    #s4:has(.ph-step:nth-of-type(12).visible) .ph-subs>*:nth-of-type(12) {
       opacity: 1;
     }
 
@@ -1614,9 +1618,9 @@
         transform var(--ph-t-slide) var(--ph-ease);
     }
 
-    /* Attribute rows: the rest state is the whole data set, everything present and
-       legible, nothing claimed. The per-stage rules are the only things that light a
-       value - a value that is not lit is a value the method did not read.
+    /* Attribute rows: the rest state is the whole data set in white, everything
+       present and legible, nothing claimed. The per-stage rules tint the values
+       a step reads and dim the ones it does not; white is the unread look.
 
        Labels are headers, not data: always lit at full opacity, never dimmed by
        a stage rule. The glow marks the row a step reads. The rest opacity below
@@ -1632,7 +1636,8 @@
     }
 
     .houses-svg .v {
-      opacity: 0.55;
+      fill: #ffffff;
+      opacity: 1;
     }
 
     /* Row labels read as fixed headers, not as data: every one of the four is
@@ -1649,29 +1654,10 @@
        of the row it reads. Nothing is inherited from the stage before and
        nothing has to be undone after. */
 
-    /* Stage 1 - Average: one column, every house. The living label glows: it is
+
+    /* Fragment 2 - Average: one column, every house. The living label glows: it is
        the row this step reads. */
-    #s4:has(.ph-step:nth-of-type(1).visible):not(:has(.ph-step:nth-of-type(2).visible)) .ar-living .v {
-      opacity: 1;
-    }
-
-    #s4:has(.ph-step:nth-of-type(1).visible):not(:has(.ph-step:nth-of-type(2).visible)) .al-living {
-      filter: drop-shadow(0 0 6px rgba(56, 189, 248, 0.9));
-    }
-
-    #s4:has(.ph-step:nth-of-type(1).visible):not(:has(.ph-step:nth-of-type(2).visible)) .ar-lot .v,
-    #s4:has(.ph-step:nth-of-type(1).visible):not(:has(.ph-step:nth-of-type(2).visible)) .ar-bed .v,
-    #s4:has(.ph-step:nth-of-type(1).visible):not(:has(.ph-step:nth-of-type(2).visible)) .ar-bath .v {
-      opacity: 0.22;
-    }
-
-    /* Stage 2 - Medium, step 1: the whole sqft_living row again, exactly like
-       Average's row at stage 1, but the values go white under the wash instead
-       of tinting - white on the medium fill is the step's own look, and the
-       glowing label carries the blue. The medium-tinted wash over the row (the
-       .bx fill below) is what says the step belongs to this method. */
     #s4:has(.ph-step:nth-of-type(2).visible):not(:has(.ph-step:nth-of-type(3).visible)) .ar-living .v {
-      fill: #ffffff;
       opacity: 1;
     }
 
@@ -1679,104 +1665,61 @@
       filter: drop-shadow(0 0 6px rgba(56, 189, 248, 0.9));
     }
 
-    /* Stage 3 - Medium, step 2: the living row is still the row step 1 read, so
+    #s4:has(.ph-step:nth-of-type(2).visible):not(:has(.ph-step:nth-of-type(3).visible)) .ar-lot .v,
+    #s4:has(.ph-step:nth-of-type(2).visible):not(:has(.ph-step:nth-of-type(3).visible)) .ar-bed .v,
+    #s4:has(.ph-step:nth-of-type(2).visible):not(:has(.ph-step:nth-of-type(3).visible)) .ar-bath .v {
+      opacity: 0.22;
+    }
+
+    /* Fragment 4 - Medium, step 1: the whole sqft_living row again, exactly like
+       Average's row at stage 1, but the values go white under the wash instead
+       of tinting - white on the medium fill is the step's own look, and the
+       glowing label carries the blue. The medium-tinted wash over the row (the
+       .bx fill below) is what says the step belongs to this method. */
+    #s4:has(.ph-step:nth-of-type(4).visible):not(:has(.ph-step:nth-of-type(5).visible)) .ar-living .v {
+      fill: #ffffff;
+      opacity: 1;
+    }
+
+    #s4:has(.ph-step:nth-of-type(4).visible):not(:has(.ph-step:nth-of-type(5).visible)) .al-living {
+      filter: drop-shadow(0 0 6px rgba(56, 189, 248, 0.9));
+    }
+
+    #s4:has(.ph-step:nth-of-type(4).visible):not(:has(.ph-step:nth-of-type(5).visible)) .ar-lot .v,
+    #s4:has(.ph-step:nth-of-type(4).visible):not(:has(.ph-step:nth-of-type(5).visible)) .ar-bed .v,
+    #s4:has(.ph-step:nth-of-type(4).visible):not(:has(.ph-step:nth-of-type(5).visible)) .ar-bath .v {
+      opacity: 0.22;
+    }
+
+    /* Fragment 5 - Medium, step 2: the living row is still the row step 1 read, so
        its values stay white like they were under the wash - except the two the
        step picked, which take the method colour. The label glows per the shared
        rule; only the pair carries the method hue. */
-    #s4:has(.ph-step:nth-of-type(3).visible):not(:has(.ph-step:nth-of-type(4).visible)) .ar-living .v.h-mid {
+    #s4:has(.ph-step:nth-of-type(5).visible):not(:has(.ph-step:nth-of-type(6).visible)) .ar-living .v.h-mid {
       fill: var(--md);
       opacity: 1;
     }
 
-    #s4:has(.ph-step:nth-of-type(3).visible):not(:has(.ph-step:nth-of-type(4).visible)) .al-living {
-      filter: drop-shadow(0 0 6px rgba(56, 189, 248, 0.9));
-    }
-
-    #s4:has(.ph-step:nth-of-type(3).visible):not(:has(.ph-step:nth-of-type(4).visible)) .ar-living .v:not(.h-mid) {
-      fill: #ffffff;
-      opacity: 1;
-    }
-
-    #s4:has(.ph-step:nth-of-type(3).visible):not(:has(.ph-step:nth-of-type(4).visible)) .ar-lot .v,
-    #s4:has(.ph-step:nth-of-type(3).visible):not(:has(.ph-step:nth-of-type(4).visible)) .ar-bed .v,
-    #s4:has(.ph-step:nth-of-type(3).visible):not(:has(.ph-step:nth-of-type(4).visible)) .ar-bath .v {
-      opacity: 0.22;
-    }
-
-    /* Stage 4 - Nearest Neighbor, step 1: the three compared rows wash over in
-       knn tint and every value in them goes white - no winner is chosen on
-       screen yet, since step 1 is the comparing, not the picking. The living
-       row is untouched: step 1 selects, it does not read. Its label stays lit
-       like every label; the glow sits on the three compared rows. */
-    #s4:has(.ph-step:nth-of-type(4).visible):not(:has(.ph-step:nth-of-type(5).visible)) .ar-lot .v,
-    #s4:has(.ph-step:nth-of-type(4).visible):not(:has(.ph-step:nth-of-type(5).visible)) .ar-bed .v,
-    #s4:has(.ph-step:nth-of-type(4).visible):not(:has(.ph-step:nth-of-type(5).visible)) .ar-bath .v {
-      fill: #ffffff;
-      opacity: 1;
-    }
-
-    #s4:has(.ph-step:nth-of-type(4).visible):not(:has(.ph-step:nth-of-type(5).visible)) .al-lot,
-    #s4:has(.ph-step:nth-of-type(4).visible):not(:has(.ph-step:nth-of-type(5).visible)) .al-bed,
-    #s4:has(.ph-step:nth-of-type(4).visible):not(:has(.ph-step:nth-of-type(5).visible)) .al-bath {
-      filter: drop-shadow(0 0 6px rgba(56, 189, 248, 0.9));
-    }
-
-    #s4:has(.ph-step:nth-of-type(4).visible):not(:has(.ph-step:nth-of-type(5).visible)) .ar-living .v {
-      opacity: 0.22;
-    }
-
-    /* Stage 4 - Nearest Neighbor, step 2: the comparison wash carries over with
-       its values still white, exactly as they read on step 1 - the step-1 work
-       stays legible under the step-2 frame. Only the five picked sizes change,
-       tinting to the method colour their calculation will average. The living
-       label glows: its row is the one this step reads. The
-       unpicked living values go back to rest ink, not white: white is step 1's
-       look, and they were never read in this step. */
     #s4:has(.ph-step:nth-of-type(5).visible):not(:has(.ph-step:nth-of-type(6).visible)) .al-living {
       filter: drop-shadow(0 0 6px rgba(56, 189, 248, 0.9));
+    }
+
+    #s4:has(.ph-step:nth-of-type(5).visible):not(:has(.ph-step:nth-of-type(6).visible)) .ar-living .v:not(.h-mid) {
+      fill: #ffffff;
+      opacity: 1;
     }
 
     #s4:has(.ph-step:nth-of-type(5).visible):not(:has(.ph-step:nth-of-type(6).visible)) .ar-lot .v,
     #s4:has(.ph-step:nth-of-type(5).visible):not(:has(.ph-step:nth-of-type(6).visible)) .ar-bed .v,
     #s4:has(.ph-step:nth-of-type(5).visible):not(:has(.ph-step:nth-of-type(6).visible)) .ar-bath .v {
-      fill: #ffffff;
-      opacity: 1;
-    }
-
-    #s4:has(.ph-step:nth-of-type(5).visible):not(:has(.ph-step:nth-of-type(6).visible)) .ar-living .v.h-nn {
-      fill: var(--knn);
-      opacity: 1;
-    }
-
-    /* Stage 5 - Scaled NN, step 1: stage 3 again, in the scaled colour. The glow
-       sits on the three compared rows. */
-    #s4:has(.ph-step:nth-of-type(6).visible):not(:has(.ph-step:nth-of-type(7).visible)) .ar-lot .v.h-nn,
-    #s4:has(.ph-step:nth-of-type(6).visible):not(:has(.ph-step:nth-of-type(7).visible)) .ar-bed .v.h-nn,
-    #s4:has(.ph-step:nth-of-type(6).visible):not(:has(.ph-step:nth-of-type(7).visible)) .ar-bath .v.h-nn {
-      opacity: 1;
-    }
-
-    #s4:has(.ph-step:nth-of-type(6).visible):not(:has(.ph-step:nth-of-type(7).visible)) .al-lot,
-    #s4:has(.ph-step:nth-of-type(6).visible):not(:has(.ph-step:nth-of-type(7).visible)) .al-bed,
-    #s4:has(.ph-step:nth-of-type(6).visible):not(:has(.ph-step:nth-of-type(7).visible)) .al-bath {
-      filter: drop-shadow(0 0 6px rgba(56, 189, 248, 0.9));
-    }
-
-    #s4:has(.ph-step:nth-of-type(6).visible):not(:has(.ph-step:nth-of-type(7).visible)) .ar-living .v,
-    #s4:has(.ph-step:nth-of-type(6).visible):not(:has(.ph-step:nth-of-type(7).visible)) .ar-lot .v:not(.h-nn),
-    #s4:has(.ph-step:nth-of-type(6).visible):not(:has(.ph-step:nth-of-type(7).visible)) .ar-bed .v:not(.h-nn),
-    #s4:has(.ph-step:nth-of-type(6).visible):not(:has(.ph-step:nth-of-type(7).visible)) .ar-bath .v:not(.h-nn) {
       opacity: 0.22;
     }
 
-    /* Stage 6 - Scaled NN, step 2: the living picks tint to the scaled colour
-       their own calculation weights, and the comparison rows keep the white
-       they read at step 1 - the same carry-over as Nearest Neighbor above.
-       The living label glows. Unpicked living values read at rest ink, not white. */
-    #s4:has(.ph-step:nth-of-type(7).visible):not(:has(.ph-step:nth-of-type(8).visible)) .al-living {
-      filter: drop-shadow(0 0 6px rgba(56, 189, 248, 0.9));
-    }
-
+    /* Fragment 7 - Nearest Neighbor, step 1: the three compared rows wash over in
+       knn tint and every value in them goes white - no winner is chosen on
+       screen yet, since step 1 is the comparing, not the picking. The living
+       row is untouched: step 1 selects, it does not read. Its label stays lit
+       like every label; the glow sits on the three compared rows. */
     #s4:has(.ph-step:nth-of-type(7).visible):not(:has(.ph-step:nth-of-type(8).visible)) .ar-lot .v,
     #s4:has(.ph-step:nth-of-type(7).visible):not(:has(.ph-step:nth-of-type(8).visible)) .ar-bed .v,
     #s4:has(.ph-step:nth-of-type(7).visible):not(:has(.ph-step:nth-of-type(8).visible)) .ar-bath .v {
@@ -1784,54 +1727,131 @@
       opacity: 1;
     }
 
-    #s4:has(.ph-step:nth-of-type(7).visible):not(:has(.ph-step:nth-of-type(8).visible)) .ar-living .v.h-nn {
+    #s4:has(.ph-step:nth-of-type(7).visible):not(:has(.ph-step:nth-of-type(8).visible)) .al-lot,
+    #s4:has(.ph-step:nth-of-type(7).visible):not(:has(.ph-step:nth-of-type(8).visible)) .al-bed,
+    #s4:has(.ph-step:nth-of-type(7).visible):not(:has(.ph-step:nth-of-type(8).visible)) .al-bath {
+      filter: drop-shadow(0 0 6px rgba(56, 189, 248, 0.9));
+    }
+
+    #s4:has(.ph-step:nth-of-type(7).visible):not(:has(.ph-step:nth-of-type(8).visible)) .ar-living .v {
+      opacity: 0.22;
+    }
+
+    /* Fragment 8 - Nearest Neighbor, step 2: the comparison wash carries over with
+       its values still white, exactly as they read on step 1 - the step-1 work
+       stays legible under the step-2 frame. Only the five picked sizes change,
+       tinting to the method colour their calculation will average. The living
+       label glows: its row is the one this step reads. The
+       unpicked living values go back to rest ink, not white: white is step 1's
+       look, and they were never read in this step. */
+    #s4:has(.ph-step:nth-of-type(8).visible):not(:has(.ph-step:nth-of-type(9).visible)) .al-living {
+      filter: drop-shadow(0 0 6px rgba(56, 189, 248, 0.9));
+    }
+
+    #s4:has(.ph-step:nth-of-type(8).visible):not(:has(.ph-step:nth-of-type(9).visible)) .ar-lot .v,
+    #s4:has(.ph-step:nth-of-type(8).visible):not(:has(.ph-step:nth-of-type(9).visible)) .ar-bed .v,
+    #s4:has(.ph-step:nth-of-type(8).visible):not(:has(.ph-step:nth-of-type(9).visible)) .ar-bath .v {
+      fill: #ffffff;
+      opacity: 1;
+    }
+
+    #s4:has(.ph-step:nth-of-type(8).visible):not(:has(.ph-step:nth-of-type(9).visible)) .ar-living .v.h-nn {
+      fill: var(--knn);
+      opacity: 1;
+    }
+
+    #s4:has(.ph-step:nth-of-type(8).visible):not(:has(.ph-step:nth-of-type(9).visible)) .ar-living .v:not(.h-nn) {
+      opacity: 0.22;
+    }
+
+    /* Fragment 10 - Scaled NN, step 1: stage 3 again, in the scaled colour. The glow
+       sits on the three compared rows. */
+    #s4:has(.ph-step:nth-of-type(10).visible):not(:has(.ph-step:nth-of-type(11).visible)) .ar-lot .v.h-nn,
+    #s4:has(.ph-step:nth-of-type(10).visible):not(:has(.ph-step:nth-of-type(11).visible)) .ar-bed .v.h-nn,
+    #s4:has(.ph-step:nth-of-type(10).visible):not(:has(.ph-step:nth-of-type(11).visible)) .ar-bath .v.h-nn {
+      opacity: 1;
+    }
+
+    #s4:has(.ph-step:nth-of-type(10).visible):not(:has(.ph-step:nth-of-type(11).visible)) .al-lot,
+    #s4:has(.ph-step:nth-of-type(10).visible):not(:has(.ph-step:nth-of-type(11).visible)) .al-bed,
+    #s4:has(.ph-step:nth-of-type(10).visible):not(:has(.ph-step:nth-of-type(11).visible)) .al-bath {
+      filter: drop-shadow(0 0 6px rgba(56, 189, 248, 0.9));
+    }
+
+    #s4:has(.ph-step:nth-of-type(10).visible):not(:has(.ph-step:nth-of-type(11).visible)) .ar-living .v,
+    #s4:has(.ph-step:nth-of-type(10).visible):not(:has(.ph-step:nth-of-type(11).visible)) .ar-lot .v:not(.h-nn),
+    #s4:has(.ph-step:nth-of-type(10).visible):not(:has(.ph-step:nth-of-type(11).visible)) .ar-bed .v:not(.h-nn),
+    #s4:has(.ph-step:nth-of-type(10).visible):not(:has(.ph-step:nth-of-type(11).visible)) .ar-bath .v:not(.h-nn) {
+      opacity: 0.22;
+    }
+
+    /* Fragment 11 - Scaled NN, step 2: the living picks tint to the scaled colour
+       their own calculation weights, and the comparison rows keep the white
+       they read at step 1 - the same carry-over as Nearest Neighbor above.
+       The living label glows. Unpicked living values read at rest ink, not white. */
+    #s4:has(.ph-step:nth-of-type(11).visible):not(:has(.ph-step:nth-of-type(12).visible)) .al-living {
+      filter: drop-shadow(0 0 6px rgba(56, 189, 248, 0.9));
+    }
+
+    #s4:has(.ph-step:nth-of-type(11).visible):not(:has(.ph-step:nth-of-type(12).visible)) .ar-lot .v,
+    #s4:has(.ph-step:nth-of-type(11).visible):not(:has(.ph-step:nth-of-type(12).visible)) .ar-bed .v,
+    #s4:has(.ph-step:nth-of-type(11).visible):not(:has(.ph-step:nth-of-type(12).visible)) .ar-bath .v {
+      fill: #ffffff;
+      opacity: 1;
+    }
+
+    #s4:has(.ph-step:nth-of-type(11).visible):not(:has(.ph-step:nth-of-type(12).visible)) .ar-living .v.h-nn {
       fill: var(--snn);
       opacity: 1;
     }
 
-    /* Stage 8 has no attribute rules at all: with every other stage guarded, no
-       stage rule matches, all 48 values fall back to the 0.55 rest opacity, and
+    #s4:has(.ph-step:nth-of-type(11).visible):not(:has(.ph-step:nth-of-type(12).visible)) .ar-living .v:not(.h-nn) {
+      opacity: 0.22;
+    }
+
+    /* Stage 12 has no attribute rules at all: with every other stage guarded, no
+       stage rule matches, all 48 values read the white rest state, and
        all four labels read lit accent with no glow. */
 
-    /* Per-stage eq houses + input boxes. Step-1 stages (4, 6) have no marker:
-       nothing has been computed yet; Medium's marker stays up through both its
-       own steps (2 and 3) since the panel is one method over two drivers.
-       Stage 8 shows all four. */
-    #s4:has(.ph-step:nth-of-type(1).visible):not(:has(.ph-step:nth-of-type(2).visible)) #mk-avg,
-    #s4:has(.ph-step:nth-of-type(2).visible):not(:has(.ph-step:nth-of-type(3).visible)) #mk-med,
-    #s4:has(.ph-step:nth-of-type(3).visible):not(:has(.ph-step:nth-of-type(4).visible)) #mk-med,
-    #s4:has(.ph-step:nth-of-type(5).visible):not(:has(.ph-step:nth-of-type(6).visible)) #mk-knn,
-    #s4:has(.ph-step:nth-of-type(7).visible):not(:has(.ph-step:nth-of-type(8).visible)) #mk-snn,
-    #s4:has(.ph-step:nth-of-type(8).visible) #mk-avg,
-    #s4:has(.ph-step:nth-of-type(8).visible) #mk-med,
-    #s4:has(.ph-step:nth-of-type(8).visible) #mk-knn,
-    #s4:has(.ph-step:nth-of-type(8).visible) #mk-snn {
+    /* Per-stage eq houses + input boxes. Lead-ins (1, 3, 6, 9) show the zero
+       state, so no marker and no box: nothing has been read yet. The
+       compare-first stages (7, 10) and Medium step 1 (4) have no marker either:
+       nothing has been computed yet - the marker lands on step 2 (5) with the
+       pick. Stage 12 shows all four. */
+    #s4:has(.ph-step:nth-of-type(2).visible):not(:has(.ph-step:nth-of-type(3).visible)) #mk-avg,
+    #s4:has(.ph-step:nth-of-type(5).visible):not(:has(.ph-step:nth-of-type(6).visible)) #mk-med,
+    #s4:has(.ph-step:nth-of-type(8).visible):not(:has(.ph-step:nth-of-type(9).visible)) #mk-knn,
+    #s4:has(.ph-step:nth-of-type(11).visible):not(:has(.ph-step:nth-of-type(12).visible)) #mk-snn,
+    #s4:has(.ph-step:nth-of-type(12).visible) #mk-avg,
+    #s4:has(.ph-step:nth-of-type(12).visible) #mk-med,
+    #s4:has(.ph-step:nth-of-type(12).visible) #mk-knn,
+    #s4:has(.ph-step:nth-of-type(12).visible) #mk-snn {
       opacity: 1;
     }
 
     /* Box height is half the encoding: 122 stops between the sqft_living row and
        the sqft_lot row, 180 reaches past bathrooms. No box at stage 7. */
-    #s4:has(.ph-step:nth-of-type(1).visible):not(:has(.ph-step:nth-of-type(2).visible)) #bx-avg,
-    #s4:has(.ph-step:nth-of-type(2).visible):not(:has(.ph-step:nth-of-type(3).visible)) #bx-med-all,
-    #s4:has(.ph-step:nth-of-type(3).visible):not(:has(.ph-step:nth-of-type(4).visible)) #bx-med-all,
-    #s4:has(.ph-step:nth-of-type(3).visible):not(:has(.ph-step:nth-of-type(4).visible)) #bx-med-2,
-    #s4:has(.ph-step:nth-of-type(4).visible):not(:has(.ph-step:nth-of-type(5).visible)) #bx-compare,
-    #s4:has(.ph-step:nth-of-type(5).visible):not(:has(.ph-step:nth-of-type(6).visible)) #bx-compare,
-    #s4:has(.ph-step:nth-of-type(6).visible):not(:has(.ph-step:nth-of-type(7).visible)) #bx-compare,
-    #s4:has(.ph-step:nth-of-type(7).visible):not(:has(.ph-step:nth-of-type(8).visible)) #bx-compare {
+    #s4:has(.ph-step:nth-of-type(2).visible):not(:has(.ph-step:nth-of-type(3).visible)) #bx-avg,
+    #s4:has(.ph-step:nth-of-type(5).visible):not(:has(.ph-step:nth-of-type(6).visible)) #bx-med-2,
+    #s4:has(.ph-step:nth-of-type(7).visible):not(:has(.ph-step:nth-of-type(8).visible)) #bx-compare,
+    #s4:has(.ph-step:nth-of-type(8).visible):not(:has(.ph-step:nth-of-type(9).visible)) #bx-compare,
+    #s4:has(.ph-step:nth-of-type(8).visible):not(:has(.ph-step:nth-of-type(9).visible)) #bx-knn-2,
+    #s4:has(.ph-step:nth-of-type(10).visible):not(:has(.ph-step:nth-of-type(11).visible)) #bx-compare,
+    #s4:has(.ph-step:nth-of-type(11).visible):not(:has(.ph-step:nth-of-type(12).visible)) #bx-compare,
+    #s4:has(.ph-step:nth-of-type(11).visible):not(:has(.ph-step:nth-of-type(12).visible)) #bx-snn-pick {
       opacity: 1;
     }
 
     /* Same rect, different name per step: knn tint on NN drivers 4 and 5,
        scaled tint on SNN drivers 6 and 7, so the frame persists while the fill
        renames the method. */
-    #s4:has(.ph-step:nth-of-type(4).visible):not(:has(.ph-step:nth-of-type(5).visible)) #bx-compare,
-    #s4:has(.ph-step:nth-of-type(5).visible):not(:has(.ph-step:nth-of-type(6).visible)) #bx-compare {
+    #s4:has(.ph-step:nth-of-type(7).visible):not(:has(.ph-step:nth-of-type(8).visible)) #bx-compare,
+    #s4:has(.ph-step:nth-of-type(8).visible):not(:has(.ph-step:nth-of-type(9).visible)) #bx-compare {
       fill: var(--tint-knn);
     }
 
-    #s4:has(.ph-step:nth-of-type(6).visible):not(:has(.ph-step:nth-of-type(7).visible)) #bx-compare,
-    #s4:has(.ph-step:nth-of-type(7).visible):not(:has(.ph-step:nth-of-type(8).visible)) #bx-compare {
+    #s4:has(.ph-step:nth-of-type(10).visible):not(:has(.ph-step:nth-of-type(11).visible)) #bx-compare,
+    #s4:has(.ph-step:nth-of-type(11).visible):not(:has(.ph-step:nth-of-type(12).visible)) #bx-compare {
       fill: var(--tint-snn);
     }
 
@@ -1877,11 +1897,11 @@
        Neighbor spans stages 4-5 and Scaled NN spans 6-7, so each guard stops at
        the stage after its LAST stage. ph-is-snn guards on driver 8, not 7 -
        guarding on 7 would leave stage 7 with no panel at all. */
-    #s4:has(.ph-step:nth-of-type(1).visible):not(:has(.ph-step:nth-of-type(2).visible)) .ph-panel.ph-is-av,
-    #s4:has(.ph-step:nth-of-type(2).visible):not(:has(.ph-step:nth-of-type(4).visible)) .ph-panel.ph-is-md,
-    #s4:has(.ph-step:nth-of-type(4).visible):not(:has(.ph-step:nth-of-type(6).visible)) .ph-panel.ph-is-knn,
-    #s4:has(.ph-step:nth-of-type(6).visible):not(:has(.ph-step:nth-of-type(8).visible)) .ph-panel.ph-is-snn,
-    #s4:has(.ph-step:nth-of-type(8).visible) .ph-panel.ph-is-sum {
+    #s4:has(.ph-step:nth-of-type(1).visible):not(:has(.ph-step:nth-of-type(3).visible)) .ph-panel.ph-is-av,
+    #s4:has(.ph-step:nth-of-type(3).visible):not(:has(.ph-step:nth-of-type(6).visible)) .ph-panel.ph-is-md,
+    #s4:has(.ph-step:nth-of-type(6).visible):not(:has(.ph-step:nth-of-type(9).visible)) .ph-panel.ph-is-knn,
+    #s4:has(.ph-step:nth-of-type(9).visible):not(:has(.ph-step:nth-of-type(12).visible)) .ph-panel.ph-is-snn,
+    #s4:has(.ph-step:nth-of-type(12).visible) .ph-panel.ph-is-sum {
       display: flex;
     }
 
@@ -2453,11 +2473,15 @@
         <header class="ph-head">
           <h2>Missing value approaches</h2>
           <div class="ph-subs" aria-live="off">
+            <p class="ph-subtitle ph-is-av">Average &#8212; the table</p>
             <p class="ph-subtitle ph-is-av">Average Value</p>
+            <p class="ph-subtitle ph-is-md">Medium &#8212; the table</p>
             <p class="ph-subtitle ph-is-md">Medium value &#8212; read the column</p>
             <p class="ph-subtitle ph-is-md">Medium value &#8212; take the middle</p>
+            <p class="ph-subtitle ph-is-knn">Nearest Neighbor &#8212; the table</p>
             <p class="ph-subtitle ph-is-knn">Nearest Neighbor &#8212; find the 5 closest</p>
             <p class="ph-subtitle ph-is-knn">Nearest Neighbor &#8212; read their size</p>
+            <p class="ph-subtitle ph-is-snn">Scaled Nearest Neighbor &#8212; the table</p>
             <p class="ph-subtitle ph-is-snn">Scaled Nearest Neighbor &#8212; find the 5 closest</p>
             <p class="ph-subtitle ph-is-snn">Scaled Nearest Neighbor &#8212; read and weight</p>
             <p class="ph-subtitle ph-is-sum">Summary: similar homes win</p>
@@ -2543,9 +2567,20 @@
                    share each row's y, so name and number sit on one baseline. -->
               <g class="ar-lab" font-size="15" fill="#BCCCD4" text-anchor="end">
                 <text class="al al-living" x="20" y="264">sqft_liv</text>
-                <text class="al al-lot" x="20" y="288">sqft_lot</text>
-                <text class="al al-bed" x="20" y="312">beds</text>
-                <text class="al al-bath" x="20" y="336">baths</text>
+                <text class="al al-lot" x="20" y="298">sqft_lot</text>
+                <text class="al al-bed" x="20" y="332">beds</text>
+                <text class="al al-bath" x="20" y="366">baths</text>
+              <!-- Ellipsis: more attributes exist between lot and beds, hidden to
+                   keep the diagram to the four the API imputes. Three circles, not
+                   a … glyph: the glyph's ink sits at the foot of a tall em box and
+                   can never be centered by baseline math. Circles are positioned by
+                   construction at the gap midpoint (lot 298 / beds 332 -> 315).
+                   Not a row: no value moves. Lit accent like every label, never
+                   dimmed, no glow. -->
+              <g class="al al-more" fill="var(--ph-accent)">
+                <circle cx="8" cy="316" r="1.6" />
+                <circle cx="13" cy="316" r="1.6" />
+                <circle cx="18" cy="316" r="1.6" />
               </g>
               <g class="ar-row ar-living" font-size="15" fill="#BCCCD4" text-anchor="middle">
                 <text class="v" x="54" y="264">1235</text>
@@ -2562,46 +2597,46 @@
                 <text class="v" x="1148" y="264">3990</text>
               </g>
               <g class="ar-row ar-lot" font-size="15" fill="#BCCCD4" text-anchor="middle">
-                <text class="v" x="54" y="288">4600</text>
-                <text class="v" x="98" y="288">4900</text>
-                <text class="v" x="142" y="288">5300</text>
-                <text class="v" x="241" y="288">5600</text>
-                <text class="v" x="297" y="288">6200</text>
-                <text class="v" x="353" y="288">5900</text>
-                <text class="v h-nn" x="551" y="288">7600</text>
-                <text class="v h-nn" x="619" y="288">8000</text>
-                <text class="v h-nn" x="687" y="288">8400</text>
-                <text class="v h-nn" x="984" y="288">8800</text>
-                <text class="v h-nn" x="1066" y="288">9100</text>
-                <text class="v" x="1148" y="288">6400</text>
+                <text class="v" x="54" y="298">4600</text>
+                <text class="v" x="98" y="298">4900</text>
+                <text class="v" x="142" y="298">5300</text>
+                <text class="v" x="241" y="298">5600</text>
+                <text class="v" x="297" y="298">6200</text>
+                <text class="v" x="353" y="298">5900</text>
+                <text class="v h-nn" x="551" y="298">7600</text>
+                <text class="v h-nn" x="619" y="298">8000</text>
+                <text class="v h-nn" x="687" y="298">8400</text>
+                <text class="v h-nn" x="984" y="298">8800</text>
+                <text class="v h-nn" x="1066" y="298">9100</text>
+                <text class="v" x="1148" y="298">6400</text>
               </g>
               <g class="ar-row ar-bed" font-size="15" fill="#BCCCD4" text-anchor="middle">
-                <text class="v" x="54" y="312">2</text>
-                <text class="v" x="98" y="312">2</text>
-                <text class="v" x="142" y="312">2</text>
-                <text class="v" x="241" y="312">3</text>
-                <text class="v" x="297" y="312">3</text>
-                <text class="v" x="353" y="312">3</text>
-                <text class="v h-nn" x="551" y="312">4</text>
-                <text class="v h-nn" x="619" y="312">4</text>
-                <text class="v h-nn" x="687" y="312">5</text>
-                <text class="v h-nn" x="984" y="312">5</text>
-                <text class="v h-nn" x="1066" y="312">5</text>
-                <text class="v" x="1148" y="312">6</text>
+                <text class="v" x="54" y="332">2</text>
+                <text class="v" x="98" y="332">2</text>
+                <text class="v" x="142" y="332">2</text>
+                <text class="v" x="241" y="332">3</text>
+                <text class="v" x="297" y="332">3</text>
+                <text class="v" x="353" y="332">3</text>
+                <text class="v h-nn" x="551" y="332">4</text>
+                <text class="v h-nn" x="619" y="332">4</text>
+                <text class="v h-nn" x="687" y="332">5</text>
+                <text class="v h-nn" x="984" y="332">5</text>
+                <text class="v h-nn" x="1066" y="332">5</text>
+                <text class="v" x="1148" y="332">6</text>
               </g>
               <g class="ar-row ar-bath" font-size="15" fill="#BCCCD4" text-anchor="middle">
-                <text class="v" x="54" y="336">1</text>
-                <text class="v" x="98" y="336">1.5</text>
-                <text class="v" x="142" y="336">1.5</text>
-                <text class="v" x="241" y="336">1.5</text>
-                <text class="v" x="297" y="336">1.5</text>
-                <text class="v" x="353" y="336">2</text>
-                <text class="v h-nn" x="551" y="336">2.5</text>
-                <text class="v h-nn" x="619" y="336">2.5</text>
-                <text class="v h-nn" x="687" y="336">3</text>
-                <text class="v h-nn" x="984" y="336">3</text>
-                <text class="v h-nn" x="1066" y="336">3</text>
-                <text class="v" x="1148" y="336">4</text>
+                <text class="v" x="54" y="366">1</text>
+                <text class="v" x="98" y="366">1.5</text>
+                <text class="v" x="142" y="366">1.5</text>
+                <text class="v" x="241" y="366">1.5</text>
+                <text class="v" x="297" y="366">1.5</text>
+                <text class="v" x="353" y="366">2</text>
+                <text class="v h-nn" x="551" y="366">2.5</text>
+                <text class="v h-nn" x="619" y="366">2.5</text>
+                <text class="v h-nn" x="687" y="366">3</text>
+                <text class="v h-nn" x="984" y="366">3</text>
+                <text class="v h-nn" x="1066" y="366">3</text>
+                <text class="v" x="1148" y="366">4</text>
               </g>
               <!-- Input boxes: dashed. The Average box is the exception: Average reads
                    only sqft_living, so it brackets just that row (y 246..274, between
@@ -2610,7 +2645,7 @@
                    boundary reads as one frame tightening. The KNN and Scaled boxes
                    keep the tall spans that say how many attributes each method
                    reads. -->
-              <rect id="bx-avg" class="bx" x="29" y="244.5" width="1146" height="28" fill="none" stroke="var(--av)"
+              <rect id="bx-avg" class="bx" x="29" y="247" width="1146" height="24" fill="none" stroke="var(--av)"
                 stroke-width="2" stroke-dasharray="8 5" />
               <rect id="bx-med" class="bx" x="324" y="116" width="260" height="204" fill="none" stroke="var(--md)"
                 stroke-width="2" stroke-dasharray="8 5" />
@@ -2621,8 +2656,8 @@
                    x=336, ends 2090 at x=570); rule edges sit clear of the ink on
                    each side. Both share the avg box's v-centre, so the swap reads
                    as one frame tightening, not as a box jumping down the slide. -->
-              <rect id="bx-med-all" class="bx" x="29" y="244.5" width="1146" height="28" fill="var(--tint-md)" stroke="none" />
-              <rect id="bx-med-2" class="bx" x="329" y="244.5" width="250" height="28" fill="none" stroke="var(--md)"
+              <rect id="bx-med-all" class="bx" x="29" y="247" width="1146" height="24" fill="var(--tint-md)" stroke="none" />
+              <rect id="bx-med-2" class="bx" x="329" y="247" width="250" height="24" fill="none" stroke="var(--md)"
                 stroke-width="2" stroke-dasharray="8 5" />
               <!-- Step-1 comparison box, shared by every neighbor method. One rect
                  over the three compared rows (sqft_lot, bedrooms, bathrooms), from
@@ -2632,17 +2667,17 @@
                  and 5, scaled tint on SNN drivers 6 and 7 - so step 2 keeps the
                  frame of step 1 while the fill flips, exactly like the Medium
                  wash carrying under its own step 2. -->
-              <rect id="bx-compare" class="bx" x="27" y="270.5" width="1148" height="72" fill="none" stroke="none" />
-              <rect id="bx-knn-2" class="bx" x="523" y="244.5" width="570" height="28" fill="none" stroke="var(--knn)"
+              <rect id="bx-compare" class="bx" x="27" y="276" width="1148" height="105" fill="none" stroke="none" />
+              <rect id="bx-knn-2" class="bx" x="523" y="247" width="570" height="24" fill="none" stroke="var(--knn)"
                 stroke-width="2" stroke-dasharray="8 5" />
-              <rect id="bx-snn-pick" class="bx" x="510" y="116" width="596" height="228" fill="none" stroke="var(--snn)"
+              <rect id="bx-snn-pick" class="bx" x="523" y="247" width="570" height="24" fill="none" stroke="var(--snn)"
                 stroke-width="2" stroke-dasharray="8 5" />
               <rect id="bx-snn" class="bx" x="510" y="116" width="596" height="204" fill="none" stroke="var(--snn)"
                 stroke-width="2" stroke-dasharray="8 5" />
               <!-- Average marker: house lifted clear; equal text gaps; down arrow to box -->
               <!-- color: #hs strokes with currentColor, which follows the CSS
                    color property, not stroke. stroke alone left every house grey. -->
-              <g id="mk-avg" class="mk" color="var(--av)" stroke="var(--av)">
+              <g id="mk-avg" class="mk" fill="none" color="var(--av)" stroke="var(--av)">
                 <g transform="translate(634,10) scale(1.264)">
                   <use href="#hs" />
                 </g>
@@ -2661,7 +2696,7 @@
                 <line x1="634" y1="44" x2="634" y2="122" stroke-width="2" marker-end="url(#arr-av)" />
               </g>
               <!-- Medium marker -->
-              <g id="mk-med" class="mk" color="var(--md)" stroke="var(--md)">
+              <g id="mk-med" class="mk" fill="none" color="var(--md)" stroke="var(--md)">
                 <g transform="translate(452,10) scale(1.119)">
                   <use href="#hs" />
                 </g>
@@ -2676,7 +2711,7 @@
               <!-- KNN marker: the five closest houses averaged with EQUAL weight. That lands
                    above the city average of 2225, because three of the five are larger than
                    it - but it is still one number for every house. -->
-              <g id="mk-knn" class="mk" color="var(--knn)" stroke="var(--knn)">
+              <g id="mk-knn" class="mk" fill="none" color="var(--knn)" stroke="var(--knn)">
                 <g transform="translate(760,10) scale(1.35)">
                   <use href="#hs" />
                 </g>
@@ -2691,7 +2726,7 @@
               <!-- Scaled KNN marker: the same five houses, each weighted 1 over its distance
                    across sqft_lot, bedrooms and bathrooms. The two closest dominate, so the
                    answer lands well above the equal-weight average of the identical five. -->
-              <g id="mk-snn" class="mk" color="var(--snn)" stroke="var(--snn)">
+              <g id="mk-snn" class="mk" fill="none" color="var(--snn)" stroke="var(--snn)">
                 <g transform="translate(940,10) scale(1.465)">
                   <use href="#hs" />
                 </g>
@@ -2904,6 +2939,10 @@
             </div>
           </div>
           <div class="ph-steps" aria-hidden="true">
+            <span class="fragment ph-step"></span>
+            <span class="fragment ph-step"></span>
+            <span class="fragment ph-step"></span>
+            <span class="fragment ph-step"></span>
             <span class="fragment ph-step"></span>
             <span class="fragment ph-step"></span>
             <span class="fragment ph-step"></span>
