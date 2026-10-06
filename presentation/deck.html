@@ -37,19 +37,11 @@
 
       /* Approach colors: one per fill-in method, reused in S4 detail + S5. */
       --av: #e8b04b;
-      /* Medium: spring green (#6ee7b7). The steel blue sat 5 degrees off the
-         deck accent, and its teal-400 replacement sat right between the accent
-         and the mint slide titles while claiming to be distinct from both -
-         it popped on navy but clashed with everything the deck frames. Hue 156
-         sits 11 degrees inside the mint band (145), so Medium blends with the
-         titles and frames it shares a slide with, while staying unmistakably
-         a method colour: still green-family like the frame, none of the
-         sky-blue of the accent. It keeps 40+ degrees from the accent, the
-         ambers, and both NN purples, which stay the closest pair on the
-         slide. 10.76:1 on the navy body, AA as text and AAA at the sizes the
-         SVG and calc numbers use; its 22% tint reads on the card fill. Red
-         excluded outright: error connotation, and nothing else needs it. */
-      --md: #6ee7b7;
+      /* Medium: light tan (#e3c99e). Reads as paper/neutral against Average's
+         saturated amber (#e8b04b): lighter, lower chroma, warm-grey rather than
+         gold. Keeps clear of the accent blue, the mint titles, and both NN
+         purples. Tint below derives from this token. */
+      --md: #e3c99e;
       --knn: #c792ea;
       /* Scaled (distance-weighted) KNN: the same method as --knn with a weight
          per neighbour, so on S4 it is a panel of its own and needs its own hue.
