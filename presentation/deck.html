@@ -299,6 +299,14 @@
       box-sizing: border-box;
     }
 
+    /* S4 is height-starved: width-driven svg + tallest panel need 769px of
+       700px. Trim the slide-level chrome just here: 72px foot pad to 12px
+       and the 15px block gap to 8px, freeing 67px so the staged fit holds. */
+    #s4 .ph-body {
+      padding-bottom: 12px;
+      gap: 8px;
+    }
+
     .reveal  {
       color: var(--ph-ink-muted);
     }
@@ -1459,6 +1467,10 @@
       color: var(--knn);
     }
 
+    #s3 article.ph-is-snn h4 {
+      color: var(--snn);
+    }
+
     /* S3 Solution: the lead-in paragraph ("Three approaches...") runs flush
        into the three approach boxes - every p inside .ph-cols is margin:0
        (deck.html:385-387), so the h3's bottom margin is the only spacing the
@@ -1467,24 +1479,33 @@
       margin-top: var(--sp-sm);
     }
 
+    /* Staged row: svg is width-driven, so the row takes the full width and
+       lets the 1225/598 ratio set its height. Tallest staged state (svg
+       ~505 + panel 244 + margins) fits the 787px body, so the diagram
+       never moves when panels appear. */
     .ph-houses-top {
       position: relative;
-      flex: 0 0 50%;
+      flex: 0 0 auto;
+      width: 100%;
       min-height: 0;
+      aspect-ratio: 1225 / 598;
       display: flex;
       flex-direction: column;
       justify-content: flex-start;
       transition: flex-basis var(--ph-t-slide) var(--ph-ease);
     }
 
-    /* Load state matches the other stages: one flex basis and one max-height
-       everywhere, so the row no longer re-centres before fragment 1. */
+    /* Row already wears the drawing's aspect, so the svg just fills it -
+       same box, no letterbox bars left/right. Border was 5px on an
+       undefined --ph-border token (computed 0px none); dropped. */
     #houses-svg {
       width: 100%;
+      max-width: 100%;
       height: 100%;
-      flex: 1 1 auto;
+      flex: 0 0 auto;
       min-height: 0;
-      max-height: 380px;
+      display: block;
+      box-sizing: border-box;
     }
 
     /* Shared sub-slide title: one step below the slide title, accent-colored
@@ -1623,6 +1644,12 @@
        is values only. Do not put opacity on the
        .ar-lab group: SVG group opacity multiplies with child opacity, which would
        halve every label and cap a lit label at half brightness. */
+    .houses-svg .ar-row {
+      transition:
+        opacity var(--ph-t-fade) var(--ph-ease),
+        transform var(--ph-t-slide) var(--ph-ease);
+    }
+
     .houses-svg .v,
     .houses-svg .al {
       transition:
@@ -1644,8 +1671,8 @@
       opacity: 1;
     }
 
-    /* Scaled rows: three duplicates (s_lot, s_bed, s_bath), one under each
-       compared row. Hidden until the SNN scale-up; only SNN stage rules ever
+    /* Scaled rows: four duplicates (s_liv, s_lot, s_bed, s_bath), one under each
+       raw row. Hidden until the SNN scale-up; only SNN stage rules ever
        raise them. Same value ink as the raw rows. */
     .houses-svg .ar-scaled {
       opacity: 0;
@@ -1657,10 +1684,77 @@
 
     /* Scaled labels hide with their rows: same rule family as the values.
        Only SNN stage rules ever raise them. */
+    .houses-svg .al-sliv,
     .houses-svg .al-slot,
     .houses-svg .al-sbed,
     .houses-svg .al-sbath {
       opacity: 0;
+    }
+
+
+    /* SNN expansion: stages 11-15 open the gaps the scaled rows slide into.
+       Rows 2-4 (lot/bed/bath) shift down 1/2/3 rows; the scaled rows sit at
+       their rest y and appear in the opened gaps. Pre-SNN stages are
+       untouched: the markup rests at the compact 4-row layout. */
+    #s4:has(.ph-step:nth-of-type(11).visible):not(:has(.ph-step:nth-of-type(12).visible)) .ar-lot,
+    #s4:has(.ph-step:nth-of-type(11).visible):not(:has(.ph-step:nth-of-type(12).visible)) .al-lot {
+      transform: translateY(34px);
+    }
+    #s4:has(.ph-step:nth-of-type(11).visible):not(:has(.ph-step:nth-of-type(12).visible)) .ar-bed,
+    #s4:has(.ph-step:nth-of-type(11).visible):not(:has(.ph-step:nth-of-type(12).visible)) .al-bed {
+      transform: translateY(68px);
+    }
+    #s4:has(.ph-step:nth-of-type(11).visible):not(:has(.ph-step:nth-of-type(12).visible)) .ar-bath,
+    #s4:has(.ph-step:nth-of-type(11).visible):not(:has(.ph-step:nth-of-type(12).visible)) .al-bath {
+      transform: translateY(102px);
+    }
+    #s4:has(.ph-step:nth-of-type(12).visible):not(:has(.ph-step:nth-of-type(13).visible)) .ar-lot,
+    #s4:has(.ph-step:nth-of-type(12).visible):not(:has(.ph-step:nth-of-type(13).visible)) .al-lot {
+      transform: translateY(34px);
+    }
+    #s4:has(.ph-step:nth-of-type(12).visible):not(:has(.ph-step:nth-of-type(13).visible)) .ar-bed,
+    #s4:has(.ph-step:nth-of-type(12).visible):not(:has(.ph-step:nth-of-type(13).visible)) .al-bed {
+      transform: translateY(68px);
+    }
+    #s4:has(.ph-step:nth-of-type(12).visible):not(:has(.ph-step:nth-of-type(13).visible)) .ar-bath,
+    #s4:has(.ph-step:nth-of-type(12).visible):not(:has(.ph-step:nth-of-type(13).visible)) .al-bath {
+      transform: translateY(102px);
+    }
+    #s4:has(.ph-step:nth-of-type(13).visible):not(:has(.ph-step:nth-of-type(14).visible)) .ar-lot,
+    #s4:has(.ph-step:nth-of-type(13).visible):not(:has(.ph-step:nth-of-type(14).visible)) .al-lot {
+      transform: translateY(34px);
+    }
+    #s4:has(.ph-step:nth-of-type(13).visible):not(:has(.ph-step:nth-of-type(14).visible)) .ar-bed,
+    #s4:has(.ph-step:nth-of-type(13).visible):not(:has(.ph-step:nth-of-type(14).visible)) .al-bed {
+      transform: translateY(68px);
+    }
+    #s4:has(.ph-step:nth-of-type(13).visible):not(:has(.ph-step:nth-of-type(14).visible)) .ar-bath,
+    #s4:has(.ph-step:nth-of-type(13).visible):not(:has(.ph-step:nth-of-type(14).visible)) .al-bath {
+      transform: translateY(102px);
+    }
+    #s4:has(.ph-step:nth-of-type(14).visible):not(:has(.ph-step:nth-of-type(15).visible)) .ar-lot,
+    #s4:has(.ph-step:nth-of-type(14).visible):not(:has(.ph-step:nth-of-type(15).visible)) .al-lot {
+      transform: translateY(34px);
+    }
+    #s4:has(.ph-step:nth-of-type(14).visible):not(:has(.ph-step:nth-of-type(15).visible)) .ar-bed,
+    #s4:has(.ph-step:nth-of-type(14).visible):not(:has(.ph-step:nth-of-type(15).visible)) .al-bed {
+      transform: translateY(68px);
+    }
+    #s4:has(.ph-step:nth-of-type(14).visible):not(:has(.ph-step:nth-of-type(15).visible)) .ar-bath,
+    #s4:has(.ph-step:nth-of-type(14).visible):not(:has(.ph-step:nth-of-type(15).visible)) .al-bath {
+      transform: translateY(102px);
+    }
+    #s4:has(.ph-step:nth-of-type(15).visible):not(:has(.ph-step:nth-of-type(16).visible)) .ar-lot,
+    #s4:has(.ph-step:nth-of-type(15).visible):not(:has(.ph-step:nth-of-type(16).visible)) .al-lot {
+      transform: translateY(34px);
+    }
+    #s4:has(.ph-step:nth-of-type(15).visible):not(:has(.ph-step:nth-of-type(16).visible)) .ar-bed,
+    #s4:has(.ph-step:nth-of-type(15).visible):not(:has(.ph-step:nth-of-type(16).visible)) .al-bed {
+      transform: translateY(68px);
+    }
+    #s4:has(.ph-step:nth-of-type(15).visible):not(:has(.ph-step:nth-of-type(16).visible)) .ar-bath,
+    #s4:has(.ph-step:nth-of-type(15).visible):not(:has(.ph-step:nth-of-type(16).visible)) .al-bath {
+      transform: translateY(102px);
     }
 
     /* One stage at a time matches, so each block states that stage's COMPLETE
@@ -1803,6 +1897,7 @@
     /* Fragment 11 - SNN scale-up, blank rows: three empty scaled rows open under
        their raw rows (s_lot / s_bed / s_bath), labels lit, values blank. The raw
        compared rows keep their step-1 read state; nothing is struck yet. */
+    #s4:has(.ph-step:nth-of-type(11).visible):not(:has(.ph-step:nth-of-type(12).visible)) .ar-living .v,
     #s4:has(.ph-step:nth-of-type(11).visible):not(:has(.ph-step:nth-of-type(12).visible)) .ar-lot .v,
     #s4:has(.ph-step:nth-of-type(11).visible):not(:has(.ph-step:nth-of-type(12).visible)) .ar-bed .v,
     #s4:has(.ph-step:nth-of-type(11).visible):not(:has(.ph-step:nth-of-type(12).visible)) .ar-bath .v {
@@ -1810,22 +1905,23 @@
       opacity: 1;
     }
 
+    #s4:has(.ph-step:nth-of-type(11).visible):not(:has(.ph-step:nth-of-type(12).visible)) .al-sliv,
     #s4:has(.ph-step:nth-of-type(11).visible):not(:has(.ph-step:nth-of-type(12).visible)) .al-slot,
     #s4:has(.ph-step:nth-of-type(11).visible):not(:has(.ph-step:nth-of-type(12).visible)) .al-sbed,
     #s4:has(.ph-step:nth-of-type(11).visible):not(:has(.ph-step:nth-of-type(12).visible)) .al-sbath,
+    #s4:has(.ph-step:nth-of-type(11).visible):not(:has(.ph-step:nth-of-type(12).visible)) .ar-sliv,
     #s4:has(.ph-step:nth-of-type(11).visible):not(:has(.ph-step:nth-of-type(12).visible)) .ar-slot,
     #s4:has(.ph-step:nth-of-type(11).visible):not(:has(.ph-step:nth-of-type(12).visible)) .ar-sbed,
     #s4:has(.ph-step:nth-of-type(11).visible):not(:has(.ph-step:nth-of-type(12).visible)) .ar-sbath {
       opacity: 1;
     }
 
-    #s4:has(.ph-step:nth-of-type(11).visible):not(:has(.ph-step:nth-of-type(12).visible)) .ar-living .v {
-      opacity: 0.22;
-    }
+    
 
     /* Fragment 12 - SNN scale fill: the scaled rows populate 0..1 while the raw
        values above them mute and strike. Raw keeps its white fill under the
        strike; scaled reads fresh white on the tint. */
+    #s4:has(.ph-step:nth-of-type(12).visible):not(:has(.ph-step:nth-of-type(13).visible)) .ar-sliv .v,
     #s4:has(.ph-step:nth-of-type(12).visible):not(:has(.ph-step:nth-of-type(13).visible)) .ar-slot .v,
     #s4:has(.ph-step:nth-of-type(12).visible):not(:has(.ph-step:nth-of-type(13).visible)) .ar-sbed .v,
     #s4:has(.ph-step:nth-of-type(12).visible):not(:has(.ph-step:nth-of-type(13).visible)) .ar-sbath .v {
@@ -1833,15 +1929,18 @@
       opacity: 1;
     }
 
+    #s4:has(.ph-step:nth-of-type(12).visible):not(:has(.ph-step:nth-of-type(13).visible)) .al-sliv,
     #s4:has(.ph-step:nth-of-type(12).visible):not(:has(.ph-step:nth-of-type(13).visible)) .al-slot,
     #s4:has(.ph-step:nth-of-type(12).visible):not(:has(.ph-step:nth-of-type(13).visible)) .al-sbed,
     #s4:has(.ph-step:nth-of-type(12).visible):not(:has(.ph-step:nth-of-type(13).visible)) .al-sbath,
+    #s4:has(.ph-step:nth-of-type(12).visible):not(:has(.ph-step:nth-of-type(13).visible)) .ar-sliv,
     #s4:has(.ph-step:nth-of-type(12).visible):not(:has(.ph-step:nth-of-type(13).visible)) .ar-slot,
     #s4:has(.ph-step:nth-of-type(12).visible):not(:has(.ph-step:nth-of-type(13).visible)) .ar-sbed,
     #s4:has(.ph-step:nth-of-type(12).visible):not(:has(.ph-step:nth-of-type(13).visible)) .ar-sbath {
       opacity: 1;
     }
 
+    #s4:has(.ph-step:nth-of-type(12).visible):not(:has(.ph-step:nth-of-type(13).visible)) .ar-living .v,
     #s4:has(.ph-step:nth-of-type(12).visible):not(:has(.ph-step:nth-of-type(13).visible)) .ar-lot .v,
     #s4:has(.ph-step:nth-of-type(12).visible):not(:has(.ph-step:nth-of-type(13).visible)) .ar-bed .v,
     #s4:has(.ph-step:nth-of-type(12).visible):not(:has(.ph-step:nth-of-type(13).visible)) .ar-bath .v {
@@ -1850,12 +1949,11 @@
       text-decoration: line-through;
     }
 
-    #s4:has(.ph-step:nth-of-type(12).visible):not(:has(.ph-step:nth-of-type(13).visible)) .ar-living .v {
-      opacity: 0.22;
-    }
+    
 
     /* Fragment 13 - SNN wash move: the tint drops from the struck raw rows to
        the scaled rows that replace them. Raw stays struck; scaled stays lit. */
+    #s4:has(.ph-step:nth-of-type(13).visible):not(:has(.ph-step:nth-of-type(14).visible)) .ar-sliv .v,
     #s4:has(.ph-step:nth-of-type(13).visible):not(:has(.ph-step:nth-of-type(14).visible)) .ar-slot .v,
     #s4:has(.ph-step:nth-of-type(13).visible):not(:has(.ph-step:nth-of-type(14).visible)) .ar-sbed .v,
     #s4:has(.ph-step:nth-of-type(13).visible):not(:has(.ph-step:nth-of-type(14).visible)) .ar-sbath .v {
@@ -1863,15 +1961,18 @@
       opacity: 1;
     }
 
+    #s4:has(.ph-step:nth-of-type(13).visible):not(:has(.ph-step:nth-of-type(14).visible)) .al-sliv,
     #s4:has(.ph-step:nth-of-type(13).visible):not(:has(.ph-step:nth-of-type(14).visible)) .al-slot,
     #s4:has(.ph-step:nth-of-type(13).visible):not(:has(.ph-step:nth-of-type(14).visible)) .al-sbed,
     #s4:has(.ph-step:nth-of-type(13).visible):not(:has(.ph-step:nth-of-type(14).visible)) .al-sbath,
+    #s4:has(.ph-step:nth-of-type(13).visible):not(:has(.ph-step:nth-of-type(14).visible)) .ar-sliv,
     #s4:has(.ph-step:nth-of-type(13).visible):not(:has(.ph-step:nth-of-type(14).visible)) .ar-slot,
     #s4:has(.ph-step:nth-of-type(13).visible):not(:has(.ph-step:nth-of-type(14).visible)) .ar-sbed,
     #s4:has(.ph-step:nth-of-type(13).visible):not(:has(.ph-step:nth-of-type(14).visible)) .ar-sbath {
       opacity: 1;
     }
 
+    #s4:has(.ph-step:nth-of-type(13).visible):not(:has(.ph-step:nth-of-type(14).visible)) .ar-living .v,
     #s4:has(.ph-step:nth-of-type(13).visible):not(:has(.ph-step:nth-of-type(14).visible)) .ar-lot .v,
     #s4:has(.ph-step:nth-of-type(13).visible):not(:has(.ph-step:nth-of-type(14).visible)) .ar-bed .v,
     #s4:has(.ph-step:nth-of-type(13).visible):not(:has(.ph-step:nth-of-type(14).visible)) .ar-bath .v {
@@ -1880,13 +1981,12 @@
       text-decoration: line-through;
     }
 
-    #s4:has(.ph-step:nth-of-type(13).visible):not(:has(.ph-step:nth-of-type(14).visible)) .ar-living .v {
-      opacity: 0.22;
-    }
+    
 
     /* Fragment 14 - SNN scaled picks: the 5 closest tint to the scaled colour
        inside the scaled rows; everything else in those rows dims. Raw rows stay
        struck; living stays dim. The living label glows: its picks come next. */
+    #s4:has(.ph-step:nth-of-type(14).visible):not(:has(.ph-step:nth-of-type(15).visible)) .ar-sliv .v.h-nn,
     #s4:has(.ph-step:nth-of-type(14).visible):not(:has(.ph-step:nth-of-type(15).visible)) .ar-slot .v.h-nn,
     #s4:has(.ph-step:nth-of-type(14).visible):not(:has(.ph-step:nth-of-type(15).visible)) .ar-sbed .v.h-nn,
     #s4:has(.ph-step:nth-of-type(14).visible):not(:has(.ph-step:nth-of-type(15).visible)) .ar-sbath .v.h-nn {
@@ -1894,21 +1994,25 @@
       opacity: 1;
     }
 
+    #s4:has(.ph-step:nth-of-type(14).visible):not(:has(.ph-step:nth-of-type(15).visible)) .al-sliv,
     #s4:has(.ph-step:nth-of-type(14).visible):not(:has(.ph-step:nth-of-type(15).visible)) .al-slot,
     #s4:has(.ph-step:nth-of-type(14).visible):not(:has(.ph-step:nth-of-type(15).visible)) .al-sbed,
     #s4:has(.ph-step:nth-of-type(14).visible):not(:has(.ph-step:nth-of-type(15).visible)) .al-sbath,
+    #s4:has(.ph-step:nth-of-type(14).visible):not(:has(.ph-step:nth-of-type(15).visible)) .ar-sliv,
     #s4:has(.ph-step:nth-of-type(14).visible):not(:has(.ph-step:nth-of-type(15).visible)) .ar-slot,
     #s4:has(.ph-step:nth-of-type(14).visible):not(:has(.ph-step:nth-of-type(15).visible)) .ar-sbed,
     #s4:has(.ph-step:nth-of-type(14).visible):not(:has(.ph-step:nth-of-type(15).visible)) .ar-sbath {
       opacity: 1;
     }
 
+    #s4:has(.ph-step:nth-of-type(14).visible):not(:has(.ph-step:nth-of-type(15).visible)) .ar-sliv .v:not(.h-nn),
     #s4:has(.ph-step:nth-of-type(14).visible):not(:has(.ph-step:nth-of-type(15).visible)) .ar-slot .v:not(.h-nn),
     #s4:has(.ph-step:nth-of-type(14).visible):not(:has(.ph-step:nth-of-type(15).visible)) .ar-sbed .v:not(.h-nn),
     #s4:has(.ph-step:nth-of-type(14).visible):not(:has(.ph-step:nth-of-type(15).visible)) .ar-sbath .v:not(.h-nn) {
       opacity: 0.22;
     }
 
+    #s4:has(.ph-step:nth-of-type(14).visible):not(:has(.ph-step:nth-of-type(15).visible)) .ar-living .v,
     #s4:has(.ph-step:nth-of-type(14).visible):not(:has(.ph-step:nth-of-type(15).visible)) .ar-lot .v,
     #s4:has(.ph-step:nth-of-type(14).visible):not(:has(.ph-step:nth-of-type(15).visible)) .ar-bed .v,
     #s4:has(.ph-step:nth-of-type(14).visible):not(:has(.ph-step:nth-of-type(15).visible)) .ar-bath .v {
@@ -1921,13 +2025,12 @@
       filter: drop-shadow(0 0 6px rgba(56, 189, 248, 0.9));
     }
 
-    #s4:has(.ph-step:nth-of-type(14).visible):not(:has(.ph-step:nth-of-type(15).visible)) .ar-living .v {
-      opacity: 0.22;
-    }
+    
 
     /* Fragment 15 - SNN living picks: the scaled state carries over and the 5
        living values of the closest houses tint, framed by the pick box. The
        marker lands with the equation. */
+    #s4:has(.ph-step:nth-of-type(15).visible):not(:has(.ph-step:nth-of-type(16).visible)) .ar-sliv .v.h-nn,
     #s4:has(.ph-step:nth-of-type(15).visible):not(:has(.ph-step:nth-of-type(16).visible)) .ar-slot .v.h-nn,
     #s4:has(.ph-step:nth-of-type(15).visible):not(:has(.ph-step:nth-of-type(16).visible)) .ar-sbed .v.h-nn,
     #s4:has(.ph-step:nth-of-type(15).visible):not(:has(.ph-step:nth-of-type(16).visible)) .ar-sbath .v.h-nn {
@@ -1935,10 +2038,12 @@
       opacity: 1;
     }
 
+    #s4:has(.ph-step:nth-of-type(15).visible):not(:has(.ph-step:nth-of-type(16).visible)) .al-sliv,
     #s4:has(.ph-step:nth-of-type(15).visible):not(:has(.ph-step:nth-of-type(16).visible)) .al-slot,
     #s4:has(.ph-step:nth-of-type(15).visible):not(:has(.ph-step:nth-of-type(16).visible)) .al-sbed,
     #s4:has(.ph-step:nth-of-type(15).visible):not(:has(.ph-step:nth-of-type(16).visible)) .al-sbath,
     #s4:has(.ph-step:nth-of-type(15).visible):not(:has(.ph-step:nth-of-type(16).visible)) .al-living,
+    #s4:has(.ph-step:nth-of-type(15).visible):not(:has(.ph-step:nth-of-type(16).visible)) .ar-sliv,
     #s4:has(.ph-step:nth-of-type(15).visible):not(:has(.ph-step:nth-of-type(16).visible)) .ar-slot,
     #s4:has(.ph-step:nth-of-type(15).visible):not(:has(.ph-step:nth-of-type(16).visible)) .ar-sbed,
     #s4:has(.ph-step:nth-of-type(15).visible):not(:has(.ph-step:nth-of-type(16).visible)) .ar-sbath {
@@ -1949,12 +2054,14 @@
       filter: drop-shadow(0 0 6px rgba(56, 189, 248, 0.9));
     }
 
+    #s4:has(.ph-step:nth-of-type(15).visible):not(:has(.ph-step:nth-of-type(16).visible)) .ar-sliv .v:not(.h-nn),
     #s4:has(.ph-step:nth-of-type(15).visible):not(:has(.ph-step:nth-of-type(16).visible)) .ar-slot .v:not(.h-nn),
     #s4:has(.ph-step:nth-of-type(15).visible):not(:has(.ph-step:nth-of-type(16).visible)) .ar-sbed .v:not(.h-nn),
     #s4:has(.ph-step:nth-of-type(15).visible):not(:has(.ph-step:nth-of-type(16).visible)) .ar-sbath .v:not(.h-nn) {
       opacity: 0.22;
     }
 
+    #s4:has(.ph-step:nth-of-type(15).visible):not(:has(.ph-step:nth-of-type(16).visible)) .ar-living .v,
     #s4:has(.ph-step:nth-of-type(15).visible):not(:has(.ph-step:nth-of-type(16).visible)) .ar-lot .v,
     #s4:has(.ph-step:nth-of-type(15).visible):not(:has(.ph-step:nth-of-type(16).visible)) .ar-bed .v,
     #s4:has(.ph-step:nth-of-type(15).visible):not(:has(.ph-step:nth-of-type(16).visible)) .ar-bath .v {
@@ -1963,14 +2070,9 @@
       text-decoration: line-through;
     }
 
-    #s4:has(.ph-step:nth-of-type(15).visible):not(:has(.ph-step:nth-of-type(16).visible)) .ar-living .v.h-nn {
-      fill: var(--snn);
-      opacity: 1;
-    }
+    
 
-    #s4:has(.ph-step:nth-of-type(15).visible):not(:has(.ph-step:nth-of-type(16).visible)) .ar-living .v:not(.h-nn) {
-      opacity: 0.22;
-    }
+    
 
     /* Stage 16 has no attribute rules at all: with every other stage guarded, no
        stage rule matches, all values read the white rest state, and
@@ -2003,29 +2105,82 @@
     #s4:has(.ph-step:nth-of-type(8).visible):not(:has(.ph-step:nth-of-type(9).visible)) #bx-compare,
     #s4:has(.ph-step:nth-of-type(8).visible):not(:has(.ph-step:nth-of-type(9).visible)) #bx-knn-2,
     #s4:has(.ph-step:nth-of-type(10).visible):not(:has(.ph-step:nth-of-type(11).visible)) #bx-compare,
+    #s4:has(.ph-step:nth-of-type(11).visible):not(:has(.ph-step:nth-of-type(12).visible)) #bx-snn-liv,
     #s4:has(.ph-step:nth-of-type(11).visible):not(:has(.ph-step:nth-of-type(12).visible)) #bx-snn-lot,
     #s4:has(.ph-step:nth-of-type(11).visible):not(:has(.ph-step:nth-of-type(12).visible)) #bx-snn-bed,
     #s4:has(.ph-step:nth-of-type(11).visible):not(:has(.ph-step:nth-of-type(12).visible)) #bx-snn-bath,
     
     
     
+    #s4:has(.ph-step:nth-of-type(12).visible):not(:has(.ph-step:nth-of-type(13).visible)) #bx-snn-liv,
     #s4:has(.ph-step:nth-of-type(12).visible):not(:has(.ph-step:nth-of-type(13).visible)) #bx-snn-lot,
     #s4:has(.ph-step:nth-of-type(12).visible):not(:has(.ph-step:nth-of-type(13).visible)) #bx-snn-bed,
     #s4:has(.ph-step:nth-of-type(12).visible):not(:has(.ph-step:nth-of-type(13).visible)) #bx-snn-bath,
     
     
     
+    #s4:has(.ph-step:nth-of-type(13).visible):not(:has(.ph-step:nth-of-type(14).visible)) #bx-snn-sliv,
     #s4:has(.ph-step:nth-of-type(13).visible):not(:has(.ph-step:nth-of-type(14).visible)) #bx-snn-slot,
     #s4:has(.ph-step:nth-of-type(13).visible):not(:has(.ph-step:nth-of-type(14).visible)) #bx-snn-sbed,
     #s4:has(.ph-step:nth-of-type(13).visible):not(:has(.ph-step:nth-of-type(14).visible)) #bx-snn-sbath,
+    #s4:has(.ph-step:nth-of-type(14).visible):not(:has(.ph-step:nth-of-type(15).visible)) #bx-snn-sliv,
     #s4:has(.ph-step:nth-of-type(14).visible):not(:has(.ph-step:nth-of-type(15).visible)) #bx-snn-slot,
     #s4:has(.ph-step:nth-of-type(14).visible):not(:has(.ph-step:nth-of-type(15).visible)) #bx-snn-sbed,
     #s4:has(.ph-step:nth-of-type(14).visible):not(:has(.ph-step:nth-of-type(15).visible)) #bx-snn-sbath,
+    #s4:has(.ph-step:nth-of-type(15).visible):not(:has(.ph-step:nth-of-type(16).visible)) #bx-snn-sliv,
     #s4:has(.ph-step:nth-of-type(15).visible):not(:has(.ph-step:nth-of-type(16).visible)) #bx-snn-slot,
     #s4:has(.ph-step:nth-of-type(15).visible):not(:has(.ph-step:nth-of-type(16).visible)) #bx-snn-sbed,
     #s4:has(.ph-step:nth-of-type(15).visible):not(:has(.ph-step:nth-of-type(16).visible)) #bx-snn-sbath,
     #s4:has(.ph-step:nth-of-type(15).visible):not(:has(.ph-step:nth-of-type(16).visible)) #bx-snn-pick {
       opacity: 1;
+    }
+
+
+    /* SNN boxes ride their rows: the markup rests compact, the stage moves them. */
+    #s4:has(.ph-step:nth-of-type(11).visible):not(:has(.ph-step:nth-of-type(12).visible)) #bx-snn-lot {
+      transform: translateY(34px);
+    }
+    #s4:has(.ph-step:nth-of-type(11).visible):not(:has(.ph-step:nth-of-type(12).visible)) #bx-snn-bed {
+      transform: translateY(68px);
+    }
+    #s4:has(.ph-step:nth-of-type(11).visible):not(:has(.ph-step:nth-of-type(12).visible)) #bx-snn-bath {
+      transform: translateY(102px);
+    }
+    #s4:has(.ph-step:nth-of-type(12).visible):not(:has(.ph-step:nth-of-type(13).visible)) #bx-snn-lot {
+      transform: translateY(34px);
+    }
+    #s4:has(.ph-step:nth-of-type(12).visible):not(:has(.ph-step:nth-of-type(13).visible)) #bx-snn-bed {
+      transform: translateY(68px);
+    }
+    #s4:has(.ph-step:nth-of-type(12).visible):not(:has(.ph-step:nth-of-type(13).visible)) #bx-snn-bath {
+      transform: translateY(102px);
+    }
+    #s4:has(.ph-step:nth-of-type(13).visible):not(:has(.ph-step:nth-of-type(14).visible)) #bx-snn-lot {
+      transform: translateY(34px);
+    }
+    #s4:has(.ph-step:nth-of-type(13).visible):not(:has(.ph-step:nth-of-type(14).visible)) #bx-snn-bed {
+      transform: translateY(68px);
+    }
+    #s4:has(.ph-step:nth-of-type(13).visible):not(:has(.ph-step:nth-of-type(14).visible)) #bx-snn-bath {
+      transform: translateY(102px);
+    }
+    #s4:has(.ph-step:nth-of-type(14).visible):not(:has(.ph-step:nth-of-type(15).visible)) #bx-snn-lot {
+      transform: translateY(34px);
+    }
+    #s4:has(.ph-step:nth-of-type(14).visible):not(:has(.ph-step:nth-of-type(15).visible)) #bx-snn-bed {
+      transform: translateY(68px);
+    }
+    #s4:has(.ph-step:nth-of-type(14).visible):not(:has(.ph-step:nth-of-type(15).visible)) #bx-snn-bath {
+      transform: translateY(102px);
+    }
+    #s4:has(.ph-step:nth-of-type(15).visible):not(:has(.ph-step:nth-of-type(16).visible)) #bx-snn-lot {
+      transform: translateY(34px);
+    }
+    #s4:has(.ph-step:nth-of-type(15).visible):not(:has(.ph-step:nth-of-type(16).visible)) #bx-snn-bed {
+      transform: translateY(68px);
+    }
+    #s4:has(.ph-step:nth-of-type(15).visible):not(:has(.ph-step:nth-of-type(16).visible)) #bx-snn-bath {
+      transform: translateY(102px);
     }
 
     /* Same frame, different fill per method: knn tint on NN drivers 4 and 5,
@@ -2056,8 +2211,8 @@
        which needs the room - the attribute rows below the baseline gained a
        step and a half of leading, so the diagram grew taller, not shorter. */
     #s4:has(.ph-step:nth-of-type(1).visible) .ph-stage-bottom {
-      flex: 0 0 44%;
-      margin-top: var(--gap-md);
+      flex: 0 0 32%;
+      margin-top: var(--sp-sm);
       overflow: visible;
     }
 
@@ -2626,7 +2781,7 @@
                 When a listing arrives with a blank, fill it from what is already on file — estimate the missing detail from the library of past sales, the way an agent prices a home off comparable sales (comps).
               </p>
               <p>
-                Three approaches, differing only in how much of the rest of the record they use:
+                Four approaches, differing only in how much of the rest of the record they use:
               </p>
               <div class="ph-cols">
                 <article class="ph-is-av">
@@ -2644,7 +2799,13 @@
                 <article class="ph-is-knn">
                   <h4>Nearest Neighbor</h4>
                   <p>
-                    The values of the items in the group closest to this one on the remaining fields. They correspond to a small set of known items, the closest counting most.
+                    The values of the 5 items closest to this one on the remaining fields, averaged with equal weight. Raw units, so the widest-ranging field decides who counts as close.
+                  </p>
+                </article>
+                <article class="ph-is-snn">
+                  <h4>Scaled Nearest Neighbor</h4>
+                  <p>
+                    The same 5 closest items, found after scaling every field 0&#8211;1 so each field votes equally, then averaged weighted by closeness and unscaled back to real units.
                   </p>
                 </article>
               </div>
@@ -2678,7 +2839,7 @@
         </header>
         <div class="ph-body ph-houses">
           <div class="ph-houses-top">
-            <svg id="houses-svg" class="houses-svg" viewBox="-40 -80 1230 470" fill="none" color="#BCCCD4" role="img"
+            <svg preserveAspectRatio="xMidYMid meet" id="houses-svg" class="houses-svg" viewBox="-34 -87 1225 598" fill="none" color="#BCCCD4" role="img"
               aria-label="Twelve houses in four groups of three, sorted smallest to largest. Under each house, four attribute values in four rows: square feet, year built, grade, and bedrooms.">
               <defs>
                 <g id="hs" stroke="currentColor" stroke-width="3">
@@ -2759,9 +2920,10 @@
                 <text class="al al-lot" x="20" y="298">sqft_lot</text>
                 <text class="al al-bed" x="20" y="332">beds</text>
                 <text class="al al-bath" x="20" y="366">baths</text>
-                <text class="al al-slot" x="20" y="310" font-size="12">s_lot</text>
-                <text class="al al-sbed" x="20" y="344" font-size="12">s_bed</text>
-                <text class="al al-sbath" x="20" y="378" font-size="12">s_bath</text>
+                <text class="al al-sliv" x="20" y="298">s_liv</text>
+                <text class="al al-slot" x="20" y="366">s_lot</text>
+                <text class="al al-sbed" x="20" y="434">s_bed</text>
+                <text class="al al-sbath" x="20" y="502">s_bath</text>
               <g class="ar-row ar-living" font-size="15" fill="#BCCCD4" text-anchor="middle">
                 <text class="v" x="54" y="264">1235</text>
                 <text class="v" x="98" y="264">1300</text>
@@ -2818,51 +2980,65 @@
                 <text class="v h-nn" x="1066" y="366">3</text>
                 <text class="v" x="1148" y="366">4</text>
               </g>
+              <g class="ar-row ar-scaled ar-sliv" font-size="15" fill="#BCCCD4" text-anchor="middle">
+                <text class="v" x="54" y="298">0</text>
+                <text class="v" x="98" y="298">0.0236</text>
+                <text class="v" x="142" y="298">0.0472</text>
+                <text class="v" x="241" y="298">0.1034</text>
+                <text class="v" x="297" y="298">0.1325</text>
+                <text class="v" x="353" y="298">0.1615</text>
+                <text class="v h-nn" x="551" y="298">0.3103</text>
+                <text class="v h-nn" x="619" y="298">0.3503</text>
+                <text class="v h-nn" x="687" y="298">0.3902</text>
+                <text class="v h-nn" x="984" y="298">0.8621</text>
+                <text class="v h-nn" x="1066" y="298">0.9310</text>
+                <text class="v" x="1148" y="298">1</text>
+              </g>
               <!-- Scaled duplicates: min-max 0..1 of the row above (lot range
                    4500, bed range 4, bath range 3). Same x columns, blank until
                    the scale-up fragment populates them. Dashed strike styling
                    comes from stage rules, not markup. -->
               <g class="ar-row ar-scaled ar-slot" font-size="15" fill="#BCCCD4" text-anchor="middle">
-                <text class="v" x="54" y="310">0</text>
-                <text class="v" x="98" y="310">0.0667</text>
-                <text class="v" x="142" y="310">0.1556</text>
-                <text class="v" x="241" y="310">0.2222</text>
-                <text class="v" x="297" y="310">0.3556</text>
-                <text class="v" x="353" y="310">0.2889</text>
-                <text class="v h-nn" x="551" y="310">0.6667</text>
-                <text class="v h-nn" x="619" y="310">0.7556</text>
-                <text class="v h-nn" x="687" y="310">0.8444</text>
-                <text class="v h-nn" x="984" y="310">0.9333</text>
-                <text class="v h-nn" x="1066" y="310">1</text>
-                <text class="v" x="1148" y="310">0.4</text>
+                <text class="v" x="54" y="366">0</text>
+                <text class="v" x="98" y="366">0.0667</text>
+                <text class="v" x="142" y="366">0.1556</text>
+                <text class="v" x="241" y="366">0.2222</text>
+                <text class="v" x="297" y="366">0.3556</text>
+                <text class="v" x="353" y="366">0.2889</text>
+                <text class="v h-nn" x="551" y="366">0.6667</text>
+                <text class="v h-nn" x="619" y="366">0.7556</text>
+                <text class="v h-nn" x="687" y="366">0.8444</text>
+                <text class="v h-nn" x="984" y="366">0.9333</text>
+                <text class="v h-nn" x="1066" y="366">1</text>
+                <text class="v" x="1148" y="366">0.4</text>
               </g>
               <g class="ar-row ar-scaled ar-sbed" font-size="15" fill="#BCCCD4" text-anchor="middle">
-                <text class="v" x="54" y="344">0</text>
-                <text class="v" x="98" y="344">0</text>
-                <text class="v" x="142" y="344">0</text>
-                <text class="v" x="241" y="344">0.25</text>
-                <text class="v" x="297" y="344">0.25</text>
-                <text class="v" x="353" y="344">0.25</text>
-                <text class="v h-nn" x="551" y="344">0.5</text>
-                <text class="v h-nn" x="619" y="344">0.5</text>
-                <text class="v h-nn" x="687" y="344">0.75</text>
-                <text class="v h-nn" x="984" y="344">0.75</text>
-                <text class="v h-nn" x="1066" y="344">0.75</text>
-                <text class="v" x="1148" y="344">1</text>
+                <text class="v" x="54" y="434">0</text>
+                <text class="v" x="98" y="434">0</text>
+                <text class="v" x="142" y="434">0</text>
+                <text class="v" x="241" y="434">0.25</text>
+                <text class="v" x="297" y="434">0.25</text>
+                <text class="v" x="353" y="434">0.25</text>
+                <text class="v h-nn" x="551" y="434">0.5</text>
+                <text class="v h-nn" x="619" y="434">0.5</text>
+                <text class="v h-nn" x="687" y="434">0.75</text>
+                <text class="v h-nn" x="984" y="434">0.75</text>
+                <text class="v h-nn" x="1066" y="434">0.75</text>
+                <text class="v" x="1148" y="434">1</text>
               </g>
               <g class="ar-row ar-scaled ar-sbath" font-size="15" fill="#BCCCD4" text-anchor="middle">
-                <text class="v" x="54" y="378">0</text>
-                <text class="v" x="98" y="378">0.1667</text>
-                <text class="v" x="142" y="378">0.1667</text>
-                <text class="v" x="241" y="378">0.1667</text>
-                <text class="v" x="297" y="378">0.1667</text>
-                <text class="v" x="353" y="378">0.3333</text>
-                <text class="v h-nn" x="551" y="378">0.5</text>
-                <text class="v h-nn" x="619" y="378">0.5</text>
-                <text class="v h-nn" x="687" y="378">0.6667</text>
-                <text class="v h-nn" x="984" y="378">0.6667</text>
-                <text class="v h-nn" x="1066" y="378">0.6667</text>
-                <text class="v" x="1148" y="378">1</text>
+                <text class="v" x="54" y="502">0</text>
+                <text class="v" x="98" y="502">0.1667</text>
+                <text class="v" x="142" y="502">0.1667</text>
+                <text class="v" x="241" y="502">0.1667</text>
+                <text class="v" x="297" y="502">0.1667</text>
+                <text class="v" x="353" y="502">0.3333</text>
+                <text class="v h-nn" x="551" y="502">0.5</text>
+                <text class="v h-nn" x="619" y="502">0.5</text>
+                <text class="v h-nn" x="687" y="502">0.6667</text>
+                <text class="v h-nn" x="984" y="502">0.6667</text>
+                <text class="v h-nn" x="1066" y="502">0.6667</text>
+                <text class="v" x="1148" y="502">1</text>
               </g>
               <!-- Input boxes: dashed. The Average box is the exception: Average reads
                    only sqft_living, so it brackets just that row (y 246..274, between
@@ -2897,15 +3073,17 @@
               <!-- SNN scale-up: one wash per compared row, so each row's fill is
                    its own background. Raw-row washes (y 281/325/359) and scaled
                    fills (y 295/343/391) share x/width with bx-compare. -->
-              <rect id="bx-snn-lot" class="bx" x="27" y="281" width="1148" height="46" fill="var(--tint-snn)" stroke="none" />
-              <rect id="bx-snn-bed" class="bx" x="27" y="315" width="1148" height="46" fill="var(--tint-snn)" stroke="none" />
-              <rect id="bx-snn-bath" class="bx" x="27" y="349" width="1148" height="46" fill="var(--tint-snn)" stroke="none" />
-              <rect id="bx-snn-slot" class="bx" x="27" y="293" width="1148" height="24" fill="var(--tint-snn)" stroke="none" />
-              <rect id="bx-snn-sbed" class="bx" x="27" y="327" width="1148" height="24" fill="var(--tint-snn)" stroke="none" />
-              <rect id="bx-snn-sbath" class="bx" x="27" y="361" width="1148" height="24" fill="var(--tint-snn)" stroke="none" />
+              <rect id="bx-snn-liv" class="bx" x="27" y="247" width="1148" height="24" fill="var(--tint-snn)" stroke="none" />
+              <rect id="bx-snn-lot" class="bx" x="27" y="281" width="1148" height="24" fill="var(--tint-snn)" stroke="none" />
+              <rect id="bx-snn-bed" class="bx" x="27" y="315" width="1148" height="24" fill="var(--tint-snn)" stroke="none" />
+              <rect id="bx-snn-bath" class="bx" x="27" y="349" width="1148" height="24" fill="var(--tint-snn)" stroke="none" />
+              <rect id="bx-snn-sliv" class="bx" x="27" y="281" width="1148" height="24" fill="var(--tint-snn)" stroke="none" />
+              <rect id="bx-snn-slot" class="bx" x="27" y="349" width="1148" height="24" fill="var(--tint-snn)" stroke="none" />
+              <rect id="bx-snn-sbed" class="bx" x="27" y="417" width="1148" height="24" fill="var(--tint-snn)" stroke="none" />
+              <rect id="bx-snn-sbath" class="bx" x="27" y="485" width="1148" height="24" fill="var(--tint-snn)" stroke="none" />
               <rect id="bx-knn-2" class="bx" x="523" y="247" width="570" height="24" fill="none" stroke="var(--knn)"
                 stroke-width="2" stroke-dasharray="8 5" />
-              <rect id="bx-snn-pick" class="bx" x="523" y="247" width="570" height="24" fill="none" stroke="var(--snn)"
+              <rect id="bx-snn-pick" class="bx" x="523" y="281" width="570" height="24" fill="none" stroke="var(--snn)"
                 stroke-width="2" stroke-dasharray="8 5" />
               <rect id="bx-snn" class="bx" x="510" y="116" width="596" height="204" fill="none" stroke="var(--snn)"
                 stroke-width="2" stroke-dasharray="8 5" />
@@ -2976,13 +3154,14 @@
                 </text>
                 <line x1="940" y1="62" x2="940" y2="122" stroke-width="2" marker-end="url(#arr-snn)" />
               </g>
-              <p class="ph-stage-hint">
-                The diagram above is 12 houses. Each carries four of the columns
-                this API imputes &#8212; living area, lot size, bedrooms,
-                bathrooms &#8212; and any one of them can be the one that came back
-                blank. This one came back with no living area:
-                <code>sqft_living: &#8212;, sqft_lot: 9000, bedrooms: 5, bathrooms: 3</code>
-              </p>
+            </svg>
+            <p class="ph-stage-hint">
+              The diagram above is 12 houses. Each carries four of the columns
+              this API imputes &#8212; living area, lot size, bedrooms,
+              bathrooms &#8212; and any one of them can be the one that came back
+              blank. This one came back with no living area:
+              <code>sqft_living: &#8212;, sqft_lot: 9000, bedrooms: 5, bathrooms: 3</code>
+            </p>
           </div>
           <div class="ph-stage-bottom">
             <div class="ph-panels">
@@ -3026,7 +3205,6 @@
                       <use href="#hs" transform="translate(198,100) scale(0.3)" />
                       <use href="#hs" transform="translate(220,100) scale(0.3)" />
                       <use href="#hs" transform="translate(242,100) scale(0.3)" />
-                      <use href="#hs" transform="translate(264,100) scale(0.3)" />
                     </g>
                     <text class="ph-calc-c" x="150" y="120" text-anchor="middle">12 of 12 read</text>
                   </svg>
