@@ -1618,51 +1618,57 @@
        legible, nothing claimed. The per-stage rules are the only things that light a
        value - a value that is not lit is a value the method did not read.
 
-       The rest opacity lives here and nowhere else. Do not put opacity on the
+       Labels are headers, not data: always lit at full opacity, never dimmed by
+       a stage rule. The glow marks the row a step reads. The rest opacity below
+       is values only. Do not put opacity on the
        .ar-lab group: SVG group opacity multiplies with child opacity, which would
        halve every label and cap a lit label at half brightness. */
     .houses-svg .v,
     .houses-svg .al {
       transition:
         opacity var(--ph-t-fade) var(--ph-ease),
-        fill var(--ph-t-fade) var(--ph-ease);
+        fill var(--ph-t-fade) var(--ph-ease),
+        filter var(--ph-t-fade) var(--ph-ease);
     }
 
-    .houses-svg .v,
-    .houses-svg .al {
+    .houses-svg .v {
       opacity: 0.55;
     }
 
     /* Row labels read as fixed headers, not as data: every one of the four is
-       the deck accent at every stage, and no step rule retints them. The value
-       rows carry the per-step colour; the name of the row never does. */
+       the deck accent at every stage, and no step rule dims or retints them.
+       The value rows carry the per-step colour; the name of the row never does. */
     .houses-svg .al {
       fill: var(--ph-accent);
+      opacity: 1;
     }
 
     /* One stage at a time matches, so each block states that stage's COMPLETE
-       state - every row explicitly lit or explicitly dimmed. Nothing is
-       inherited from the stage before and nothing has to be undone after. */
+       value state - every value explicitly lit or explicitly dimmed. Labels are
+       never dimmed (see above); a stage block only adds the glow to the label
+       of the row it reads. Nothing is inherited from the stage before and
+       nothing has to be undone after. */
 
-    /* Stage 1 - Average: one column, every house. */
-    #s4:has(.ph-step:nth-of-type(1).visible):not(:has(.ph-step:nth-of-type(2).visible)) .ar-living .v,
-    #s4:has(.ph-step:nth-of-type(1).visible):not(:has(.ph-step:nth-of-type(2).visible)) .al-living {
+    /* Stage 1 - Average: one column, every house. The living label glows: it is
+       the row this step reads. */
+    #s4:has(.ph-step:nth-of-type(1).visible):not(:has(.ph-step:nth-of-type(2).visible)) .ar-living .v {
       opacity: 1;
+    }
+
+    #s4:has(.ph-step:nth-of-type(1).visible):not(:has(.ph-step:nth-of-type(2).visible)) .al-living {
+      filter: drop-shadow(0 0 6px rgba(56, 189, 248, 0.9));
     }
 
     #s4:has(.ph-step:nth-of-type(1).visible):not(:has(.ph-step:nth-of-type(2).visible)) .ar-lot .v,
     #s4:has(.ph-step:nth-of-type(1).visible):not(:has(.ph-step:nth-of-type(2).visible)) .ar-bed .v,
-    #s4:has(.ph-step:nth-of-type(1).visible):not(:has(.ph-step:nth-of-type(2).visible)) .ar-bath .v,
-    #s4:has(.ph-step:nth-of-type(1).visible):not(:has(.ph-step:nth-of-type(2).visible)) .al-lot,
-    #s4:has(.ph-step:nth-of-type(1).visible):not(:has(.ph-step:nth-of-type(2).visible)) .al-bed,
-    #s4:has(.ph-step:nth-of-type(1).visible):not(:has(.ph-step:nth-of-type(2).visible)) .al-bath {
+    #s4:has(.ph-step:nth-of-type(1).visible):not(:has(.ph-step:nth-of-type(2).visible)) .ar-bath .v {
       opacity: 0.22;
     }
 
     /* Stage 2 - Medium, step 1: the whole sqft_living row again, exactly like
        Average's row at stage 1, but the values go white under the wash instead
        of tinting - white on the medium fill is the step's own look, and the
-       label alone carries the blue. The medium-tinted wash over the row (the
+       glowing label carries the blue. The medium-tinted wash over the row (the
        .bx fill below) is what says the step belongs to this method. */
     #s4:has(.ph-step:nth-of-type(2).visible):not(:has(.ph-step:nth-of-type(3).visible)) .ar-living .v {
       fill: #ffffff;
@@ -1670,20 +1676,20 @@
     }
 
     #s4:has(.ph-step:nth-of-type(2).visible):not(:has(.ph-step:nth-of-type(3).visible)) .al-living {
-      opacity: 1;
+      filter: drop-shadow(0 0 6px rgba(56, 189, 248, 0.9));
     }
 
     /* Stage 3 - Medium, step 2: the living row is still the row step 1 read, so
        its values stay white like they were under the wash - except the two the
-       step picked, which take the method colour. The label stays accent per
-       the deck-wide rule; only the pair carries the method hue. */
+       step picked, which take the method colour. The label glows per the shared
+       rule; only the pair carries the method hue. */
     #s4:has(.ph-step:nth-of-type(3).visible):not(:has(.ph-step:nth-of-type(4).visible)) .ar-living .v.h-mid {
       fill: var(--md);
       opacity: 1;
     }
 
     #s4:has(.ph-step:nth-of-type(3).visible):not(:has(.ph-step:nth-of-type(4).visible)) .al-living {
-      opacity: 1;
+      filter: drop-shadow(0 0 6px rgba(56, 189, 248, 0.9));
     }
 
     #s4:has(.ph-step:nth-of-type(3).visible):not(:has(.ph-step:nth-of-type(4).visible)) .ar-living .v:not(.h-mid) {
@@ -1693,18 +1699,15 @@
 
     #s4:has(.ph-step:nth-of-type(3).visible):not(:has(.ph-step:nth-of-type(4).visible)) .ar-lot .v,
     #s4:has(.ph-step:nth-of-type(3).visible):not(:has(.ph-step:nth-of-type(4).visible)) .ar-bed .v,
-    #s4:has(.ph-step:nth-of-type(3).visible):not(:has(.ph-step:nth-of-type(4).visible)) .ar-bath .v,
-    #s4:has(.ph-step:nth-of-type(3).visible):not(:has(.ph-step:nth-of-type(4).visible)) .al-lot,
-    #s4:has(.ph-step:nth-of-type(3).visible):not(:has(.ph-step:nth-of-type(4).visible)) .al-bed,
-    #s4:has(.ph-step:nth-of-type(3).visible):not(:has(.ph-step:nth-of-type(4).visible)) .al-bath {
+    #s4:has(.ph-step:nth-of-type(3).visible):not(:has(.ph-step:nth-of-type(4).visible)) .ar-bath .v {
       opacity: 0.22;
     }
 
     /* Stage 4 - Nearest Neighbor, step 1: the three compared rows wash over in
        knn tint and every value in them goes white - no winner is chosen on
        screen yet, since step 1 is the comparing, not the picking. The living
-       row is untouched: step 1 selects, it does not read. The sq_liv label
-       dims with the un-compared rows. */
+       row is untouched: step 1 selects, it does not read. Its label stays lit
+       like every label; the glow sits on the three compared rows. */
     #s4:has(.ph-step:nth-of-type(4).visible):not(:has(.ph-step:nth-of-type(5).visible)) .ar-lot .v,
     #s4:has(.ph-step:nth-of-type(4).visible):not(:has(.ph-step:nth-of-type(5).visible)) .ar-bed .v,
     #s4:has(.ph-step:nth-of-type(4).visible):not(:has(.ph-step:nth-of-type(5).visible)) .ar-bath .v {
@@ -1715,22 +1718,22 @@
     #s4:has(.ph-step:nth-of-type(4).visible):not(:has(.ph-step:nth-of-type(5).visible)) .al-lot,
     #s4:has(.ph-step:nth-of-type(4).visible):not(:has(.ph-step:nth-of-type(5).visible)) .al-bed,
     #s4:has(.ph-step:nth-of-type(4).visible):not(:has(.ph-step:nth-of-type(5).visible)) .al-bath {
-      opacity: 1;
+      filter: drop-shadow(0 0 6px rgba(56, 189, 248, 0.9));
     }
 
-    #s4:has(.ph-step:nth-of-type(4).visible):not(:has(.ph-step:nth-of-type(5).visible)) .ar-living .v,
-    #s4:has(.ph-step:nth-of-type(4).visible):not(:has(.ph-step:nth-of-type(5).visible)) .al-living {
+    #s4:has(.ph-step:nth-of-type(4).visible):not(:has(.ph-step:nth-of-type(5).visible)) .ar-living .v {
       opacity: 0.22;
     }
 
     /* Stage 4 - Nearest Neighbor, step 2: the comparison wash carries over with
        its values still white, exactly as they read on step 1 - the step-1 work
        stays legible under the step-2 frame. Only the five picked sizes change,
-       tinting to the method colour their calculation will average. The
+       tinting to the method colour their calculation will average. The living
+       label glows: its row is the one this step reads. The
        unpicked living values go back to rest ink, not white: white is step 1's
        look, and they were never read in this step. */
     #s4:has(.ph-step:nth-of-type(5).visible):not(:has(.ph-step:nth-of-type(6).visible)) .al-living {
-      opacity: 1;
+      filter: drop-shadow(0 0 6px rgba(56, 189, 248, 0.9));
     }
 
     #s4:has(.ph-step:nth-of-type(5).visible):not(:has(.ph-step:nth-of-type(6).visible)) .ar-lot .v,
@@ -1745,30 +1748,33 @@
       opacity: 1;
     }
 
-    /* Stage 5 - Scaled NN, step 1: stage 3 again, in the scaled colour. */
+    /* Stage 5 - Scaled NN, step 1: stage 3 again, in the scaled colour. The glow
+       sits on the three compared rows. */
     #s4:has(.ph-step:nth-of-type(6).visible):not(:has(.ph-step:nth-of-type(7).visible)) .ar-lot .v.h-nn,
     #s4:has(.ph-step:nth-of-type(6).visible):not(:has(.ph-step:nth-of-type(7).visible)) .ar-bed .v.h-nn,
-    #s4:has(.ph-step:nth-of-type(6).visible):not(:has(.ph-step:nth-of-type(7).visible)) .ar-bath .v.h-nn,
+    #s4:has(.ph-step:nth-of-type(6).visible):not(:has(.ph-step:nth-of-type(7).visible)) .ar-bath .v.h-nn {
+      opacity: 1;
+    }
+
     #s4:has(.ph-step:nth-of-type(6).visible):not(:has(.ph-step:nth-of-type(7).visible)) .al-lot,
     #s4:has(.ph-step:nth-of-type(6).visible):not(:has(.ph-step:nth-of-type(7).visible)) .al-bed,
     #s4:has(.ph-step:nth-of-type(6).visible):not(:has(.ph-step:nth-of-type(7).visible)) .al-bath {
-      opacity: 1;
+      filter: drop-shadow(0 0 6px rgba(56, 189, 248, 0.9));
     }
 
     #s4:has(.ph-step:nth-of-type(6).visible):not(:has(.ph-step:nth-of-type(7).visible)) .ar-living .v,
     #s4:has(.ph-step:nth-of-type(6).visible):not(:has(.ph-step:nth-of-type(7).visible)) .ar-lot .v:not(.h-nn),
     #s4:has(.ph-step:nth-of-type(6).visible):not(:has(.ph-step:nth-of-type(7).visible)) .ar-bed .v:not(.h-nn),
-    #s4:has(.ph-step:nth-of-type(6).visible):not(:has(.ph-step:nth-of-type(7).visible)) .ar-bath .v:not(.h-nn),
-    #s4:has(.ph-step:nth-of-type(6).visible):not(:has(.ph-step:nth-of-type(7).visible)) .al-living {
+    #s4:has(.ph-step:nth-of-type(6).visible):not(:has(.ph-step:nth-of-type(7).visible)) .ar-bath .v:not(.h-nn) {
       opacity: 0.22;
     }
 
     /* Stage 6 - Scaled NN, step 2: the living picks tint to the scaled colour
        their own calculation weights, and the comparison rows keep the white
        they read at step 1 - the same carry-over as Nearest Neighbor above.
-       Unpicked living values read at rest ink, not white. */
+       The living label glows. Unpicked living values read at rest ink, not white. */
     #s4:has(.ph-step:nth-of-type(7).visible):not(:has(.ph-step:nth-of-type(8).visible)) .al-living {
-      opacity: 1;
+      filter: drop-shadow(0 0 6px rgba(56, 189, 248, 0.9));
     }
 
     #s4:has(.ph-step:nth-of-type(7).visible):not(:has(.ph-step:nth-of-type(8).visible)) .ar-lot .v,
@@ -1784,7 +1790,8 @@
     }
 
     /* Stage 8 has no attribute rules at all: with every other stage guarded, no
-       stage rule matches and all 48 values fall back to the 0.55 rest opacity. */
+       stage rule matches, all 48 values fall back to the 0.55 rest opacity, and
+       all four labels read lit accent with no glow. */
 
     /* Per-stage eq houses + input boxes. Step-1 stages (4, 6) have no marker:
        nothing has been computed yet; Medium's marker stays up through both its
