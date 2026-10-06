@@ -2056,8 +2056,9 @@
        which needs the room - the attribute rows below the baseline gained a
        step and a half of leading, so the diagram grew taller, not shorter. */
     #s4:has(.ph-step:nth-of-type(1).visible) .ph-stage-bottom {
-      flex: 0 0 42%;
-      overflow: hidden;
+      flex: 0 0 44%;
+      margin-top: var(--gap-md);
+      overflow: visible;
     }
 
     .ph-panels {
@@ -2677,7 +2678,7 @@
         </header>
         <div class="ph-body ph-houses">
           <div class="ph-houses-top">
-            <svg id="houses-svg" class="houses-svg" viewBox="-70 -80 1280 534" fill="none" color="#BCCCD4" role="img"
+            <svg id="houses-svg" class="houses-svg" viewBox="-70 -80 1280 470" fill="none" color="#BCCCD4" role="img"
               aria-label="Twelve houses in four groups of three, sorted smallest to largest. Under each house, four attribute values in four rows: square feet, year built, grade, and bedrooms.">
               <defs>
                 <g id="hs" stroke="currentColor" stroke-width="3">
@@ -2756,23 +2757,11 @@
               <g class="ar-lab" font-size="15" fill="#BCCCD4" text-anchor="end">
                 <text class="al al-living" x="20" y="264">sqft_liv</text>
                 <text class="al al-lot" x="20" y="298">sqft_lot</text>
-                <text class="al al-bed" x="20" y="348">beds</text>
-                <text class="al al-bath" x="20" y="398">baths</text>
-                <text class="al al-slot" x="20" y="320" font-size="12">s_lot</text>
-                <text class="al al-sbed" x="20" y="370" font-size="12">s_bed</text>
-                <text class="al al-sbath" x="20" y="420" font-size="12">s_bath</text>
-              <!-- Ellipsis: more attributes exist between lot and beds, hidden to
-                   keep the diagram to the four the API imputes. Three circles, not
-                   a … glyph: the glyph's ink sits at the foot of a tall em box and
-                   can never be centered by baseline math. Circles are positioned by
-                   construction at the gap midpoint (lot 298 / beds 332 -> 315).
-                   Not a row: no value moves. Lit accent like every label, never
-                   dimmed, no glow. -->
-              <g class="al al-more" fill="var(--ph-accent)">
-                <circle cx="8" cy="323" r="1.6" />
-                <circle cx="13" cy="323" r="1.6" />
-                <circle cx="18" cy="323" r="1.6" />
-              </g>
+                <text class="al al-bed" x="20" y="332">beds</text>
+                <text class="al al-bath" x="20" y="366">baths</text>
+                <text class="al al-slot" x="20" y="310" font-size="12">s_lot</text>
+                <text class="al al-sbed" x="20" y="344" font-size="12">s_bed</text>
+                <text class="al al-sbath" x="20" y="378" font-size="12">s_bath</text>
               <g class="ar-row ar-living" font-size="15" fill="#BCCCD4" text-anchor="middle">
                 <text class="v" x="54" y="264">1235</text>
                 <text class="v" x="98" y="264">1300</text>
@@ -2802,78 +2791,78 @@
                 <text class="v" x="1148" y="298">6400</text>
               </g>
               <g class="ar-row ar-bed" font-size="15" fill="#BCCCD4" text-anchor="middle">
-                <text class="v" x="54" y="348">2</text>
-                <text class="v" x="98" y="348">2</text>
-                <text class="v" x="142" y="348">2</text>
-                <text class="v" x="241" y="348">3</text>
-                <text class="v" x="297" y="348">3</text>
-                <text class="v" x="353" y="348">3</text>
-                <text class="v h-nn" x="551" y="348">4</text>
-                <text class="v h-nn" x="619" y="348">4</text>
-                <text class="v h-nn" x="687" y="348">5</text>
-                <text class="v h-nn" x="984" y="348">5</text>
-                <text class="v h-nn" x="1066" y="348">5</text>
-                <text class="v" x="1148" y="348">6</text>
+                <text class="v" x="54" y="332">2</text>
+                <text class="v" x="98" y="332">2</text>
+                <text class="v" x="142" y="332">2</text>
+                <text class="v" x="241" y="332">3</text>
+                <text class="v" x="297" y="332">3</text>
+                <text class="v" x="353" y="332">3</text>
+                <text class="v h-nn" x="551" y="332">4</text>
+                <text class="v h-nn" x="619" y="332">4</text>
+                <text class="v h-nn" x="687" y="332">5</text>
+                <text class="v h-nn" x="984" y="332">5</text>
+                <text class="v h-nn" x="1066" y="332">5</text>
+                <text class="v" x="1148" y="332">6</text>
               </g>
               <g class="ar-row ar-bath" font-size="15" fill="#BCCCD4" text-anchor="middle">
-                <text class="v" x="54" y="398">1</text>
-                <text class="v" x="98" y="398">1.5</text>
-                <text class="v" x="142" y="398">1.5</text>
-                <text class="v" x="241" y="398">1.5</text>
-                <text class="v" x="297" y="398">1.5</text>
-                <text class="v" x="353" y="398">2</text>
-                <text class="v h-nn" x="551" y="398">2.5</text>
-                <text class="v h-nn" x="619" y="398">2.5</text>
-                <text class="v h-nn" x="687" y="398">3</text>
-                <text class="v h-nn" x="984" y="398">3</text>
-                <text class="v h-nn" x="1066" y="398">3</text>
-                <text class="v" x="1148" y="398">4</text>
+                <text class="v" x="54" y="366">1</text>
+                <text class="v" x="98" y="366">1.5</text>
+                <text class="v" x="142" y="366">1.5</text>
+                <text class="v" x="241" y="366">1.5</text>
+                <text class="v" x="297" y="366">1.5</text>
+                <text class="v" x="353" y="366">2</text>
+                <text class="v h-nn" x="551" y="366">2.5</text>
+                <text class="v h-nn" x="619" y="366">2.5</text>
+                <text class="v h-nn" x="687" y="366">3</text>
+                <text class="v h-nn" x="984" y="366">3</text>
+                <text class="v h-nn" x="1066" y="366">3</text>
+                <text class="v" x="1148" y="366">4</text>
               </g>
               <!-- Scaled duplicates: min-max 0..1 of the row above (lot range
                    4500, bed range 4, bath range 3). Same x columns, blank until
                    the scale-up fragment populates them. Dashed strike styling
                    comes from stage rules, not markup. -->
               <g class="ar-row ar-scaled ar-slot" font-size="15" fill="#BCCCD4" text-anchor="middle">
-                <text class="v" x="54" y="320">0</text>
-                <text class="v" x="98" y="320">0.0667</text>
-                <text class="v" x="142" y="320">0.1556</text>
-                <text class="v" x="241" y="320">0.2222</text>
-                <text class="v" x="297" y="320">0.3556</text>
-                <text class="v" x="353" y="320">0.2889</text>
-                <text class="v h-nn" x="551" y="320">0.6667</text>
-                <text class="v h-nn" x="619" y="320">0.7556</text>
-                <text class="v h-nn" x="687" y="320">0.8444</text>
-                <text class="v h-nn" x="984" y="320">0.9333</text>
-                <text class="v h-nn" x="1066" y="320">1</text>
-                <text class="v" x="1148" y="320">0.4</text>
+                <text class="v" x="54" y="310">0</text>
+                <text class="v" x="98" y="310">0.0667</text>
+                <text class="v" x="142" y="310">0.1556</text>
+                <text class="v" x="241" y="310">0.2222</text>
+                <text class="v" x="297" y="310">0.3556</text>
+                <text class="v" x="353" y="310">0.2889</text>
+                <text class="v h-nn" x="551" y="310">0.6667</text>
+                <text class="v h-nn" x="619" y="310">0.7556</text>
+                <text class="v h-nn" x="687" y="310">0.8444</text>
+                <text class="v h-nn" x="984" y="310">0.9333</text>
+                <text class="v h-nn" x="1066" y="310">1</text>
+                <text class="v" x="1148" y="310">0.4</text>
               </g>
               <g class="ar-row ar-scaled ar-sbed" font-size="15" fill="#BCCCD4" text-anchor="middle">
-                <text class="v" x="54" y="370">0</text>
-                <text class="v" x="98" y="370">0</text>
-                <text class="v" x="142" y="370">0</text>
-                <text class="v" x="241" y="370">0.25</text>
-                <text class="v" x="297" y="370">0.25</text>
-                <text class="v" x="353" y="370">0.25</text>
-                <text class="v h-nn" x="551" y="370">0.5</text>
-                <text class="v h-nn" x="619" y="370">0.5</text>
-                <text class="v h-nn" x="687" y="370">0.75</text>
-                <text class="v h-nn" x="984" y="370">0.75</text>
-                <text class="v h-nn" x="1066" y="370">0.75</text>
-                <text class="v" x="1148" y="370">1</text>
+                <text class="v" x="54" y="344">0</text>
+                <text class="v" x="98" y="344">0</text>
+                <text class="v" x="142" y="344">0</text>
+                <text class="v" x="241" y="344">0.25</text>
+                <text class="v" x="297" y="344">0.25</text>
+                <text class="v" x="353" y="344">0.25</text>
+                <text class="v h-nn" x="551" y="344">0.5</text>
+                <text class="v h-nn" x="619" y="344">0.5</text>
+                <text class="v h-nn" x="687" y="344">0.75</text>
+                <text class="v h-nn" x="984" y="344">0.75</text>
+                <text class="v h-nn" x="1066" y="344">0.75</text>
+                <text class="v" x="1148" y="344">1</text>
               </g>
               <g class="ar-row ar-scaled ar-sbath" font-size="15" fill="#BCCCD4" text-anchor="middle">
-                <text class="v" x="54" y="420">0</text>
-                <text class="v" x="98" y="420">0.1667</text>
-                <text class="v" x="142" y="420">0.1667</text>
-                <text class="v" x="241" y="420">0.1667</text>
-                <text class="v" x="297" y="420">0.1667</text>
-                <text class="v" x="353" y="420">0.3333</text>
-                <text class="v h-nn" x="551" y="420">0.5</text>
-                <text class="v h-nn" x="619" y="420">0.5</text>
-                <text class="v h-nn" x="687" y="420">0.6667</text>
-                <text class="v h-nn" x="984" y="420">0.6667</text>
-                <text class="v h-nn" x="1066" y="420">0.6667</text>
-                <text class="v" x="1148" y="420">1</text>
+                <text class="v" x="54" y="378">0</text>
+                <text class="v" x="98" y="378">0.1667</text>
+                <text class="v" x="142" y="378">0.1667</text>
+                <text class="v" x="241" y="378">0.1667</text>
+                <text class="v" x="297" y="378">0.1667</text>
+                <text class="v" x="353" y="378">0.3333</text>
+                <text class="v h-nn" x="551" y="378">0.5</text>
+                <text class="v h-nn" x="619" y="378">0.5</text>
+                <text class="v h-nn" x="687" y="378">0.6667</text>
+                <text class="v h-nn" x="984" y="378">0.6667</text>
+                <text class="v h-nn" x="1066" y="378">0.6667</text>
+                <text class="v" x="1148" y="378">1</text>
               </g>
               <!-- Input boxes: dashed. The Average box is the exception: Average reads
                    only sqft_living, so it brackets just that row (y 246..274, between
@@ -2904,16 +2893,16 @@
                  and 5, scaled tint on SNN drivers 6 and 7 - so step 2 keeps the
                  frame of step 1 while the fill flips, exactly like the Medium
                  wash carrying under its own step 2. -->
-              <rect id="bx-compare" class="bx" x="27" y="276" width="1148" height="161" fill="none" stroke="none" />
+              <rect id="bx-compare" class="bx" x="27" y="276" width="1148" height="105" fill="none" stroke="none" />
               <!-- SNN scale-up: one wash per compared row, so each row's fill is
                    its own background. Raw-row washes (y 281/325/359) and scaled
                    fills (y 295/343/391) share x/width with bx-compare. -->
-              <rect id="bx-snn-lot" class="bx" x="27" y="281" width="1148" height="56" fill="var(--tint-snn)" stroke="none" />
-              <rect id="bx-snn-bed" class="bx" x="27" y="331" width="1148" height="56" fill="var(--tint-snn)" stroke="none" />
-              <rect id="bx-snn-bath" class="bx" x="27" y="381" width="1148" height="56" fill="var(--tint-snn)" stroke="none" />
-              <rect id="bx-snn-slot" class="bx" x="27" y="303" width="1148" height="24" fill="var(--tint-snn)" stroke="none" />
-              <rect id="bx-snn-sbed" class="bx" x="27" y="353" width="1148" height="24" fill="var(--tint-snn)" stroke="none" />
-              <rect id="bx-snn-sbath" class="bx" x="27" y="403" width="1148" height="24" fill="var(--tint-snn)" stroke="none" />
+              <rect id="bx-snn-lot" class="bx" x="27" y="281" width="1148" height="46" fill="var(--tint-snn)" stroke="none" />
+              <rect id="bx-snn-bed" class="bx" x="27" y="315" width="1148" height="46" fill="var(--tint-snn)" stroke="none" />
+              <rect id="bx-snn-bath" class="bx" x="27" y="349" width="1148" height="46" fill="var(--tint-snn)" stroke="none" />
+              <rect id="bx-snn-slot" class="bx" x="27" y="293" width="1148" height="24" fill="var(--tint-snn)" stroke="none" />
+              <rect id="bx-snn-sbed" class="bx" x="27" y="327" width="1148" height="24" fill="var(--tint-snn)" stroke="none" />
+              <rect id="bx-snn-sbath" class="bx" x="27" y="361" width="1148" height="24" fill="var(--tint-snn)" stroke="none" />
               <rect id="bx-knn-2" class="bx" x="523" y="247" width="570" height="24" fill="none" stroke="var(--knn)"
                 stroke-width="2" stroke-dasharray="8 5" />
               <rect id="bx-snn-pick" class="bx" x="523" y="247" width="570" height="24" fill="none" stroke="var(--snn)"
