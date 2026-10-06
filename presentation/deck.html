@@ -1824,6 +1824,8 @@
     /* Box height is half the encoding: 122 stops between the sqft_living row and
        the sqft_lot row, 180 reaches past bathrooms. No box at stage 7. */
     #s4:has(.ph-step:nth-of-type(2).visible):not(:has(.ph-step:nth-of-type(3).visible)) #bx-avg,
+    #s4:has(.ph-step:nth-of-type(4).visible):not(:has(.ph-step:nth-of-type(5).visible)) #bx-med-all,
+    #s4:has(.ph-step:nth-of-type(5).visible):not(:has(.ph-step:nth-of-type(6).visible)) #bx-med-all,
     #s4:has(.ph-step:nth-of-type(5).visible):not(:has(.ph-step:nth-of-type(6).visible)) #bx-med-2,
     #s4:has(.ph-step:nth-of-type(7).visible):not(:has(.ph-step:nth-of-type(8).visible)) #bx-compare,
     #s4:has(.ph-step:nth-of-type(8).visible):not(:has(.ph-step:nth-of-type(9).visible)) #bx-compare,
