@@ -26,7 +26,11 @@ services:
       api:
         condition: service_healthy
     environment:
+      - COVERAGE_FILE=/tmp/.coverage
       - API_BASE_URL=http://api:8000
+    # Run as the host user so files written into the test-results bind mount stay
+    # owned by you instead of root. Export UID/GID first if your ids are not 1000.
+    user: "${UID:-1000}:${GID:-1000}"
     volumes:
       - ./test-results:/app/test-results
       - ./test:/app/test:ro

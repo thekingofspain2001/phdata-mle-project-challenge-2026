@@ -250,12 +250,25 @@ def require_artifacts(request: Request) -> Artifacts:
     return artifacts
 
 
+def fill_missing(payload: dict[str, int | float | str | None], artifacts: Artifacts) -> tuple[dict[str, float], list[str]]:
+    """Fill null request fields via the fitted KNN imputer; return values + filled names."""
+    missing = [c for c in REQUEST_COLUMNS if payload.get(c) is None]
+    row = pd.DataFrame([{c: payload.get(c) for c in REQUEST_COLUMNS}])
+    if row.isna().any().any():
+        logger.info("imputing_null_features")
+        filled = pd.DataFrame(
+            artifacts.imputer.transform(row[REQUEST_COLUMNS]),
+            columns=REQUEST_COLUMNS,
+        )
+        row[REQUEST_COLUMNS] = filled
+    return {c: float(row.iloc[0][c]) for c in REQUEST_COLUMNS}, missing
+
+
 def predict_price(payload: dict[str, int | float | str | None], artifacts: Artifacts) -> dict[str, float]:
     """Run the shared load/join/predict pipeline over a raw feature payload."""
     model = artifacts.model
     model_features = artifacts.model_features
     demographics = artifacts.demographics
-
     input_data: pd.DataFrame = pd.DataFrame([payload])
 
     demographic_info = demographics[demographics["zipcode"] == payload["zipcode"]].drop(columns="zipcode").reset_index(drop=True)

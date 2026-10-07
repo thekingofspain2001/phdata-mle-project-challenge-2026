@@ -2,12 +2,11 @@
 
 from typing import Annotated
 
-import pandas as pd
 import structlog
 from fastapi import APIRouter, Body, HTTPException, Request
 from pydantic import BaseModel, ConfigDict, Field
 
-from api.shared import REQUEST_COLUMNS, UNKNOWN_ZIP, Artifacts, listing_examples, predict_price, require_artifacts
+from api.shared import UNKNOWN_ZIP, Artifacts, fill_missing, listing_examples, predict_price, require_artifacts
 
 router_v2 = APIRouter(tags=["v2"])
 
@@ -18,6 +17,20 @@ class PredictionResponse(BaseModel):
     """Predicted home sale price."""
 
     predicted_price: float = Field(examples=[394708.0])
+
+
+class ImputeResponse(BaseModel):
+    """KNN-imputed request fields; valid input for v1 /predict."""
+
+    bedrooms: int = Field(examples=[3])
+    bathrooms: float = Field(examples=[2.25])
+    sqft_living: float = Field(examples=[1840.0])
+    sqft_lot: float = Field(examples=[11403.0])
+    floors: float = Field(examples=[2.0])
+    sqft_above: float = Field(examples=[1840.0])
+    sqft_basement: float = Field(examples=[0.0])
+    zipcode: str = Field(examples=["98045"])
+    imputed: list[str] = Field(examples=[["sqft_living"]])
 
 
 class HealthResponse(BaseModel):
@@ -119,13 +132,26 @@ def predict_v2(
         log.warning("artifacts_unavailable", detail=str(exc.detail), status_code=exc.status_code)
         raise
     payload = home_features.model_dump()
-    row = pd.DataFrame([{c: payload.get(c) for c in REQUEST_COLUMNS}])
-    if row.isna().any().any():
-        log.info("imputing_null_features", zipcode=home_features.zipcode)
-        filled = pd.DataFrame(
-            artifacts.imputer.transform(row[REQUEST_COLUMNS]),
-            columns=REQUEST_COLUMNS,
-        )
-        row[REQUEST_COLUMNS] = filled
-        payload |= {c: float(row.iloc[0][c]) for c in REQUEST_COLUMNS}
+    filled, _ = fill_missing(payload, artifacts)
+    payload |= filled
     return PredictionResponse(**predict_price(payload, artifacts))
+
+
+@router_v2.post(
+    "/impute",
+    response_model=ImputeResponse,
+    responses=ERROR_RESPONSES,
+)
+def impute(
+    home_features: Annotated[HomeFeaturesV2, Body(openapi_examples=listing_examples())],
+    request: Request,
+) -> ImputeResponse:
+    """Fill null fields via KNN (k=5); output feeds v1 /predict as-is."""
+    try:
+        artifacts: Artifacts = require_artifacts(request)
+    except HTTPException as exc:
+        log.warning("artifacts_unavailable", detail=str(exc.detail), status_code=exc.status_code)
+        raise
+    payload = home_features.model_dump()
+    filled, missing = fill_missing(payload, artifacts)
+    return ImputeResponse(zipcode=home_features.zipcode, imputed=missing, **filled)

@@ -18,6 +18,11 @@
             "source.organizeImports": "explicit"
         },
     },
+    "[html]": {
+        "editor.formatOnType": false
+    },
+    "html.format.wrapLineLength": 150,
+    "prettier.printWidth": 150,
     "notebook.formatOnSave.enabled": true,
     "files.associations": {
         ".dockerignore": "ignore"
