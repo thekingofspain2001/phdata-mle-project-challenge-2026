@@ -1978,7 +1978,20 @@
     #s4:has(.ph-step:nth-of-type(12).visible):not(:has(.ph-step:nth-of-type(13).visible)) .al-sliv,
     #s4:has(.ph-step:nth-of-type(12).visible):not(:has(.ph-step:nth-of-type(13).visible)) .al-slot,
     #s4:has(.ph-step:nth-of-type(12).visible):not(:has(.ph-step:nth-of-type(13).visible)) .al-sbed,
-    #s4:has(.ph-step:nth-of-type(12).visible):not(:has(.ph-step:nth-of-type(13).visible)) .al-sbath,
+    #s4:has(.ph-step:nth-of-type(12).visible):not(:has(.ph-step:nth-of-type(13).visible)) .al-sbath {
+      /* s_x labels stay lit; only the glow waits for the move end. */
+      opacity: 1;
+      filter: drop-shadow(0 0 6px rgba(232, 121, 249, 0.9));
+      transition: filter var(--ph-t-stage) var(--ph-ease) var(--ph-t-stage);
+    }
+
+    #s4:has(.ph-step:nth-of-type(12).visible):not(:has(.ph-step:nth-of-type(13).visible)) .al-living,
+    #s4:has(.ph-step:nth-of-type(12).visible):not(:has(.ph-step:nth-of-type(13).visible)) .al-lot,
+    #s4:has(.ph-step:nth-of-type(12).visible):not(:has(.ph-step:nth-of-type(13).visible)) .al-bed,
+    #s4:has(.ph-step:nth-of-type(12).visible):not(:has(.ph-step:nth-of-type(13).visible)) .al-bath {
+      /* Raw labels hand off: accent glow fades out as the rows dim. */
+      filter: none;
+    }
     #s4:has(.ph-step:nth-of-type(12).visible):not(:has(.ph-step:nth-of-type(13).visible)) .ar-sliv,
     #s4:has(.ph-step:nth-of-type(12).visible):not(:has(.ph-step:nth-of-type(13).visible)) .ar-slot,
     #s4:has(.ph-step:nth-of-type(12).visible):not(:has(.ph-step:nth-of-type(13).visible)) .ar-sbed,
@@ -1990,9 +2003,9 @@
     #s4:has(.ph-step:nth-of-type(12).visible):not(:has(.ph-step:nth-of-type(13).visible)) .ar-lot .v,
     #s4:has(.ph-step:nth-of-type(12).visible):not(:has(.ph-step:nth-of-type(13).visible)) .ar-bed .v,
     #s4:has(.ph-step:nth-of-type(12).visible):not(:has(.ph-step:nth-of-type(13).visible)) .ar-bath .v {
+      /* Raw stays highlighted white; the dim+strike lands on 5/6 with the wash. */
       fill: #ffffff;
-      opacity: 0.35;
-      text-decoration: line-through;
+      opacity: 1;
     }
 
     
