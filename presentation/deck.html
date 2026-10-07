@@ -1922,7 +1922,7 @@
       filter: drop-shadow(0 0 6px rgba(56, 189, 248, 0.9));
     }
 
-    /* Fragment 11 - SNN 3/6: raw rows stay highlighted white while the gaps
+    /* Fragment 11 - SNN 3/7: raw rows stay highlighted white while the gaps
        open; scaled cells are pending dots, unpopulated and unhighlighted. */
     #s4:has(.ph-step:nth-of-type(11).visible):not(:has(.ph-step:nth-of-type(12).visible)) .ar-living .v,
     #s4:has(.ph-step:nth-of-type(11).visible):not(:has(.ph-step:nth-of-type(12).visible)) .ar-lot .v,
@@ -1965,9 +1965,8 @@
 
     
 
-    /* Fragment 12 - SNN scale fill: the scaled rows populate 0..1 while the raw
-       values above them mute and strike. Raw keeps its white fill under the
-       strike; scaled reads fresh white on the tint. */
+    /* Fragment 12 - SNN 4/7 scale fill: both raw and scaled read white; the
+       dim+strike lands on 5/7 with the wash move. */
     #s4:has(.ph-step:nth-of-type(12).visible):not(:has(.ph-step:nth-of-type(13).visible)) .ar-sliv .v,
     #s4:has(.ph-step:nth-of-type(12).visible):not(:has(.ph-step:nth-of-type(13).visible)) .ar-slot .v,
     #s4:has(.ph-step:nth-of-type(12).visible):not(:has(.ph-step:nth-of-type(13).visible)) .ar-sbed .v,
@@ -2004,14 +2003,14 @@
     #s4:has(.ph-step:nth-of-type(12).visible):not(:has(.ph-step:nth-of-type(13).visible)) .ar-lot .v,
     #s4:has(.ph-step:nth-of-type(12).visible):not(:has(.ph-step:nth-of-type(13).visible)) .ar-bed .v,
     #s4:has(.ph-step:nth-of-type(12).visible):not(:has(.ph-step:nth-of-type(13).visible)) .ar-bath .v {
-      /* Raw stays highlighted white; the dim+strike lands on 5/6 with the wash. */
+      /* Raw stays highlighted white; the dim+strike lands on 5/7 with the wash. */
       fill: #ffffff;
       opacity: 1;
     }
 
     
 
-    /* Fragment 13 - SNN 5/6: opens from 4/6's end (raw lit, scaled lit, raw
+    /* Fragment 13 - SNN 5/7: opens from 4/7's end (raw lit, scaled lit, raw
        wash); the wash moves to scaled while raw dims and strikes. */
     #s4:has(.ph-step:nth-of-type(13).visible):not(:has(.ph-step:nth-of-type(14).visible)) .ar-sliv .v,
     #s4:has(.ph-step:nth-of-type(13).visible):not(:has(.ph-step:nth-of-type(14).visible)) .ar-slot .v,
@@ -2043,13 +2042,23 @@
 
     
 
-    /* Fragment 14 - SNN scaled picks: the 5 closest stay white like the rest -
-       no sliv highlight at this stage; the picks land with the box next. Raw
-       rows stay struck. */
-    #s4:has(.ph-step:nth-of-type(14).visible):not(:has(.ph-step:nth-of-type(15).visible)) .ar-sliv .v,
-    #s4:has(.ph-step:nth-of-type(14).visible):not(:has(.ph-step:nth-of-type(15).visible)) .ar-slot .v,
-    #s4:has(.ph-step:nth-of-type(14).visible):not(:has(.ph-step:nth-of-type(15).visible)) .ar-sbed .v,
-    #s4:has(.ph-step:nth-of-type(14).visible):not(:has(.ph-step:nth-of-type(15).visible)) .ar-sbath .v {
+    /* Fragment 14 - SNN 5/7 pick: opens from 4/7's end; s_liv stays white
+       while slot/sbed/sbath box their 5 NN values. s_liv's pick lands next. */
+    #s4:has(.ph-step:nth-of-type(14).visible):not(:has(.ph-step:nth-of-type(15).visible)) .ar-sliv .v {
+      fill: #ffffff;
+      opacity: 1;
+    }
+
+    #s4:has(.ph-step:nth-of-type(14).visible):not(:has(.ph-step:nth-of-type(15).visible)) .ar-slot .v.h-nn,
+    #s4:has(.ph-step:nth-of-type(14).visible):not(:has(.ph-step:nth-of-type(15).visible)) .ar-sbed .v.h-nn,
+    #s4:has(.ph-step:nth-of-type(14).visible):not(:has(.ph-step:nth-of-type(15).visible)) .ar-sbath .v.h-nn {
+      fill: var(--snn);
+      opacity: 1;
+    }
+
+    #s4:has(.ph-step:nth-of-type(14).visible):not(:has(.ph-step:nth-of-type(15).visible)) .ar-slot .v:not(.h-nn),
+    #s4:has(.ph-step:nth-of-type(14).visible):not(:has(.ph-step:nth-of-type(15).visible)) .ar-sbed .v:not(.h-nn),
+    #s4:has(.ph-step:nth-of-type(14).visible):not(:has(.ph-step:nth-of-type(15).visible)) .ar-sbath .v:not(.h-nn) {
       fill: #ffffff;
       opacity: 1;
     }
@@ -2081,9 +2090,9 @@
 
     
 
-    /* Fragment 15 - SNN living picks: the sliv wash fades off as the dashed
-       pick box slides in around the 5 closest; sliv whites mute, the 5 in
-       the box tint to the calc colour. Other scaled rows carry over lit. */
+    /* Fragment 15 - SNN 7/7: the sliv wash fades off as the dashed pick box
+       slides in around the 5 closest; sliv whites mute, the 5 in the box tint
+       to the calc colour. Other scaled rows carry over lit. */
     #s4:has(.ph-step:nth-of-type(15).visible):not(:has(.ph-step:nth-of-type(16).visible)) .al-sliv,
     #s4:has(.ph-step:nth-of-type(15).visible):not(:has(.ph-step:nth-of-type(16).visible)) .al-slot,
     #s4:has(.ph-step:nth-of-type(15).visible):not(:has(.ph-step:nth-of-type(16).visible)) .al-sbed,
@@ -2179,6 +2188,9 @@
     #s4:has(.ph-step:nth-of-type(14).visible):not(:has(.ph-step:nth-of-type(15).visible)) #bx-snn-slot,
     #s4:has(.ph-step:nth-of-type(14).visible):not(:has(.ph-step:nth-of-type(15).visible)) #bx-snn-sbed,
     #s4:has(.ph-step:nth-of-type(14).visible):not(:has(.ph-step:nth-of-type(15).visible)) #bx-snn-sbath,
+    #s4:has(.ph-step:nth-of-type(14).visible):not(:has(.ph-step:nth-of-type(15).visible)) #bx-snn-pick-slot,
+    #s4:has(.ph-step:nth-of-type(14).visible):not(:has(.ph-step:nth-of-type(15).visible)) #bx-snn-pick-sbed,
+    #s4:has(.ph-step:nth-of-type(14).visible):not(:has(.ph-step:nth-of-type(15).visible)) #bx-snn-pick-sbath,
     #s4:has(.ph-step:nth-of-type(15).visible):not(:has(.ph-step:nth-of-type(16).visible)) #bx-snn-slot,
     #s4:has(.ph-step:nth-of-type(15).visible):not(:has(.ph-step:nth-of-type(16).visible)) #bx-snn-sbed,
     #s4:has(.ph-step:nth-of-type(15).visible):not(:has(.ph-step:nth-of-type(16).visible)) #bx-snn-sbath,
@@ -2880,13 +2892,13 @@
             <p class="ph-subtitle ph-is-knn">Nearest Neighbor &#8212; find the 5 closest</p>
             <p class="ph-subtitle ph-is-knn">Nearest Neighbor &#8212; read their size</p>
             <p class="ph-subtitle ph-is-knn">Nearest Neighbor &#8212; read and weight</p>
-            <p class="ph-subtitle ph-is-snn">Scaled Nearest Neighbor 1/6 &#8212; find the 5 closest</p>
-            <p class="ph-subtitle ph-is-snn">Scaled Nearest Neighbor 2/6 &#8212; scale the columns</p>
-            <p class="ph-subtitle ph-is-snn">Scaled Nearest Neighbor 3/6 &#8212; read the scaled rows</p>
-            <p class="ph-subtitle ph-is-snn">Scaled Nearest Neighbor 4/6 &#8212; move the wash to scaled</p>
-            <p class="ph-subtitle ph-is-snn">Scaled Nearest Neighbor 5/6 &#8212; pick the 5 scaled</p>
-            <p class="ph-subtitle ph-is-snn">Scaled Nearest Neighbor 6/6 &#8212; read and weight</p>
-            <p class="ph-subtitle ph-is-snn">Scaled Nearest Neighbor 6/6 &#8212; read and weight</p>
+            <p class="ph-subtitle ph-is-snn">Scaled Nearest Neighbor 1/7 &#8212; find the 5 closest</p>
+            <p class="ph-subtitle ph-is-snn">Scaled Nearest Neighbor 2/7 &#8212; scale the columns</p>
+            <p class="ph-subtitle ph-is-snn">Scaled Nearest Neighbor 3/7 &#8212; read the scaled rows</p>
+            <p class="ph-subtitle ph-is-snn">Scaled Nearest Neighbor 4/7 &#8212; move the wash to scaled</p>
+            <p class="ph-subtitle ph-is-snn">Scaled Nearest Neighbor 5/7 &#8212; pick the 5 scaled</p>
+            <p class="ph-subtitle ph-is-snn">Scaled Nearest Neighbor 6/7 &#8212; read and weight</p>
+            <p class="ph-subtitle ph-is-snn">Scaled Nearest Neighbor 7/7 &#8212; read and weight</p>
             <p class="ph-subtitle ph-is-sum">Summary: similar homes win</p>
           </div>
         </header>
@@ -3143,6 +3155,12 @@
               <rect id="bx-knn-2" class="bx" x="523" y="247.6" width="570" height="21.8" fill="none" stroke="var(--knn)"
                 stroke-width="2" stroke-dasharray="8 5" />
               <rect id="bx-snn-pick" class="bx" x="523" y="273.6" width="570" height="21.8" fill="none" stroke="var(--snn)"
+                stroke-width="2" stroke-dasharray="8 5" />
+              <rect id="bx-snn-pick-slot" class="bx" x="523" y="326.45" width="570" height="21.8" fill="none" stroke="var(--snn)"
+                stroke-width="2" stroke-dasharray="8 5" />
+              <rect id="bx-snn-pick-sbed" class="bx" x="523" y="378.45" width="570" height="21.8" fill="none" stroke="var(--snn)"
+                stroke-width="2" stroke-dasharray="8 5" />
+              <rect id="bx-snn-pick-sbath" class="bx" x="523" y="430.45" width="570" height="21.8" fill="none" stroke="var(--snn)"
                 stroke-width="2" stroke-dasharray="8 5" />
               <rect id="bx-snn" class="bx" x="510" y="116" width="596" height="187" fill="none" stroke="var(--snn)"
                 stroke-width="2" stroke-dasharray="8 5" />

@@ -441,7 +441,7 @@ of the record they use.
   imputation; the stated principle is to use available auxiliary
   information, choosing by strength of association between fields).
 
-## S4 — Missing value approaches (`#s4`, 16 `.ph-step` fragments)
+## S4 — Missing value approaches (`#s4`, 17 `.ph-step` fragments)
 
 Layout: T-houses-staged. **Staging is CSS only** — stage N is
 `:has(.ph-step:nth-of-type(N).visible):not(:has(.ph-step:nth-of-type(N+1).visible))`,
@@ -452,9 +452,9 @@ exists nowhere else. There is no staging JS. House glyphs are STATIC (mist
 stroke, fixed transforms); markers, dashed boxes, subtitle, panel and attribute
 values change per stage.
 
-Subtitles: 15 stacked `.ph-subtitle` in `.ph-subs` grid (one cell); stage N
-shows item N (16 steps, 15 titles). SNN titles carry the calc step:
-`Scaled Nearest Neighbor 1/6` … `6/6`, then `read and weight`, then summary.
+Subtitles: 17 stacked `.ph-subtitle` in `.ph-subs` grid (one cell); stage N
+shows item N (17 steps, 16 titles + summary). SNN titles carry the calc step
+`1/7` … `7/7`, then summary.
 
 **Houses** — 12, in four groups of three sorted smallest to largest.
 `svg#houses-svg`, `viewBox="-34 -87 1225 542"`, `color="#BCCCD4"`.
@@ -541,7 +541,7 @@ vertical leader with an arrowhead:
 `.mk-real` dashed box (x=905, y=36, 70×18) around the real number, visible
 only at frag 15.
 
-**Stage map** (16 fragments, 15 subtitles + summary):
+**Stage map** (17 fragments, 16 subtitles + summary):
 
 | Frag | Subtitle | Box | Marker | Rows lit |
 |------|----------|-----|--------|----------|
@@ -552,15 +552,16 @@ only at frag 15.
 | 5 | Nearest Neighbor — the table | `.bx-compare` (knn tint) | — | lot/bed/bath white, living dim |
 | 6 | Nearest Neighbor — find the 5 closest | `.bx-compare` + `bx-knn-2` | — | lot/bed/bath white, living dim |
 | 7 | Nearest Neighbor — read their size | `.bx-compare` | `mk-knn` | living NN `--knn`, rest dim |
-| 8 | Scaled Nearest Neighbor 1/6 — find the 5 closest | `.bx-compare` (snn tint) | — | lot/bed/bath white, living dim |
-| 9 | Scaled Nearest Neighbor 2/6 — scale the columns | `.bx-compare` + `bx-snn-liv` | — | all four rows white |
-| 10 | Scaled Nearest Neighbor 3/6 — read the scaled rows | `bx-snn-liv/lot/bed/bath` (raw washes) | — | raw rows white, scaled values hidden, dots lit |
-| 11 | Scaled Nearest Neighbor 4/6 — move the wash to scaled | raw + scaled washes | — | scaled white, raw struck |
-| 12 | Scaled Nearest Neighbor 5/6 — pick the 5 scaled | scaled washes | — | scaled white, raw struck |
-| 13 | Scaled Nearest Neighbor 6/6 — read and weight | scaled washes | — | scaled white, raw struck |
-| 14 | Scaled Nearest Neighbor — read and weight | scaled washes | — | scaled white, raw struck |
-| 15 | (same subtitle) | slot/sbed/sbath washes + `bx-snn-pick`, sliv wash off | `mk-snn` | sliv NN `--snn` in box, rest white |
-| 16 | Summary: similar homes win | — | all four | rest state |
+| 8 | Scaled Nearest Neighbor 1/7 — find the 5 closest | `.bx-compare` (snn tint) | — | lot/bed/bath white, living dim |
+| 9 | Scaled Nearest Neighbor 2/7 — scale the columns | `.bx-compare` + `bx-snn-liv` | — | all four rows white |
+| 10 | Scaled Nearest Neighbor 3/7 — read the scaled rows | `bx-snn-liv/lot/bed/bath` (raw washes) | — | raw rows white, scaled values hidden, dots lit (from 80% of stage) |
+| 11 | Scaled Nearest Neighbor 4/7 — move the wash to scaled | raw + scaled washes | — | raw + scaled white; s_x labels flare at move end, raw glow off |
+| 12 | Scaled Nearest Neighbor 5/7 — pick the 5 scaled | scaled washes | — | scaled white, raw struck |
+| 13 | Scaled Nearest Neighbor 6/7 — read and weight | scaled washes | — | scaled white, raw struck |
+| 14 | Scaled Nearest Neighbor 6/7 — read and weight | slot/sbed/sbath washes + `bx-snn-pick-slot/sbed/sbath` | — | sliv white; slot/sbed/sbath NN `--snn` in per-row pick boxes |
+| 15 | Scaled Nearest Neighbor 7/7 — read and weight | slot/sbed/sbath washes + `bx-snn-pick`, sliv wash off | `mk-snn` | sliv NN `--snn` in box, rest white |
+| 16 | (same subtitle) | slot/sbed/sbath washes + `bx-snn-pick`, sliv wash off | `mk-snn` | sliv NN `--snn` in box, rest white |
+| 17 | Summary: similar homes win | — | all four | rest state |
 
 `--snn` is a hue of its own rather than a tint of `--knn`: the two panels
 are seen one after another and then compared on the summary stage, and a
@@ -586,11 +587,11 @@ S4 body trims slide chrome just here: `padding-bottom:12px`, `gap:8px`.
 | 1 | Average Value | 1 step | 1 column — square feet | Nothing — all 12 houses | 1 number: the average of all 12 | Same answer for every blank |
 | 2–3 | Medium value | 2 steps: read the column, then take the middle | 1 column — square feet, all 12 houses | The 1 middle house, or the 2 middle ones | 1 number: its value, or the average of 2 | Same answer for every blank |
 | 4–7 | Nearest Neighbor | 2 steps: find, then fill | 3 columns to find, 1 to fill | The 5 closest on lot size, bedrooms and bathrooms | 1 number: plain average of their 5 sizes | The answer changes with the house |
-| 8–15 | Scaled Nearest Neighbor | 6 steps: find, scale, then fill | 3 columns to find, scaled 0–1, 1 to fill | The 5 closest on scaled lot size, bedrooms and bathrooms | 1 number: weighted average of their 5 sizes | The answer changes with the house |
-| 16 | Summary: which value to fill | — (`ul` instead of `dl`) | — | — | — | See bullets below. |
+| 8–16 | Scaled Nearest Neighbor | 6 steps: find, scale, then fill | 3 columns to find, scaled 0–1, 1 to fill | The 5 closest on scaled lot size, bedrooms and bathrooms | 1 number: weighted average of their 5 sizes | The answer changes with the house |
+| 17 | Summary: which value to fill | — (`ul` instead of `dl`) | — | — | — | See bullets below. |
 
 Panel visibility: av on frag 1; md on frags 2–5; knn on frags 6–8; snn on
-frags 9–15; sum on frag 16.
+frags 9–16; sum on frag 17.
 
 **The four calculation panels are one template.** Same five `dt` labels in
 the same order in each. `dl` is a 2-column grid; `dt` is uppercase
