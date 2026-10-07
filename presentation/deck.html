@@ -1555,6 +1555,15 @@
         text-overflow: ellipsis;
       }
 
+      /* S4 driver map: .ph-step index -> topic fragment. var() never
+         substitutes inside :nth-of-type() (selectors, not property values),
+         so these stay a comment map - the rules below carry bare numbers.
+         D1 Intro Frag1: 1; D2 Avg Frag1: 2; D3 Avg Frag2: 3;
+         D4 Med Frag1: 4; D5 Med Frag2: 5; D6 Med Frag3: 6;
+         D7 KNN Frag1: 7; D8 KNN Frag2: 8; D9 KNN Frag3: 9;
+         D10 SNN Frag1: 10; D11 SNN Frag2: 11; D12 SNN Frag3: 12;
+         D13 SNN Frag4: 13; D14 SNN Frag5: 14; D15 SNN Frag6: 15;
+         D16 SNN Frag7: 16; D17 Summary Frag1: 17. */
       /* S4 staged subs: grid stack reserves one line; drivers are native
          fragments, CSS reacts to reveal's .visible — no JS staging. */
       .ph-subs {
