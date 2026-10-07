@@ -3133,10 +3133,11 @@
         fill: var(--tint-knn);
       }
 
-      /* SNN washes on drivers 10-14: same reason as the med fill below -
+      /* SNN washes on drivers 10-15: same reason as the med fill below -
          `.houses-svg .bx { fill: none }` beats the markup fill attribute, so
-         the stage rule paints them. Raw on 10-12, scaled on 13-14 (sliv drops
-         off at 14: its pick lands at 15, so only slot/sbed/sbath carry over). */
+         the stage rule paints them. Raw on 10-12, all four scaled on 13,
+         slot/sbed/sbath on 14; on 15 the per-row pick boxes (houses 7-11
+         x-geometry) carry the wash, sliv off with its pick landed. */
       #s4:has(.ph-step:nth-of-type(10).visible):not(
           :has(.ph-step:nth-of-type(11).visible)
         )
@@ -3212,7 +3213,19 @@
       #s4:has(.ph-step:nth-of-type(14).visible):not(
           :has(.ph-step:nth-of-type(15).visible)
         )
-        #bx-snn-sbath {
+        #bx-snn-sbath,
+      #s4:has(.ph-step:nth-of-type(15).visible):not(
+          :has(.ph-step:nth-of-type(16).visible)
+        )
+        #bx-snn-pick-slot,
+      #s4:has(.ph-step:nth-of-type(15).visible):not(
+          :has(.ph-step:nth-of-type(16).visible)
+        )
+        #bx-snn-pick-sbed,
+      #s4:has(.ph-step:nth-of-type(15).visible):not(
+          :has(.ph-step:nth-of-type(16).visible)
+        )
+        #bx-snn-pick-sbath {
         fill: var(--tint-snn);
       }
 
