@@ -1629,6 +1629,72 @@
     .houses-svg .h {
       transition: opacity var(--ph-t-fade) var(--ph-ease);
     }
+    /* S4 SVG DRY: repeated presentation attrs live here, not per element.
+       Coordinates stay in markup. Tokens reused, no new raw values
+       except the shared dash (one place). */
+    #hs {
+      stroke: currentColor;
+      stroke-width: var(--line-md);
+    }
+    .houses-svg .ar-row {
+      font-size: 15px;
+      text-anchor: middle;
+    }
+    .houses-svg .ar-lab {
+      font-size: 15px;
+      text-anchor: end;
+    }
+    .houses-svg .bx {
+      fill: none;
+      stroke-width: var(--line-sm);
+      stroke-dasharray: 8 5;
+    }
+    .houses-svg .bx-wash {
+      stroke: none;
+    }
+    .houses-svg .bx-compare {
+      fill: none;
+      stroke: none;
+    }
+    .houses-svg .mk {
+      fill: none;
+      stroke: currentColor;
+    }
+    .houses-svg .mk text {
+      fill: currentColor;
+      stroke: none;
+      text-anchor: middle;
+    }
+    .houses-svg .mk .mk-name {
+      font-size: 20px;
+    }
+    .houses-svg .mk .mk-val {
+      font-size: 16px;
+    }
+    .ph-calc text {
+      text-anchor: middle;
+    }
+    .houses-svg .ar-dots {
+      fill: var(--ph-ink-muted);
+    }
+    .houses-svg .ar-dots circle {
+      r: 2.5;
+    }
+    .houses-svg .mk line {
+      stroke-width: var(--line-sm);
+    }
+    .houses-svg .mk-real {
+      fill: none;
+      stroke: currentColor;
+      stroke-width: var(--line-sm);
+      stroke-dasharray: 8 5;
+    }
+    .houses-svg .mk-eq {
+      font-size: 13px;
+    }
+    #houses-svg {
+      color: var(--ph-mist);
+    }
 
     .houses-svg .mk,
     .houses-svg .bx,
@@ -2885,7 +2951,7 @@
           <h2>Missing value approaches</h2>
           <div class="ph-subs" aria-live="off">
             <p class="ph-subtitle ph-is-av">Average Value</p>
-            <p class="ph-subtitle ph-is-md">Medium &#8212; the table</p>
+            <p class="ph-subtitle ph-is-av">Average Value</p>
             <p class="ph-subtitle ph-is-md">Medium value &#8212; read the column</p>
             <p class="ph-subtitle ph-is-md">Medium value &#8212; take the middle</p>
             <p class="ph-subtitle ph-is-knn">Nearest Neighbor &#8212; the table</p>
@@ -2904,12 +2970,12 @@
         </header>
         <div class="ph-body ph-houses">
           <div class="ph-houses-top">
-            <svg preserveAspectRatio="xMidYMid meet" id="houses-svg" class="houses-svg" viewBox="-34 -87 1225 542" fill="none" color="#BCCCD4" role="img"
+            <svg preserveAspectRatio="xMidYMid meet" id="houses-svg" class="houses-svg" viewBox="-34 -87 1225 542" fill="none" role="img"
               aria-label="Twelve houses in four groups of three, sorted smallest to largest. Under each house, four attribute values in four rows: square feet, year built, grade, and bedrooms.">
               <defs>
-                <g id="hs" stroke="currentColor" stroke-width="3">
+                <g id="hs">
                   <rect x="-20" y="-30" width="40" height="30" />
-                  <path d="M-25 -30 L0 -48 L25 -30 Z" stroke-width="3" />
+                  <path d="M-25 -30 L0 -48 L25 -30 Z" />
                   <rect x="-6" y="-16" width="12" height="16" />
                 </g>
                 <marker id="arr-av" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7"
@@ -2950,7 +3016,7 @@
                 <use href="#hs" />
               </g>
               <!-- Group C: intra 68u clears roofs (need 64); gap B-C = 198u (2x) -->
-              <g class="h h-nn" stroke="#BCCCD4" transform="translate(551,210) scale(1.1875)">
+              <g class="h h-nn" transform="translate(551,210) scale(1.1875)">
                 <use href="#hs" />
               </g>
               <g class="h h-nn" transform="translate(619,210) scale(1.25)">
@@ -2980,7 +3046,7 @@
               <!-- Attribute names, abbreviated so they clear the first value
                    column: at the value size the widest name ran into it. Labels
                    share each row's y, so name and number sit on one baseline. -->
-              <g class="ar-lab" font-size="15" fill="#BCCCD4" text-anchor="end">
+              <g class="ar-lab">
                 <text class="al al-living" x="20" y="264">sqft_liv</text>
                 <text class="al al-lot" x="20" y="290">sqft_lot</text>
                 <text class="al al-bed" x="20" y="316">beds</text>
@@ -2989,7 +3055,8 @@
                 <text class="al al-slot" x="20" y="342">s_lot</text>
                 <text class="al al-sbed" x="20" y="394">s_bed</text>
                 <text class="al al-sbath" x="20" y="446">s_bath</text>
-              <g class="ar-row ar-living" font-size="15" fill="#BCCCD4" text-anchor="middle">
+              </g>
+              <g class="ar-row ar-living">
                 <text class="v" x="70" y="264">1235</text>
                 <text class="v" x="114" y="264">1300</text>
                 <text class="v" x="158" y="264">1365</text>
@@ -3003,7 +3070,7 @@
                 <text class="v h-nn" x="1066" y="264">3800</text>
                 <text class="v" x="1148" y="264">3990</text>
               </g>
-              <g class="ar-row ar-lot" font-size="15" fill="#BCCCD4" text-anchor="middle">
+              <g class="ar-row ar-lot">
                 <text class="v" x="70" y="290">4600</text>
                 <text class="v" x="114" y="290">4900</text>
                 <text class="v" x="158" y="290">5300</text>
@@ -3017,7 +3084,7 @@
                 <text class="v h-nn" x="1066" y="290">9100</text>
                 <text class="v" x="1148" y="290">6400</text>
               </g>
-              <g class="ar-row ar-bed" font-size="15" fill="#BCCCD4" text-anchor="middle">
+              <g class="ar-row ar-bed">
                 <text class="v" x="70" y="316">2</text>
                 <text class="v" x="114" y="316">2</text>
                 <text class="v" x="158" y="316">2</text>
@@ -3031,7 +3098,7 @@
                 <text class="v h-nn" x="1066" y="316">5</text>
                 <text class="v" x="1148" y="316">6</text>
               </g>
-              <g class="ar-row ar-bath" font-size="15" fill="#BCCCD4" text-anchor="middle">
+              <g class="ar-row ar-bath">
                 <text class="v" x="70" y="342">1</text>
                 <text class="v" x="114" y="342">1.5</text>
                 <text class="v" x="158" y="342">1.5</text>
@@ -3049,13 +3116,13 @@
                    in the cell the value will occupy. Lit only at frag 10, while
                    the raw rows read white and the scaled values are not yet
                    placed. -->
-              <g class="ar-dots" fill="var(--ph-ink-muted)" opacity="0">
-                <circle cx="68" cy="285" r="2.5" /><circle cx="114" cy="285" r="2.5" /><circle cx="156" cy="285" r="2.5" /><circle cx="241" cy="285" r="2.5" /><circle cx="297" cy="285" r="2.5" /><circle cx="353" cy="285" r="2.5" /><circle cx="551" cy="285" r="2.5" /><circle cx="619" cy="285" r="2.5" /><circle cx="687" cy="285" r="2.5" /><circle cx="984" cy="285" r="2.5" /><circle cx="1066" cy="285" r="2.5" /><circle cx="1148" cy="285" r="2.5" />
-                <circle cx="68" cy="337" r="2.5" /><circle cx="114" cy="337" r="2.5" /><circle cx="156" cy="337" r="2.5" /><circle cx="241" cy="337" r="2.5" /><circle cx="297" cy="337" r="2.5" /><circle cx="353" cy="337" r="2.5" /><circle cx="551" cy="337" r="2.5" /><circle cx="619" cy="337" r="2.5" /><circle cx="687" cy="337" r="2.5" /><circle cx="984" cy="337" r="2.5" /><circle cx="1066" cy="337" r="2.5" /><circle cx="1148" cy="337" r="2.5" />
-                <circle cx="68" cy="389" r="2.5" /><circle cx="114" cy="389" r="2.5" /><circle cx="156" cy="389" r="2.5" /><circle cx="241" cy="389" r="2.5" /><circle cx="297" cy="389" r="2.5" /><circle cx="353" cy="389" r="2.5" /><circle cx="551" cy="389" r="2.5" /><circle cx="619" cy="389" r="2.5" /><circle cx="687" cy="389" r="2.5" /><circle cx="984" cy="389" r="2.5" /><circle cx="1066" cy="389" r="2.5" /><circle cx="1148" cy="389" r="2.5" />
-                <circle cx="68" cy="441" r="2.5" /><circle cx="114" cy="441" r="2.5" /><circle cx="156" cy="441" r="2.5" /><circle cx="241" cy="441" r="2.5" /><circle cx="297" cy="441" r="2.5" /><circle cx="353" cy="441" r="2.5" /><circle cx="551" cy="441" r="2.5" /><circle cx="619" cy="441" r="2.5" /><circle cx="687" cy="441" r="2.5" /><circle cx="984" cy="441" r="2.5" /><circle cx="1066" cy="441" r="2.5" /><circle cx="1148" cy="441" r="2.5" />
+              <g class="ar-dots" opacity="0">
+                <circle cx="68" cy="285"/><circle cx="114" cy="285"/><circle cx="156" cy="285"/><circle cx="241" cy="285"/><circle cx="297" cy="285"/><circle cx="353" cy="285"/><circle cx="551" cy="285"/><circle cx="619" cy="285"/><circle cx="687" cy="285"/><circle cx="984" cy="285"/><circle cx="1066" cy="285"/><circle cx="1148" cy="285"/>
+                <circle cx="68" cy="337"/><circle cx="114" cy="337"/><circle cx="156" cy="337"/><circle cx="241" cy="337"/><circle cx="297" cy="337"/><circle cx="353" cy="337"/><circle cx="551" cy="337"/><circle cx="619" cy="337"/><circle cx="687" cy="337"/><circle cx="984" cy="337"/><circle cx="1066" cy="337"/><circle cx="1148" cy="337"/>
+                <circle cx="68" cy="389"/><circle cx="114" cy="389"/><circle cx="156" cy="389"/><circle cx="241" cy="389"/><circle cx="297" cy="389"/><circle cx="353" cy="389"/><circle cx="551" cy="389"/><circle cx="619" cy="389"/><circle cx="687" cy="389"/><circle cx="984" cy="389"/><circle cx="1066" cy="389"/><circle cx="1148" cy="389"/>
+                <circle cx="68" cy="441"/><circle cx="114" cy="441"/><circle cx="156" cy="441"/><circle cx="241" cy="441"/><circle cx="297" cy="441"/><circle cx="353" cy="441"/><circle cx="551" cy="441"/><circle cx="619" cy="441"/><circle cx="687" cy="441"/><circle cx="984" cy="441"/><circle cx="1066" cy="441"/><circle cx="1148" cy="441"/>
               </g>
-              <g class="ar-row ar-scaled ar-sliv" font-size="15" fill="#BCCCD4" text-anchor="middle">
+              <g class="ar-row ar-scaled ar-sliv">
                 <text class="v" x="68" y="290">0</text>
                 <text class="v" x="114" y="290">.024</text>
                 <text class="v" x="156" y="290">.047</text>
@@ -3073,7 +3140,7 @@
                    4500, bed range 4, bath range 3). Same x columns, blank until
                    the scale-up fragment populates them. Dashed strike styling
                    comes from stage rules, not markup. -->
-              <g class="ar-row ar-scaled ar-slot" font-size="15" fill="#BCCCD4" text-anchor="middle">
+              <g class="ar-row ar-scaled ar-slot">
                 <text class="v" x="68" y="342">0</text>
                 <text class="v" x="114" y="342">.067</text>
                 <text class="v" x="156" y="342">.156</text>
@@ -3087,7 +3154,7 @@
                 <text class="v h-nn" x="1066" y="342">1</text>
                 <text class="v" x="1148" y="342">.400</text>
               </g>
-              <g class="ar-row ar-scaled ar-sbed" font-size="15" fill="#BCCCD4" text-anchor="middle">
+              <g class="ar-row ar-scaled ar-sbed">
                 <text class="v" x="68" y="394">0</text>
                 <text class="v" x="114" y="394">0</text>
                 <text class="v" x="156" y="394">0</text>
@@ -3101,7 +3168,7 @@
                 <text class="v h-nn" x="1066" y="394">.750</text>
                 <text class="v" x="1148" y="394">1</text>
               </g>
-              <g class="ar-row ar-scaled ar-sbath" font-size="15" fill="#BCCCD4" text-anchor="middle">
+              <g class="ar-row ar-scaled ar-sbath">
                 <text class="v" x="68" y="446">0</text>
                 <text class="v" x="114" y="446">.167</text>
                 <text class="v" x="156" y="446">.167</text>
@@ -3120,61 +3187,52 @@
                    x and width match the medium wash, since both span exactly the
                    row's ink - the swap at the step boundary reads as one frame
                    tightening. -->
-              <rect id="bx-avg" class="bx" x="29" y="247.6" width="1146" height="21.8" fill="none" stroke="var(--av)"
-                stroke-width="2" stroke-dasharray="8 5" />
-              <rect id="bx-med" class="bx" x="324" y="116" width="260" height="187" fill="none" stroke="var(--md)"
-                stroke-width="2" stroke-dasharray="8 5" />
+              <rect id="bx-avg" class="bx" x="29" y="247.6" width="1146" height="21.8" stroke="var(--av)" />
+              <rect id="bx-med" class="bx" x="324" y="116" width="260" height="187" stroke="var(--md)" />
 
               <!-- Medium, step 1: a solid medium-hue wash over the whole sqft_living
                    row. The dashed step-2 box answers only the two middle values;
                    rule edges sit clear of the ink on each side. Both share the
                    avg box's v-centre, so the swap reads as one frame tightening,
                    not as a box jumping down the slide. -->
-              <rect id="bx-med-all" class="bx" x="29" y="247.6" width="1146" height="21.8" fill="var(--tint-md)" stroke="none" />
-              <rect id="bx-med-2" class="bx" x="329" y="247.6" width="250" height="21.8" fill="none" stroke="var(--md)"
-                stroke-width="2" stroke-dasharray="8 5" />
+              <rect id="bx-med-all" class="bx bx-wash" x="29" y="247.6" width="1146" height="21.8" fill="var(--tint-md)" />
+              <rect id="bx-med-2" class="bx" x="329" y="247.6" width="250" height="21.8" stroke="var(--md)" />
               <!-- Step-1 comparison washes: one per compared row (sqft_lot,
                  bedrooms, bathrooms), 6u gaps between them so each highlighted
                  row reads separately. Per-stage rules below re-fill the SAME
                  rects - knn tint on NN drivers 4 and 5, scaled tint on SNN
                  drivers 6 and 7 - so step 2 keeps the frame of step 1 while
                  the fill flips. -->
-              <rect id="bx-compare-lot" class="bx bx-compare" x="27" y="273.6" width="1148" height="21.8" fill="none" stroke="none" />
-              <rect id="bx-compare-bed" class="bx bx-compare" x="27" y="299.6" width="1148" height="21.8" fill="none" stroke="none" />
-              <rect id="bx-compare-bath" class="bx bx-compare" x="27" y="325.6" width="1148" height="21.8" fill="none" stroke="none" />
+              <rect id="bx-compare-lot" class="bx bx-compare" x="27" y="273.6" width="1148" height="21.8" />
+              <rect id="bx-compare-bed" class="bx bx-compare" x="27" y="299.6" width="1148" height="21.8" />
+              <rect id="bx-compare-bath" class="bx bx-compare" x="27" y="325.6" width="1148" height="21.8" />
               <!-- SNN scale-up: one wash per raw row; scaled fills sit at the
                    compact rest y the rows below will shift away from. -->
-              <rect id="bx-snn-liv" class="bx" x="27" y="247.6" width="1148" height="21.8" fill="var(--tint-snn)" stroke="none" />
-              <rect id="bx-snn-lot" class="bx" x="27" y="273.6" width="1148" height="21.8" fill="var(--tint-snn)" stroke="none" />
-              <rect id="bx-snn-bed" class="bx" x="27" y="299.6" width="1148" height="21.8" fill="var(--tint-snn)" stroke="none" />
-              <rect id="bx-snn-bath" class="bx" x="27" y="325.6" width="1148" height="21.8" fill="var(--tint-snn)" stroke="none" />
-              <rect id="bx-snn-sliv" class="bx" x="27" y="274.45" width="1148" height="21.8" fill="var(--tint-snn)" stroke="none" />
-              <rect id="bx-snn-slot" class="bx" x="27" y="326.45" width="1148" height="21.8" fill="var(--tint-snn)" stroke="none" />
-              <rect id="bx-snn-sbed" class="bx" x="27" y="378.45" width="1148" height="21.8" fill="var(--tint-snn)" stroke="none" />
-              <rect id="bx-snn-sbath" class="bx" x="27" y="430.45" width="1148" height="21.8" fill="var(--tint-snn)" stroke="none" />
-              <rect id="bx-knn-2" class="bx" x="523" y="247.6" width="570" height="21.8" fill="none" stroke="var(--knn)"
-                stroke-width="2" stroke-dasharray="8 5" />
-              <rect id="bx-snn-pick" class="bx" x="523" y="273.6" width="570" height="21.8" fill="none" stroke="var(--snn)"
-                stroke-width="2" stroke-dasharray="8 5" />
-              <rect id="bx-snn-pick-slot" class="bx" x="523" y="326.45" width="570" height="21.8" fill="none" stroke="var(--snn)"
-                stroke-width="2" stroke-dasharray="8 5" />
-              <rect id="bx-snn-pick-sbed" class="bx" x="523" y="378.45" width="570" height="21.8" fill="none" stroke="var(--snn)"
-                stroke-width="2" stroke-dasharray="8 5" />
-              <rect id="bx-snn-pick-sbath" class="bx" x="523" y="430.45" width="570" height="21.8" fill="none" stroke="var(--snn)"
-                stroke-width="2" stroke-dasharray="8 5" />
-              <rect id="bx-snn" class="bx" x="510" y="116" width="596" height="187" fill="none" stroke="var(--snn)"
-                stroke-width="2" stroke-dasharray="8 5" />
+              <rect id="bx-snn-liv" class="bx bx-wash" x="27" y="247.6" width="1148" height="21.8" fill="var(--tint-snn)" />
+              <rect id="bx-snn-lot" class="bx bx-wash" x="27" y="273.6" width="1148" height="21.8" fill="var(--tint-snn)" />
+              <rect id="bx-snn-bed" class="bx bx-wash" x="27" y="299.6" width="1148" height="21.8" fill="var(--tint-snn)" />
+              <rect id="bx-snn-bath" class="bx bx-wash" x="27" y="325.6" width="1148" height="21.8" fill="var(--tint-snn)" />
+              <rect id="bx-snn-sliv" class="bx bx-wash" x="27" y="274.45" width="1148" height="21.8" fill="var(--tint-snn)" />
+              <rect id="bx-snn-slot" class="bx bx-wash" x="27" y="326.45" width="1148" height="21.8" fill="var(--tint-snn)" />
+              <rect id="bx-snn-sbed" class="bx bx-wash" x="27" y="378.45" width="1148" height="21.8" fill="var(--tint-snn)" />
+              <rect id="bx-snn-sbath" class="bx bx-wash" x="27" y="430.45" width="1148" height="21.8" fill="var(--tint-snn)" />
+              <rect id="bx-knn-2" class="bx" x="523" y="247.6" width="570" height="21.8" stroke="var(--knn)" />
+              <rect id="bx-snn-pick" class="bx" x="523" y="273.6" width="570" height="21.8" stroke="var(--snn)" />
+              <rect id="bx-snn-pick-slot" class="bx" x="523" y="326.45" width="570" height="21.8" stroke="var(--snn)" />
+              <rect id="bx-snn-pick-sbed" class="bx" x="523" y="378.45" width="570" height="21.8" stroke="var(--snn)" />
+              <rect id="bx-snn-pick-sbath" class="bx" x="523" y="430.45" width="570" height="21.8" stroke="var(--snn)" />
+              <rect id="bx-snn" class="bx" x="510" y="116" width="596" height="187" stroke="var(--snn)" />
               <!-- Average marker: house lifted clear; equal text gaps; down arrow to box -->
               <!-- color: #hs strokes with currentColor, which follows the CSS
                    color property, not stroke. stroke alone left every house grey. -->
-              <g id="mk-avg" class="mk" fill="none" color="var(--av)" stroke="var(--av)">
-                <g transform="translate(634,10) scale(1.264)">
+              <g id="mk-avg" class="mk" color="var(--av)">
+                <g class="mk-house" transform="translate(634,10) scale(1.264)">
                   <use href="#hs" />
                 </g>
-                <text x="634" y="-66" text-anchor="middle" font-size="20" fill="var(--av)" stroke="none">
+                <text class="mk-name" x="634" y="-66">
                   Avg
                 </text>
-                <text x="634" y="30" text-anchor="middle" font-size="16" fill="var(--av)" stroke="none">
+                <text class="mk-val" x="634" y="30">
                   2225
                 </text>
                 <!-- All four arrows share one lane: each starts 14u below its own
@@ -3183,55 +3241,54 @@
                      at 131.25 plus the same 6.5 clear the avg box once kept. Lane
                      122 is above every house that is ever drawn below it, and the
                      anchor icons hold the actual method values instead. -->
-                <line x1="634" y1="44" x2="634" y2="122" stroke-width="2" marker-end="url(#arr-av)" />
+                <line x1="634" y1="44" x2="634" y2="122" marker-end="url(#arr-av)" />
               </g>
               <!-- Medium marker -->
-              <g id="mk-med" class="mk" fill="none" color="var(--md)" stroke="var(--md)">
-                <g transform="translate(452,10) scale(1.119)">
+              <g id="mk-med" class="mk" color="var(--md)">
+                <g class="mk-house" transform="translate(452,10) scale(1.119)">
                   <use href="#hs" />
                 </g>
-                <text x="452" y="-66" text-anchor="middle" font-size="20" fill="var(--md)" stroke="none">
+                <text class="mk-name" x="452" y="-66">
                   Medium
                 </text>
-                <text x="452" y="30" text-anchor="middle" font-size="16" fill="var(--md)" stroke="none">
+                <text class="mk-val" x="452" y="30">
                   1885
                 </text>
-                <line x1="452" y1="44" x2="452" y2="122" stroke-width="2" marker-end="url(#arr-md)" />
+                <line x1="452" y1="44" x2="452" y2="122" marker-end="url(#arr-md)" />
               </g>
               <!-- KNN marker: the five closest houses averaged with EQUAL weight. That lands
                    above the city average of 2225, because three of the five are larger than
                    it - but it is still one number for every house. -->
-              <g id="mk-knn" class="mk" fill="none" color="var(--knn)" stroke="var(--knn)">
-                <g transform="translate(760,10) scale(1.35)">
+              <g id="mk-knn" class="mk" color="var(--knn)">
+                <g class="mk-house" transform="translate(760,10) scale(1.35)">
                   <use href="#hs" />
                 </g>
-                <text x="760" y="-66" text-anchor="middle" font-size="20" fill="var(--knn)" stroke="none">
+                <text class="mk-name" x="760" y="-66">
                   NN(5)
                 </text>
-                <text x="760" y="30" text-anchor="middle" font-size="16" fill="var(--knn)" stroke="none">
+                <text class="mk-val" x="760" y="30">
                   2802
                 </text>
-                <line x1="760" y1="44" x2="760" y2="122" stroke-width="2" marker-end="url(#arr-knn)" />
+                <line x1="760" y1="44" x2="760" y2="122" marker-end="url(#arr-knn)" />
               </g>
               <!-- Scaled KNN marker: the same five houses, each weighted 1 over its distance
                    across sqft_lot, bedrooms and bathrooms. The two closest dominate, so the
                    answer lands well above the equal-weight average of the identical five. -->
-              <g id="mk-snn" class="mk" fill="none" color="var(--snn)" stroke="var(--snn)">
-                <g transform="translate(940,10) scale(1.465)">
+              <g id="mk-snn" class="mk" color="var(--snn)">
+                <g class="mk-house" transform="translate(940,10) scale(1.465)">
                   <use href="#hs" />
                 </g>
-                <text x="940" y="-66" text-anchor="middle" font-size="20" fill="var(--snn)" stroke="none">
+                <text class="mk-name" x="940" y="-66">
                   NN(5)w
                 </text>
-                <text x="940" y="30" text-anchor="middle" font-size="16" fill="var(--snn)" stroke="none">
+                <text class="mk-val" x="940" y="30">
                   3470
                 </text>
-                <rect class="mk-real" x="905" y="36" width="70" height="18" fill="none" stroke="var(--snn)"
-                  stroke-width="2" stroke-dasharray="8 5" />
-                <text class="mk-eq" x="940" y="52" text-anchor="middle" font-size="13" fill="var(--snn)" stroke="none">
+                <rect class="mk-real" x="905" y="36" width="70" height="18" />
+                <text class="mk-eq" x="940" y="52">
                   0.8113 &#215; 2755 + 1235
                 </text>
-                <line x1="940" y1="62" x2="940" y2="122" stroke-width="2" marker-end="url(#arr-snn)" />
+                <line x1="940" y1="62" x2="940" y2="122" marker-end="url(#arr-snn)" />
               </g>
             </svg>
             <p class="ph-stage-hint">
@@ -3267,11 +3324,11 @@
                 <div class="ph-panel-pick">
                   <svg class="ph-calc" viewBox="0 0 300 128" fill="none" role="img"
                     aria-label="Average of all 12 houses: 2225 square feet. One column is read, living area, across all 12 houses.">
-                    <text class="ph-calc-f" x="150" y="10" text-anchor="middle">one column, every house</text>
-                    <text class="ph-calc-f" x="150" y="26" text-anchor="middle">=AVERAGE(1235,1300,1365,1520,1600,1680,</text>
-                    <text class="ph-calc-f" x="150" y="38" text-anchor="middle">2090,2200,2310,3610,3800,3990)</text>
-                    <text class="ph-calc-r" x="150" y="62" text-anchor="middle">= 2225</text>
-                    <text class="ph-calc-n" x="150" y="78" text-anchor="middle">n = 12 houses</text>
+                    <text class="ph-calc-f" x="150" y="10">one column, every house</text>
+                    <text class="ph-calc-f" x="150" y="26">=AVERAGE(1235,1300,1365,1520,1600,1680,</text>
+                    <text class="ph-calc-f" x="150" y="38">2090,2200,2310,3610,3800,3990)</text>
+                    <text class="ph-calc-r" x="150" y="62">= 2225</text>
+                    <text class="ph-calc-n" x="150" y="78">n = 12 houses</text>
                     <g class="ph-calc-strip">
                       <use href="#hs" transform="translate(22,100) scale(0.3)" />
                       <use href="#hs" transform="translate(44,100) scale(0.3)" />
@@ -3285,7 +3342,7 @@
                       <use href="#hs" transform="translate(220,100) scale(0.3)" />
                       <use href="#hs" transform="translate(242,100) scale(0.3)" />
                     </g>
-                    <text class="ph-calc-c" x="150" y="120" text-anchor="middle">12 of 12 read</text>
+                    <text class="ph-calc-c" x="150" y="120">12 of 12 read</text>
                   </svg>
                 </div>
               </article>
@@ -3308,11 +3365,11 @@
                 <div class="ph-panel-pick">
                   <svg class="ph-calc" viewBox="0 0 300 128" fill="none" role="img"
                     aria-label="Median of all 12 houses: 1885 square feet. Step one reads every living area; step two takes the middle house, or the average of the two middle.">
-                    <text class="ph-calc-f" x="150" y="10" text-anchor="middle">1 · one column, every house</text>
-                    <text class="ph-calc-f" x="150" y="26" text-anchor="middle">all 12 read</text>
-                    <text class="ph-calc-f" x="150" y="42" text-anchor="middle">2 · the middle, or the middle two</text>
-                    <text class="ph-calc-r" x="150" y="66" text-anchor="middle">= 1885</text>
-                    <text class="ph-calc-n" x="150" y="82" text-anchor="middle">n = 12 houses</text>
+                    <text class="ph-calc-f" x="150" y="10">1 · one column, every house</text>
+                    <text class="ph-calc-f" x="150" y="26">all 12 read</text>
+                    <text class="ph-calc-f" x="150" y="42">2 · the middle, or the middle two</text>
+                    <text class="ph-calc-r" x="150" y="66">= 1885</text>
+                    <text class="ph-calc-n" x="150" y="82">n = 12 houses</text>
                     <g class="ph-calc-strip">
                       <use href="#hs" transform="translate(22,102) scale(0.3)" />
                       <use href="#hs" transform="translate(44,102) scale(0.3)" />
@@ -3327,7 +3384,7 @@
                       <use href="#hs" transform="translate(242,102) scale(0.3)" />
                       <use href="#hs" transform="translate(264,102) scale(0.3)" />
                     </g>
-                    <text class="ph-calc-c" x="150" y="126" text-anchor="middle">step 1 reads 12 &#183; step 2 keeps 1, or 2</text>
+                    <text class="ph-calc-c" x="150" y="126">step 1 reads 12 &#183; step 2 keeps 1, or 2</text>
                   </svg>
                 </div>
               </article>
@@ -3350,11 +3407,11 @@
                 <div class="ph-panel-pick">
                   <svg class="ph-calc" viewBox="0 0 300 128" fill="none" role="img"
                     aria-label="Nearest Neighbor in two steps. Step one compares every house on lot size, bedrooms and bathrooms and keeps the five closest. Step two averages their living area: 2802.">
-                    <text class="ph-calc-f" x="150" y="10" text-anchor="middle">this listing: 5 bed, 3 bath, 9000 sqft lot</text>
-                    <text class="ph-calc-f" x="150" y="26" text-anchor="middle">12 compared on 3 columns, 5 kept</text>
-                    <text class="ph-calc-f" x="150" y="38" text-anchor="middle">=AVERAGE(3800,3610,2310,2200,2090)</text>
-                    <text class="ph-calc-r" x="150" y="62" text-anchor="middle">= 2802</text>
-                    <text class="ph-calc-n" x="150" y="78" text-anchor="middle">then one column is read</text>
+                    <text class="ph-calc-f" x="150" y="10">this listing: 5 bed, 3 bath, 9000 sqft lot</text>
+                    <text class="ph-calc-f" x="150" y="26">12 compared on 3 columns, 5 kept</text>
+                    <text class="ph-calc-f" x="150" y="38">=AVERAGE(3800,3610,2310,2200,2090)</text>
+                    <text class="ph-calc-r" x="150" y="62">= 2802</text>
+                    <text class="ph-calc-n" x="150" y="78">then one column is read</text>
                     <g class="ph-calc-strip">
                       <use href="#hs" transform="translate(22,100) scale(0.3)" />
                       <use href="#hs" transform="translate(44,100) scale(0.3)" />
@@ -3369,7 +3426,7 @@
                       <use href="#hs" transform="translate(242,100) scale(0.3)" />
                       <use href="#hs" transform="translate(264,100) scale(0.3)" />
                     </g>
-                    <text class="ph-calc-c" x="150" y="120" text-anchor="middle">5 of 12 read &#8212; closest on all three</text>
+                    <text class="ph-calc-c" x="150" y="120">5 of 12 read &#8212; closest on all three</text>
                   </svg>
                 </div>
               </article>
@@ -3392,11 +3449,11 @@
                 <div class="ph-panel-pick">
                   <svg class="ph-calc" viewBox="0 0 300 128" fill="none" role="img"
                     aria-label="Scaled Nearest Neighbor in six steps. Step one keeps the same five houses by the same three columns, scaled 0 to 1. Step two weights their living area by closeness and unscales: 3470.">
-                    <text class="ph-calc-f" x="150" y="10" text-anchor="middle">this listing: 5 bed, 3 bath, 9000 sqft lot</text>
-                    <text class="ph-calc-f" x="150" y="26" text-anchor="middle">scaled 0&#8211;1, then 5 closest kept</text>
-                    <text class="ph-calc-f" x="150" y="38" text-anchor="middle">0.8113 &#215; 2755 + 1235</text>
-                    <text class="ph-calc-r" x="150" y="62" text-anchor="middle">= 3470</text>
-                    <text class="ph-calc-n" x="150" y="78" text-anchor="middle">n = 12 houses</text>
+                    <text class="ph-calc-f" x="150" y="10">this listing: 5 bed, 3 bath, 9000 sqft lot</text>
+                    <text class="ph-calc-f" x="150" y="26">scaled 0&#8211;1, then 5 closest kept</text>
+                    <text class="ph-calc-f" x="150" y="38">0.8113 &#215; 2755 + 1235</text>
+                    <text class="ph-calc-r" x="150" y="62">= 3470</text>
+                    <text class="ph-calc-n" x="150" y="78">n = 12 houses</text>
                     <g class="ph-calc-strip">
                       <use href="#hs" transform="translate(22,100) scale(0.3)" />
                       <use href="#hs" transform="translate(44,100) scale(0.3)" />
@@ -3411,7 +3468,7 @@
                       <use href="#hs" transform="translate(242,100) scale(0.3)" />
                       <use href="#hs" transform="translate(264,100) scale(0.3)" />
                     </g>
-                    <text class="ph-calc-c" x="150" y="120" text-anchor="middle">same 5, closest counting most</text>
+                    <text class="ph-calc-c" x="150" y="120">same 5, closest counting most</text>
                   </svg>
                 </div>
               </article>
