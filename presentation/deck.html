@@ -1626,13 +1626,20 @@
     }
 
     .houses-svg .mk,
-    .houses-svg .bx {
+    .houses-svg .bx,
+    .houses-svg .mk-real {
       opacity: 0;
       transform-box: fill-box;
       transform-origin: center;
       transition:
         opacity var(--ph-t-slide) var(--ph-ease),
         transform var(--ph-t-slide) var(--ph-ease);
+    }
+
+    /* The marker's real-number box rides with its marker: visible exactly when
+       mk-snn is. */
+    #s4:has(.ph-step:nth-of-type(15).visible):not(:has(.ph-step:nth-of-type(16).visible)) #mk-snn .mk-real {
+      opacity: 1;
     }
 
     /* Attribute rows: the rest state is the whole data set in white, everything
@@ -1981,14 +1988,14 @@
 
     
 
-    /* Fragment 14 - SNN scaled picks: the 5 closest tint to the scaled colour
-       inside the scaled rows; everything else in those rows dims. Raw rows stay
-       struck; living stays dim. The living label glows: its picks come next. */
-    #s4:has(.ph-step:nth-of-type(14).visible):not(:has(.ph-step:nth-of-type(15).visible)) .ar-sliv .v.h-nn,
-    #s4:has(.ph-step:nth-of-type(14).visible):not(:has(.ph-step:nth-of-type(15).visible)) .ar-slot .v.h-nn,
-    #s4:has(.ph-step:nth-of-type(14).visible):not(:has(.ph-step:nth-of-type(15).visible)) .ar-sbed .v.h-nn,
-    #s4:has(.ph-step:nth-of-type(14).visible):not(:has(.ph-step:nth-of-type(15).visible)) .ar-sbath .v.h-nn {
-      fill: var(--snn);
+    /* Fragment 14 - SNN scaled picks: the 5 closest stay white like the rest -
+       no sliv highlight at this stage; the picks land with the box next. Raw
+       rows stay struck. */
+    #s4:has(.ph-step:nth-of-type(14).visible):not(:has(.ph-step:nth-of-type(15).visible)) .ar-sliv .v,
+    #s4:has(.ph-step:nth-of-type(14).visible):not(:has(.ph-step:nth-of-type(15).visible)) .ar-slot .v,
+    #s4:has(.ph-step:nth-of-type(14).visible):not(:has(.ph-step:nth-of-type(15).visible)) .ar-sbed .v,
+    #s4:has(.ph-step:nth-of-type(14).visible):not(:has(.ph-step:nth-of-type(15).visible)) .ar-sbath .v {
+      fill: #ffffff;
       opacity: 1;
     }
 
@@ -2003,12 +2010,6 @@
       opacity: 1;
     }
 
-    #s4:has(.ph-step:nth-of-type(14).visible):not(:has(.ph-step:nth-of-type(15).visible)) .ar-sliv .v:not(.h-nn),
-    #s4:has(.ph-step:nth-of-type(14).visible):not(:has(.ph-step:nth-of-type(15).visible)) .ar-slot .v:not(.h-nn),
-    #s4:has(.ph-step:nth-of-type(14).visible):not(:has(.ph-step:nth-of-type(15).visible)) .ar-sbed .v:not(.h-nn),
-    #s4:has(.ph-step:nth-of-type(14).visible):not(:has(.ph-step:nth-of-type(15).visible)) .ar-sbath .v:not(.h-nn) {
-      opacity: 0.22;
-    }
 
     #s4:has(.ph-step:nth-of-type(14).visible):not(:has(.ph-step:nth-of-type(15).visible)) .ar-living .v,
     #s4:has(.ph-step:nth-of-type(14).visible):not(:has(.ph-step:nth-of-type(15).visible)) .ar-lot .v,
@@ -2101,10 +2102,8 @@
     #s4:has(.ph-step:nth-of-type(8).visible):not(:has(.ph-step:nth-of-type(9).visible)) #bx-knn-2,
     #s4:has(.ph-step:nth-of-type(10).visible):not(:has(.ph-step:nth-of-type(11).visible)) .bx-compare,
     #s4:has(.ph-step:nth-of-type(10).visible):not(:has(.ph-step:nth-of-type(11).visible)) #bx-snn-liv,
-    #s4:has(.ph-step:nth-of-type(11).visible):not(:has(.ph-step:nth-of-type(12).visible)) #bx-snn-lot,
-    #s4:has(.ph-step:nth-of-type(11).visible):not(:has(.ph-step:nth-of-type(12).visible)) #bx-snn-bed,
-    #s4:has(.ph-step:nth-of-type(11).visible):not(:has(.ph-step:nth-of-type(12).visible)) #bx-snn-bath,
-    #s4:has(.ph-step:nth-of-type(11).visible):not(:has(.ph-step:nth-of-type(12).visible)) #bx-snn-pick,
+    #s4:has(.ph-step:nth-of-type(11).visible):not(:has(.ph-step:nth-of-type(12).visible)) #bx-snn-liv,
+    #s4:has(.ph-step:nth-of-type(11).visible):not(:has(.ph-step:nth-of-type(12).visible)) #bx-snn-sliv,
     
     
     
@@ -2816,7 +2815,6 @@
         <header class="ph-head">
           <h2>Missing value approaches</h2>
           <div class="ph-subs" aria-live="off">
-            <p class="ph-subtitle ph-is-av">Average &#8212; the table</p>
             <p class="ph-subtitle ph-is-av">Average Value</p>
             <p class="ph-subtitle ph-is-md">Medium &#8212; the table</p>
             <p class="ph-subtitle ph-is-md">Medium value &#8212; read the column</p>
@@ -2824,12 +2822,12 @@
             <p class="ph-subtitle ph-is-knn">Nearest Neighbor &#8212; the table</p>
             <p class="ph-subtitle ph-is-knn">Nearest Neighbor &#8212; find the 5 closest</p>
             <p class="ph-subtitle ph-is-knn">Nearest Neighbor &#8212; read their size</p>
-            <p class="ph-subtitle ph-is-snn">Scaled Nearest Neighbor &#8212; the table</p>
-            <p class="ph-subtitle ph-is-snn">Scaled Nearest Neighbor &#8212; find the 5 closest</p>
-            <p class="ph-subtitle ph-is-snn">Scaled Nearest Neighbor &#8212; scale the columns</p>
-            <p class="ph-subtitle ph-is-snn">Scaled Nearest Neighbor &#8212; read the scaled rows</p>
-            <p class="ph-subtitle ph-is-snn">Scaled Nearest Neighbor &#8212; move the wash to scaled</p>
-            <p class="ph-subtitle ph-is-snn">Scaled Nearest Neighbor &#8212; pick the 5 scaled</p>
+            <p class="ph-subtitle ph-is-snn">Scaled Nearest Neighbor 1/6 &#8212; the table</p>
+            <p class="ph-subtitle ph-is-snn">Scaled Nearest Neighbor 2/6 &#8212; find the 5 closest</p>
+            <p class="ph-subtitle ph-is-snn">Scaled Nearest Neighbor 3/6 &#8212; scale the columns</p>
+            <p class="ph-subtitle ph-is-snn">Scaled Nearest Neighbor 4/6 &#8212; read the scaled rows</p>
+            <p class="ph-subtitle ph-is-snn">Scaled Nearest Neighbor 5/6 &#8212; move the wash to scaled</p>
+            <p class="ph-subtitle ph-is-snn">Scaled Nearest Neighbor 6/6 &#8212; pick the 5 scaled</p>
             <p class="ph-subtitle ph-is-snn">Scaled Nearest Neighbor &#8212; read and weight</p>
             <p class="ph-subtitle ph-is-sum">Summary: similar homes win</p>
           </div>
@@ -2943,6 +2941,7 @@
                 <text class="v" x="297" y="290">6200</text>
                 <text class="v" x="353" y="290">5900</text>
                 <text class="v h-nn" x="551" y="290">7600</text>
+                <text class="v h-nn" x="619" y="290">8000</text>
                 <text class="v h-nn" x="687" y="290">8400</text>
                 <text class="v h-nn" x="984" y="290">8800</text>
                 <text class="v h-nn" x="1066" y="290">9100</text>
@@ -2976,64 +2975,64 @@
                 <text class="v h-nn" x="1066" y="342">3</text>
                 <text class="v" x="1148" y="342">4</text>
               </g>
-              <g class="ar-row ar-scaled ar-sliv" font-size="13" fill="#BCCCD4" text-anchor="middle">
-                <text class="v" x="70" y="290">0</text>
-                <text class="v" x="114" y="290">0.024</text>
-                <text class="v" x="158" y="290">0.047</text>
-                <text class="v" x="241" y="290">0.103</text>
-                <text class="v" x="297" y="290">0.133</text>
-                <text class="v" x="353" y="290">0.162</text>
-                <text class="v h-nn" x="551" y="290">0.310</text>
-                <text class="v h-nn" x="619" y="290">0.350</text>
-                <text class="v h-nn" x="687" y="290">0.390</text>
-                <text class="v h-nn" x="984" y="290">0.862</text>
-                <text class="v h-nn" x="1066" y="290">0.931</text>
+              <g class="ar-row ar-scaled ar-sliv" font-size="15" fill="#BCCCD4" text-anchor="middle">
+                <text class="v" x="68" y="290">0</text>
+                <text class="v" x="114" y="290">.024</text>
+                <text class="v" x="156" y="290">.047</text>
+                <text class="v" x="241" y="290">.103</text>
+                <text class="v" x="297" y="290">.133</text>
+                <text class="v" x="353" y="290">.162</text>
+                <text class="v h-nn" x="551" y="290">.310</text>
+                <text class="v h-nn" x="619" y="290">.350</text>
+                <text class="v h-nn" x="687" y="290">.390</text>
+                <text class="v h-nn" x="984" y="290">.862</text>
+                <text class="v h-nn" x="1066" y="290">.931</text>
                 <text class="v" x="1148" y="290">1</text>
               </g>
               <!-- Scaled duplicates: min-max 0..1 of the row above (lot range
                    4500, bed range 4, bath range 3). Same x columns, blank until
                    the scale-up fragment populates them. Dashed strike styling
                    comes from stage rules, not markup. -->
-              <g class="ar-row ar-scaled ar-slot" font-size="13" fill="#BCCCD4" text-anchor="middle">
-                <text class="v" x="70" y="342">0</text>
-                <text class="v" x="114" y="342">0.067</text>
-                <text class="v" x="158" y="342">0.156</text>
-                <text class="v" x="241" y="342">0.222</text>
-                <text class="v" x="297" y="342">0.356</text>
-                <text class="v" x="353" y="342">0.289</text>
-                <text class="v h-nn" x="551" y="342">0.667</text>
-                <text class="v h-nn" x="619" y="342">0.756</text>
-                <text class="v h-nn" x="687" y="342">0.844</text>
-                <text class="v h-nn" x="984" y="342">0.933</text>
+              <g class="ar-row ar-scaled ar-slot" font-size="15" fill="#BCCCD4" text-anchor="middle">
+                <text class="v" x="68" y="342">0</text>
+                <text class="v" x="114" y="342">.067</text>
+                <text class="v" x="156" y="342">.156</text>
+                <text class="v" x="241" y="342">.222</text>
+                <text class="v" x="297" y="342">.356</text>
+                <text class="v" x="353" y="342">.289</text>
+                <text class="v h-nn" x="551" y="342">.667</text>
+                <text class="v h-nn" x="619" y="342">.756</text>
+                <text class="v h-nn" x="687" y="342">.844</text>
+                <text class="v h-nn" x="984" y="342">.933</text>
                 <text class="v h-nn" x="1066" y="342">1</text>
-                <text class="v" x="1148" y="342">0.4</text>
+                <text class="v" x="1148" y="342">.400</text>
               </g>
-              <g class="ar-row ar-scaled ar-sbed" font-size="13" fill="#BCCCD4" text-anchor="middle">
-                <text class="v" x="70" y="394">0</text>
+              <g class="ar-row ar-scaled ar-sbed" font-size="15" fill="#BCCCD4" text-anchor="middle">
+                <text class="v" x="68" y="394">0</text>
                 <text class="v" x="114" y="394">0</text>
-                <text class="v" x="158" y="394">0</text>
-                <text class="v" x="241" y="394">0.25</text>
-                <text class="v" x="297" y="394">0.25</text>
-                <text class="v" x="353" y="394">0.25</text>
-                <text class="v h-nn" x="551" y="394">0.5</text>
-                <text class="v h-nn" x="619" y="394">0.5</text>
-                <text class="v h-nn" x="687" y="394">0.75</text>
-                <text class="v h-nn" x="984" y="394">0.75</text>
-                <text class="v h-nn" x="1066" y="394">0.75</text>
+                <text class="v" x="156" y="394">0</text>
+                <text class="v" x="241" y="394">.250</text>
+                <text class="v" x="297" y="394">.250</text>
+                <text class="v" x="353" y="394">.250</text>
+                <text class="v h-nn" x="551" y="394">.500</text>
+                <text class="v h-nn" x="619" y="394">.500</text>
+                <text class="v h-nn" x="687" y="394">.750</text>
+                <text class="v h-nn" x="984" y="394">.750</text>
+                <text class="v h-nn" x="1066" y="394">.750</text>
                 <text class="v" x="1148" y="394">1</text>
               </g>
-              <g class="ar-row ar-scaled ar-sbath" font-size="13" fill="#BCCCD4" text-anchor="middle">
-                <text class="v" x="70" y="446">0</text>
-                <text class="v" x="114" y="446">0.167</text>
-                <text class="v" x="158" y="446">0.167</text>
-                <text class="v" x="241" y="446">0.167</text>
-                <text class="v" x="297" y="446">0.167</text>
-                <text class="v" x="353" y="446">0.333</text>
-                <text class="v h-nn" x="551" y="446">0.5</text>
-                <text class="v h-nn" x="619" y="446">0.5</text>
-                <text class="v h-nn" x="687" y="446">0.667</text>
-                <text class="v h-nn" x="984" y="446">0.667</text>
-                <text class="v h-nn" x="1066" y="446">0.667</text>
+              <g class="ar-row ar-scaled ar-sbath" font-size="15" fill="#BCCCD4" text-anchor="middle">
+                <text class="v" x="68" y="446">0</text>
+                <text class="v" x="114" y="446">.167</text>
+                <text class="v" x="156" y="446">.167</text>
+                <text class="v" x="241" y="446">.167</text>
+                <text class="v" x="297" y="446">.167</text>
+                <text class="v" x="353" y="446">.333</text>
+                <text class="v h-nn" x="551" y="446">.500</text>
+                <text class="v h-nn" x="619" y="446">.500</text>
+                <text class="v h-nn" x="687" y="446">.667</text>
+                <text class="v h-nn" x="984" y="446">.667</text>
+                <text class="v h-nn" x="1066" y="446">.667</text>
                 <text class="v" x="1148" y="446">1</text>
               </g>
               <!-- Input boxes: dashed. The Average box is the exception: Average reads
@@ -3069,10 +3068,10 @@
               <rect id="bx-snn-lot" class="bx" x="27" y="273.6" width="1148" height="21.8" fill="var(--tint-snn)" stroke="none" />
               <rect id="bx-snn-bed" class="bx" x="27" y="299.6" width="1148" height="21.8" fill="var(--tint-snn)" stroke="none" />
               <rect id="bx-snn-bath" class="bx" x="27" y="325.6" width="1148" height="21.8" fill="var(--tint-snn)" stroke="none" />
-              <rect id="bx-snn-sliv" class="bx" x="27" y="273.6" width="1148" height="21.8" fill="var(--tint-snn)" stroke="none" />
-              <rect id="bx-snn-slot" class="bx" x="27" y="325.6" width="1148" height="21.8" fill="var(--tint-snn)" stroke="none" />
-              <rect id="bx-snn-sbed" class="bx" x="27" y="377.6" width="1148" height="21.8" fill="var(--tint-snn)" stroke="none" />
-              <rect id="bx-snn-sbath" class="bx" x="27" y="429.6" width="1148" height="21.8" fill="var(--tint-snn)" stroke="none" />
+              <rect id="bx-snn-sliv" class="bx" x="27" y="274.45" width="1148" height="21.8" fill="var(--tint-snn)" stroke="none" />
+              <rect id="bx-snn-slot" class="bx" x="27" y="326.45" width="1148" height="21.8" fill="var(--tint-snn)" stroke="none" />
+              <rect id="bx-snn-sbed" class="bx" x="27" y="378.45" width="1148" height="21.8" fill="var(--tint-snn)" stroke="none" />
+              <rect id="bx-snn-sbath" class="bx" x="27" y="430.45" width="1148" height="21.8" fill="var(--tint-snn)" stroke="none" />
               <rect id="bx-knn-2" class="bx" x="523" y="247.6" width="570" height="21.8" fill="none" stroke="var(--knn)"
                 stroke-width="2" stroke-dasharray="8 5" />
               <rect id="bx-snn-pick" class="bx" x="523" y="273.6" width="570" height="21.8" fill="none" stroke="var(--snn)"
@@ -3141,6 +3140,8 @@
                 <text x="940" y="30" text-anchor="middle" font-size="16" fill="var(--snn)" stroke="none">
                   3470
                 </text>
+                <rect class="mk-real" x="905" y="36" width="70" height="18" fill="none" stroke="var(--snn)"
+                  stroke-width="2" stroke-dasharray="8 5" />
                 <text class="mk-eq" x="940" y="52" text-anchor="middle" font-size="13" fill="var(--snn)" stroke="none">
                   0.8113 &#215; 2755 + 1235
                 </text>

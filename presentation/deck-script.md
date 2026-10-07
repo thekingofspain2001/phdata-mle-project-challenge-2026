@@ -439,182 +439,160 @@ of the record they use.
   imputation; the stated principle is to use available auxiliary
   information, choosing by strength of association between fields).
 
-## S4 — Missing value approaches (`#s4-approaches`, `data-s4`)
+## S4 — Missing value approaches (`#s4`, 16 `.ph-step` fragments)
 
-Layout: T-houses-staged. Fragments: 7 hidden `.ph-s4-go` drivers.
-**Staging is CSS only** — stage N is
-`:has(.ph-s4-go:nth-of-type(N).visible):not(:has(.ph-s4-go:nth-of-type(N+1).visible))`,
+Layout: T-houses-staged. **Staging is CSS only** — stage N is
+`:has(.ph-step:nth-of-type(N).visible):not(:has(.ph-step:nth-of-type(N+1).visible))`,
 because reveal only ever ADDS `.visible`: at stage N drivers 1..N are all
 visible, so a rule without the `:not()` guard fires for every stage at or after
-its own. Stage 7 is the one bare `:has(...7...)` rule, unique because driver 7
-exists nowhere else. There is no `setS4Stage`, no `is-stage-N` class, no
-`Reveal.slide(h,0,-1)` reset. House glyphs are STATIC (mist stroke, fixed transforms);
-markers, dashed boxes, subtitle, panel and attribute values change per stage.
+its own. Stage 16 is the one bare `:has(...16...)` rule, unique because driver 16
+exists nowhere else. There is no staging JS. House glyphs are STATIC (mist
+stroke, fixed transforms); markers, dashed boxes, subtitle, panel and attribute
+values change per stage.
+
+Subtitles: 15 stacked `.ph-subtitle` in `.ph-subs` grid (one cell); stage N
+shows item N (16 steps, 15 titles). SNN titles carry the calc step:
+`Scaled Nearest Neighbor 1/6` … `6/6`, then `read and weight`, then summary.
 
 **Houses** — 12, in four groups of three sorted smallest to largest.
-`svg#houses-svg`, `viewBox="-30 -80 1240 380"`, `color="#BCCCD4"`.
-Baseline line `y=214` from `x=35` to `x=1188`.
+`svg#houses-svg`, `viewBox="-34 -87 1225 542"`, `color="#BCCCD4"`.
+`preserveAspectRatio="xMidYMid meet"`. The row wears the drawing's aspect
+(`.ph-houses-top { aspect-ratio:1225/542 }`) so the svg fills it exactly —
+no letterbox bars. Baseline line `y=222` from `x=35` to `x=1188`.
 
-| Group | x | scale | sqft_living (y=232) |
+| Group | x | scale | sqft_living (y=264) |
 |-------|---|-------|--------------------|
-| A | 54 / 98 / 142 | 0.76 / 0.8 / 0.84 | 1235 1300 1365 |
+| A | 70 / 114 / 158 | 0.76 / 0.8 / 0.84 | 1235 1300 1365 |
 | B | 241 / 297 / 353 | 0.95 / 1.0 / 1.05 | 1520 1600 1680 |
 | C | 551 / 619 / 687 | 1.1875 / 1.25 / 1.3125 | 2090 2200 2310 |
 | D | 984 / 1066 / 1148 | 1.484 / 1.5625 / 1.6406 | 3610 3800 3990 |
 
-**Attribute rows** — four rows below the baseline, twelve values each, keyed to
-the same twelve house `x` values. Row baselines 232 / 251 / 270 / 289; pitch
-19u. `sqft_living` at 14px, the other three at 13px. The left gutter (viewBox
-x = -30 to 35, house 1's left tip) carries one label per row, right-anchored
-at `x = 30`, `y = row + 3`, 11px. Labels carry NO opacity attribute - SVG group
-opacity would multiply with the CSS rest opacity.
+**Attribute rows** — four raw rows below the baseline, twelve values each, plus
+four scaled duplicates (`.ar-scaled`) for the SNN scale-up. Raw pitch 26u
+(baselines 264 / 290 / 316 / 342); scaled rows rest at 290 / 342 / 394 / 446
+and stages 11–15 shift raw rows 2–4 down 26/52/78 to open the gaps. All rows
+15px. Labels right-anchored at `x=20`, sharing each row's baseline.
 
 | Row | Class | Label | Values (houses 1-12) |
 |-----|-------|-------|-----------------------|
-| `sqft_living` | `.ar-row.ar-living` | `sqft_living` | 1235 1300 1365 1520 1600 1680 2090 2200 2310 3610 3800 3990 |
+| `sqft_living` | `.ar-row.ar-living` | `sqft_liv` | 1235 1300 1365 1520 1600 1680 2090 2200 2310 3610 3800 3990 |
 | `sqft_lot` | `.ar-row.ar-lot` | `sqft_lot` | 4600 4900 5300 5600 6200 5900 7600 8000 8400 8800 9100 6400 |
-| `bedrooms` | `.ar-row.ar-bed` | `bedrooms` | 2 2 2 3 3 3 4 4 5 5 5 6 |
-| `bathrooms` | `.ar-row.ar-bath` | `bathrooms` | 1 1.5 1.5 1.5 1.5 2 2.5 2.5 3 3 3 4 |
+| `bedrooms` | `.ar-row.ar-bed` | `beds` | 2 2 2 3 3 3 4 4 5 5 5 6 |
+| `bathrooms` | `.ar-row.ar-bath` | `baths` | 1 1.5 1.5 1.5 1.5 2 2.5 2.5 3 3 3 4 |
+| `s_liv` | `.ar-row.ar-scaled.ar-sliv` | `s_liv` (SNN pink) | 0 .024 .047 .103 .133 .162 .310 .350 .390 .862 .931 1 |
+| `s_lot` | `.ar-row.ar-scaled.ar-slot` | `s_lot` (SNN pink) | 0 .067 .156 .222 .356 .289 .667 .756 .844 .933 1 .400 |
+| `s_bed` | `.ar-row.ar-scaled.ar-sbed` | `s_bed` (SNN pink) | 0 0 0 .250 .250 .250 .500 .500 .750 .750 .750 1 |
+| `s_bath` | `.ar-row.ar-scaled.ar-sbath` | `s_bath` (SNN pink) | 0 .167 .167 .167 .167 .333 .500 .500 .667 .667 .667 1 |
 
-The four row labels are column names from `src/api/shared.py` `REQUEST_COLUMNS`
-(`bedrooms`, `bathrooms`, `sqft_living`, `sqft_lot`, `floors`, `sqft_above`,
-`sqft_basement`) - the slide must not show a field the service does not carry.
-`sqft_living` is the one that came back blank; the other three choose the
-neighbours. `floors`, `sqft_above` and `sqft_basement` are not shown because
-`sqft_above` and `sqft_basement` are derived from `sqft_living`, and using them
-to find neighbours would contradict the diagram dimming that row during the
-find. The VALUES are constructed for this example, not sampled from the
-dataset; only the column names are taken from the schema.
+Scaled values: no leading zero, 3 decimals (`.024`, `.250`, `.400`); `0` and
+`1` stay bare. Scaled labels wear `var(--snn)` always; raw labels wear
+`var(--ph-accent)`.
 
 The diagram describes one listing whose living area came back blank (5
 bedrooms, 3 bathrooms, a 9000 sq ft lot). Neighbour distance is
-`|sqft_lot-9000|/50 + |bedrooms-5| + 2*|bathrooms-3|`; the `/50` normalises a
-four-digit lot into the same range as the two counts, and the `2*` is because
-bathrooms move in half-steps, so one full mismatch is worth two bedroom
-mismatches. It ranks houses 11, 10, 9, 8, 7 as the five closest - the same five
-`.h-nn` already marks - at distances 2, 4, 12, 22, 30, which are distinct and
-monotonic in size, so the bigger house is the closer one. House 12, the largest
-on the slide, ranks sixth at 55 and is deliberately not a neighbour: it is a big
-house on a 6400 sq ft lot with 6 bedrooms and 4 bathrooms, a different kind of
-house rather than a closer one.
+`|sqft_lot-9000|/50 + |bedrooms-5| + 2*|bathrooms-3|`; it ranks houses 11, 10,
+9, 8, 7 as the five closest — the same five `.h-nn` marks. Houses 6 and 7
+also carry `.h-mid` (the medium pair); house 7 carries both.
 
-Every value carries `.v`; houses 6 and 7 also carry `.h-mid`; houses 7-11 also
-carry `.h-nn`; house 7 carries both. A value that is not lit is a value the
-method did not read. Rest opacity 0.55, lit 1 at the method's colour, unused
-rows 0.22. Each stage's rule block states that stage's COMPLETE state, since the
-range guards mean only one stage's rules match at a time.
+Every value carries `.v`. A value that is not lit is a value the method did
+not read. Each stage's rule block states that stage's COMPLETE state. Muted
+is white at reduced opacity (0.22 dim, 0.35 struck); lit is white at 1 or the
+method colour; picked values take the method hue.
 
-All `translate(·,210)`. Intra-group gaps clear the roofs
-(44/56/68/82u); inter-group gaps are staggered 1:2:3 (99/198/297u);
-both edges pinned to the baseline. `.h-nn` marks the five largest
-(groups C and the first two of D) — those are the nearest-neighbour set.
-The `<g id="hs">` glyph strokes with `currentColor`, so `stroke` alone
+All `translate(·,210)`. Intra-group gaps clear the roofs; inter-group gaps
+are staggered 1:2:3; both edges pinned to the baseline. `.h-nn` marks houses
+7–11. The `<g id="hs">` glyph strokes with `currentColor`, so `stroke` alone
 leaves every house grey.
 
-**Dashed input boxes** (`.bx`, `y=116`, `stroke-dasharray="8 5"`). Horizontal
-extent answers *which houses*; height answers *which attributes*: 122 stops
-between the `sqft_living` row and the `sqft_lot` row, 180 reaches past
-`bathrooms`. No box at stage 7.
+**Single-row container geometry** — every single-row wash and dashed box
+shares one formula: `y = rowbase − 15.2`, `height = 21.8`, centred on the
+true digit-ink band (cap top = baseline − 11, no descenders — `getBBox`
+symmetry lies by ~6.8u of phantom descent; centre on canvas
+`actualBoundingBox` ink instead). Inter-row gap 4.2u.
 
-| Id | x | width | height | right | bottom | Colour | Stage |
-|----|---|-------|--------|-------|--------|--------|-------|
-| `bx-avg` | 32 | 1164 | 122 | 1196 | 238 | `var(--av)` | 1 |
-| `bx-med` | 324 | 260 | 122 | 584 | 238 | `var(--md)` | 2 |
-| `bx-knn-pick` | 510 | 596 | 180 | 1106 | 296 | `var(--knn)` | 3 |
-| `bx-knn` | 510 | 596 | 122 | 1106 | 238 | `var(--knn)` | 4 |
-| `bx-snn-pick` | 510 | 596 | 180 | 1106 | 296 | `var(--snn)` | 5 |
-| `bx-snn` | 510 | 596 | 122 | 1106 | 238 | `var(--snn)` | 6 |
+| Id | x | y | width × height | Fill |
+|----|---|---|---------------|------|
+| `bx-avg` | 29 | 247.6 | 1146 × 21.8 | none, `var(--av)` dash |
+| `bx-med` | 324 | 116 | 260 × 187 | none, `var(--md)` dash (tall) |
+| `bx-med-all` | 29 | 247.6 | 1146 × 21.8 | `var(--tint-md)` wash |
+| `bx-med-2` | 329 | 247.6 | 250 × 21.8 | none, `var(--md)` dash |
+| `bx-compare-lot/bed/bath` | 27 | 273.6 / 299.6 / 325.6 | 1148 × 21.8 | none → per-method tint |
+| `bx-snn-liv/lot/bed/bath` | 27 | 247.6 / 273.6 / 299.6 / 325.6 | 1148 × 21.8 | `var(--tint-snn)` |
+| `bx-snn-sliv/slot/sbed/sbath` | 27 | 274.45 / 326.45 / 378.45 / 430.45 | 1148 × 21.8 | `var(--tint-snn)` |
+| `bx-knn-2` | 523 | 247.6 | 570 × 21.8 | none, `var(--knn)` dash |
+| `bx-snn-pick` | 523 | 273.6 | 570 × 21.8 | none, `var(--snn)` dash |
+| `bx-snn` | 510 | 116 | 596 × 187 | none, `var(--snn)` dash (tall) |
 
-Box bounds are not house centres. `#hs` spans `x - 25` to `x + 25`, so a house
-at `x` with `scale s` occupies `x - 25s` to `x + 25s`. The box table was derived
-from those spans so each box encloses exactly its stage's houses. House 11's
-right tip is 1105.1 and house 12's left tip is 1107.0 - a 1.9u gap - so
-`bx-knn`'s right edge at 1106 sits inside it and its dash touches house 12's roof.
-That is inherent to the load-bearing house spacing and is acceptable because the
-ATTRIBUTE LIGHTING, not the box, says which houses are read: house 12's values
-never light.
-
-The previous `bx-knn` was `x=584 width=611` and enclosed houses 8-12: it
-included house 12, the house this design deliberately excludes, and dropped
-house 7. Corrected to 510-1106.
+All `stroke-dasharray="8 5"`, `stroke-width="2"`.
 
 **Markers** (`.mk`) — floating house + name above + value below + a
 vertical leader with an arrowhead:
 
 | Marker | cx | House scale | Name (y=-66, 20px) | Value (y=30, 16px) | Leader | Marker id |
 |--------|----|-------------|--------------------|--------------------|--------|-----------|
-| Average | 634 | 1.264 | `Avg` | `2225` | y 44→108, `url(#arr-av)` | `arr-av` |
-| Medium | 452 | 1.119 | `Medium` | `1885` | y 44→108, `url(#arr-md)` | `arr-md` |
-| NN | 760 | 1.35 | `NN(5)` | `2802` | y 44→116, `url(#arr-knn)` | `arr-knn` |
-| NN weighted | 940 | 1.465 | `NN(5)w` | `3470` | y 44→116, `url(#arr-snn)` | `arr-snn` |
+| Average | 634 | 1.264 | `Avg` | `2225` | y 44→122, `url(#arr-av)` | `arr-av` |
+| Medium | 452 | 1.119 | `Medium` | `1885` | y 44→122, `url(#arr-md)` | `arr-md` |
+| NN | 760 | 1.35 | `NN(5)` | `2802` | y 44→122, `url(#arr-knn)` | `arr-knn` |
+| NN weighted | 940 | 1.465 | `NN(5)w` | `3470` | y 62→122, `url(#arr-snn)` | `arr-snn` |
 
-No extra scale or offset on either KNN marker: each base transform
-already encodes its own value — 2802 equal-weight, 3470 weighted — and the
-other two carry no transform either, so any override would break both the
-value sizing and the shared baseline. The two live side by side at stage 7;
-940 puts the weighted house clear of the plain one at 760, and both sit inside
-the `bx-knn` box's 510-1106 span.
+`mk-snn` also carries the equation (`0.8113 × 2755 + 1235`, y=52, 13px) and a
+`.mk-real` dashed box (x=905, y=36, 70×18) around the real number, visible
+only at frag 15.
 
-**Corner subtitles** — `div.ph-subs`, a one-cell grid
-(`min-height:calc(var(--fs-sub) * 1.3)`) holding seven stacked
-`p.ph-subtitle.ph-s4-sub` at `opacity:0`; the active one fades to 1.
-Stage 7 shows all four markers and the summary panel. Two subtitles share
-`ph-is-knn` and two share `ph-is-snn`, so the opacity rule keys off
-`.ph-s4-sub:nth-of-type(N)` and colour off `.ph-is-*`.
+**Stage map** (16 fragments, 15 subtitles + summary):
 
-| Stage | Subtitle | Class | Box | Marker | Rows lit |
-|-------|----------|-------|-----|--------|----------|
-| 1 | Average Value | `ph-is-av` | `bx-avg` | `mk-avg` | `sqft_living`, 12 houses |
-| 2 | Medium value | `ph-is-md` | `bx-med` | `mk-med` | `sqft_living`, houses 6-7 |
-| 3 | Nearest Neighbor — find the 5 closest | `ph-is-knn` | `bx-knn-pick` | — | `sqft_lot`/`bedrooms`/`bathrooms`, 5 houses |
-| 4 | Nearest Neighbor — read their size | `ph-is-knn` | `bx-knn` | `mk-knn` | `sqft_living`, 5 houses |
-| 5 | Scaled Nearest Neighbor — find the 5 closest | `ph-is-snn` | `bx-snn-pick` | — | `sqft_lot`/`bedrooms`/`bathrooms`, 5 houses |
-| 6 | Scaled Nearest Neighbor — read and weight | `ph-is-snn` | `bx-snn` | `mk-snn` | `sqft_living`, 5 houses |
-| 7 | Summary: similar homes win | `ph-is-sum` (`--ph-accent`) | — | all four | none |
+| Frag | Subtitle | Box | Marker | Rows lit |
+|------|----------|-----|--------|----------|
+| 1 | Average Value | `bx-avg` | — | `sqft_living` white, rest dim |
+| 2 | Medium — the table | `bx-med-all` | — | `sqft_living` white, rest dim |
+| 3 | Medium value — read the column | `bx-med-all` + `bx-med-2` | — | `sqft_living` white, rest dim |
+| 4 | Medium value — take the middle | `bx-med-all` + `bx-med-2` | `mk-med` | middle pair `--md`, rest white |
+| 5 | Nearest Neighbor — the table | `.bx-compare` (knn tint) | — | lot/bed/bath white, living dim |
+| 6 | Nearest Neighbor — find the 5 closest | `.bx-compare` + `bx-knn-2` | — | lot/bed/bath white, living dim |
+| 7 | Nearest Neighbor — read their size | `.bx-compare` | `mk-knn` | living NN `--knn`, rest dim |
+| 8 | Scaled Nearest Neighbor 1/6 — the table | `.bx-compare` (snn tint) | — | lot/bed/bath white, living dim |
+| 9 | Scaled Nearest Neighbor 2/6 — find the 5 closest | `.bx-compare` (snn tint) | — | lot/bed/bath white, living dim |
+| 10 | Scaled Nearest Neighbor 3/6 — scale the columns | `.bx-compare` + `bx-snn-liv` | — | all four rows white |
+| 11 | Scaled Nearest Neighbor 4/6 — read the scaled rows | `bx-snn-liv` + `bx-snn-pick` | — | raw rows white, scaled dotted muted |
+| 12 | Scaled Nearest Neighbor 5/6 — move the wash to scaled | raw + scaled washes | — | scaled white, raw struck |
+| 13 | Scaled Nearest Neighbor 6/6 — pick the 5 scaled | scaled washes | — | scaled white, raw struck |
+| 14 | Scaled Nearest Neighbor — read and weight | scaled washes | — | scaled white, raw struck |
+| 15 | (same subtitle) | slot/sbed/sbath washes + `bx-snn-pick`, sliv wash off | `mk-snn` | sliv NN `--snn` in box, rest white |
+| 16 | Summary: similar homes win | — | all four | rest state |
 
 `--snn` is a hue of its own rather than a tint of `--knn`: the two panels
 are seen one after another and then compared on the summary stage, and a
 lighter purple read as a typo beside the original.
 
 `p.ph-stage-hint` is `position:absolute` **below** the top row
-(`top:100%`), not in flow — in flow it added ~19px that the 50% flex
-basis absorbed, nudging the houses down on load only. Its rule is
-`.reveal .ph-stage-hint`, not a bare `.ph-stage-hint`: `.reveal p` scores
-0,1,1 against 0,1,0, so a size declared on that rule alone never applies.
-The hint is the slide's lead-in, so it runs at `--fs-lead` (22px), one step
-above body. Hidden once driver 1 is visible.
+(`top:100%`), not in flow. Its rule is `.reveal .ph-stage-hint`, not a bare
+`.ph-stage-hint`. The hint runs at `--fs-lead` (22px). Hidden once driver 1
+is visible.
 
 | Item | Content |
 |------|---------|
 | Hint | The diagram above is 12 houses. Each carries four of the columns this API imputes — living area, lot size, bedrooms, bathrooms — and any one of them can be the one that came back blank. |
 
 **Bottom panels** — `.ph-stage-bottom` is `flex:0 0 0` until driver 1
-fires, then `flex:0 0 50%`. `.ph-panels` is a flex row; every
-`.ph-panel` is `display:none` and exactly one is `display:flex` per
-stage. Each panel is `ph-panel-words` (50%) + `ph-panel-pick` (50%).
+fires, then `flex:0 0 32%` + `margin-top:var(--sp-sm)`. `.ph-panels` is a flex
+row; every `.ph-panel` is `display:none` and exactly one is `display:flex`
+per stage. Each panel is `ph-panel-words` (50%) + `ph-panel-pick` (50%).
+S4 body trims slide chrome just here: `padding-bottom:12px`, `gap:8px`.
 
-| Stage | Panel `h3` | Steps | Reads | Chooses | Computes | Per house |
-|-------|-----------|-------|-------|---------|----------|-----------|
+| Frag | Panel `h3` | Steps | Reads | Chooses | Computes | Per house |
+|------|-----------|-------|-------|---------|----------|-----------|
 | 1 | Average Value | 1 step | 1 column — square feet | Nothing — all 12 houses | 1 number: the average of all 12 | Same answer for every blank |
-| 2 | Medium value | 1 step, or 2 on an even count | 1 column — square feet | The 1 middle house, or the 2 middle ones | 1 number: its value, or the average of 2 | Same answer for every blank |
-| 3, 4 | Nearest Neighbor / Scaled NN (each spans two stages) | 2 steps: find, then fill | 3 columns to find, 1 to fill | The 5 closest on lot size, bedrooms and bathrooms | 1 number: plain average of their 5 sizes (plain) / weighted average of their 5 sizes (scaled) | The answer changes with the house |
-| 7 | Summary: which value to fill | — (`ul` instead of `dl`) | — | — | — | See bullets below. |
+| 2–3 | Medium value | 2 steps: read the column, then take the middle | 1 column — square feet, all 12 houses | The 1 middle house, or the 2 middle ones | 1 number: its value, or the average of 2 | Same answer for every blank |
+| 4–7 | Nearest Neighbor | 2 steps: find, then fill | 3 columns to find, 1 to fill | The 5 closest on lot size, bedrooms and bathrooms | 1 number: plain average of their 5 sizes | The answer changes with the house |
+| 8–15 | Scaled Nearest Neighbor | 6 steps: find, scale, then fill | 3 columns to find, scaled 0–1, 1 to fill | The 5 closest on scaled lot size, bedrooms and bathrooms | 1 number: weighted average of their 5 sizes | The answer changes with the house |
+| 16 | Summary: which value to fill | — (`ul` instead of `dl`) | — | — | — | See bullets below. |
 
-`Reads` counts the columns that decide **which houses**, not the columns read in
-total: it is 3, not 4, because square feet is what comes *out* of the find and
-the diagram dims that row during stages 3 and 5. The four-cell change for
-panels 3 and 4 is `Steps`, `Reads`, `Chooses` and `Computes`.
+Panel visibility: av on frag 1; md on frags 2–5; knn on frags 6–8; snn on
+frags 9–15; sum on frag 16.
 
 **The four calculation panels are one template.** Same five `dt` labels in
-the same order in each, so a row means the same thing in every panel and the
-four can be read down the column instead of across four layouts. There is no
-prose paragraph in them any more; the five rows carry the argument, and the
-`Inputs`/`Values produced` pair they replaced could not express the
-selection step, which is the only row where KNN differs from Average.
-
-`dl` is a 2-column grid so the labels align into one column and the
-answers into a second across all four panels; `dt` is uppercase
-caption-size in `--ph-ink-muted`.
+the same order in each. `dl` is a 2-column grid; `dt` is uppercase
+caption-size in `--ph-accent`.
 
 Summary panel bullets (`.ph-panel.ph-is-sum .ph-panel-words ul`, no list
 markers, flex column):
@@ -626,32 +604,18 @@ markers, flex column):
 
 **c-calc SVGs** — `svg.ph-calc`, one per calculation panel, identical shape:
 a context line, one or two formula lines, the result, an `n` line, a strip of
-twelve `#hs` at 0.3 scale (x = 22 to 264 in steps of 22, baseline y=100), and a
-caption. `max-height:240px`, `width:100%`, `viewBox="0 0 300 128"`. The height
-is 128, not more: the panel cell measures ~548px wide, so the scale is ~1.83
-and 128 gives ~234px — under the 240px cap, and still width-capped rather than
-height-capped, so the text renders at full size.
+twelve `#hs` at 0.3 scale, and a caption. `max-height:240px`, `width:100%`,
+`viewBox="0 0 300 128"`.
 
 Every panel draws all twelve houses at the same positions; CSS lights the
-ones its method reads, which is what makes "nothing is chosen" and "5 of
-12" the same picture with different houses bright:
+ones its method reads:
 
 | Panel | Houses lit | Formula | Result |
 |-------|-----------|---------|--------|
 | Average | all 12 | `=AVERAGE(1235,1300,1365,1520,1600,1680,` / `2090,2200,2310,3610,3800,3990)` | `= 2225` |
-| Medium | 6 and 7 — the two middle | `=MEDIUM(1235,1300,1365,1520,1600,1680,` / `2090,2200,2310,3610,3800,3990)` | `= 1885` |
+| Medium | 6 and 7 — the two middle | `1 · one column, every house` / `all 12 read` / `2 · the middle, or the middle two` | `= 1885` |
 | KNN | 7-11 — the five closest | `this listing: 5 bed, 3 bath, 9000 sqft lot` / `12 compared on 3 columns, 5 kept` / `=AVERAGE(3800,3610,2310,2200,2090)` | `= 2802` |
-| Scaled NN | 7-11 — the same five | `this listing: 5 bed, 3 bath, 9000 sqft lot` / `=SUMPRODUCT({3800;3610;2310;2200;2090},` / `{1/2;1/4;1/12;1/22;1/30}) ÷ SUM(w)` | `= 3470` |
-
-The two KNN answers are 14010/5 = **2802** equal-weight and the same five
-weighted by 1/d over three columns = **3470** — distances 2, 4, 12, 22, 30,
-reciprocated. House 12, the largest on the slide, is not among the five: at 55
-its distance ranks it sixth, so however big it is, it is not a neighbour — it
-is a big house on a 6400 sq ft lot with 6 bedrooms and 4 bathrooms.
-`src/api/shared.py` fits
-`KNNImputer(n_neighbors=5, weights="distance")`, so the service always runs
-the scaled variant.
-Summary: `p.ph-panel-nums`: `AVG 2225 · MEDIUM 1885 · NN(5) 2802 · NN(5)w 3470`
+| Scaled NN | 7-11 — the same five | `this listing: 5 bed, 3 bath, 9000 sqft lot` / `scaled 0–1, then 5 closest kept` / `0.8113 × 2755 + 1235` | `= 3470` |
 
 - Say (per click): "City average — one column, one number for every house." →
   "Middle value — mansions stop skewing it, still one number." →
