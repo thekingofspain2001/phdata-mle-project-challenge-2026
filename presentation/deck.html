@@ -1685,8 +1685,12 @@
       opacity: 0;
     }
 
-    .houses-svg .ar-scaled .v {
+    .houses-svg .ar-scaled .v,
+    .houses-svg .ar-dots {
       opacity: 0;
+      transition:
+        opacity var(--ph-t-fade) var(--ph-ease),
+        transform var(--ph-t-slide) var(--ph-ease);
     }
 
     /* Scaled labels hide with their rows and wear the SNN calculation colour
@@ -1882,8 +1886,9 @@
       opacity: 0.22;
     }
 
-    /* Fragment 10 - Scaled NN, step 1: every row highlighted, every value
-       white. The glow sits on all four rows. */
+    /* Fragment 10 - Scaled NN, step 1: every raw row highlighted, every raw
+       value white. The glow sits on all four rows. Scaled rows show a
+       centered dot per cell - conversion pending, values not yet placed. */
     #s4:has(.ph-step:nth-of-type(10).visible):not(:has(.ph-step:nth-of-type(11).visible)) .ar-living .v,
     #s4:has(.ph-step:nth-of-type(10).visible):not(:has(.ph-step:nth-of-type(11).visible)) .ar-lot .v,
     #s4:has(.ph-step:nth-of-type(10).visible):not(:has(.ph-step:nth-of-type(11).visible)) .ar-bed .v,
@@ -1891,6 +1896,15 @@
       fill: #ffffff;
       opacity: 1;
     }
+
+    #s4:has(.ph-step:nth-of-type(10).visible):not(:has(.ph-step:nth-of-type(11).visible)) .ar-scaled .v {
+      opacity: 0;
+    }
+
+    #s4:has(.ph-step:nth-of-type(11).visible):not(:has(.ph-step:nth-of-type(12).visible)) .ar-dots {
+      opacity: 1;
+    }
+
 
     #s4:has(.ph-step:nth-of-type(10).visible):not(:has(.ph-step:nth-of-type(11).visible)) .al-living,
     #s4:has(.ph-step:nth-of-type(10).visible):not(:has(.ph-step:nth-of-type(11).visible)) .al-lot,
@@ -2822,13 +2836,13 @@
             <p class="ph-subtitle ph-is-knn">Nearest Neighbor &#8212; the table</p>
             <p class="ph-subtitle ph-is-knn">Nearest Neighbor &#8212; find the 5 closest</p>
             <p class="ph-subtitle ph-is-knn">Nearest Neighbor &#8212; read their size</p>
-            <p class="ph-subtitle ph-is-snn">Scaled Nearest Neighbor 1/6 &#8212; the table</p>
-            <p class="ph-subtitle ph-is-snn">Scaled Nearest Neighbor 2/6 &#8212; find the 5 closest</p>
-            <p class="ph-subtitle ph-is-snn">Scaled Nearest Neighbor 3/6 &#8212; scale the columns</p>
-            <p class="ph-subtitle ph-is-snn">Scaled Nearest Neighbor 4/6 &#8212; read the scaled rows</p>
-            <p class="ph-subtitle ph-is-snn">Scaled Nearest Neighbor 5/6 &#8212; move the wash to scaled</p>
-            <p class="ph-subtitle ph-is-snn">Scaled Nearest Neighbor 6/6 &#8212; pick the 5 scaled</p>
-            <p class="ph-subtitle ph-is-snn">Scaled Nearest Neighbor &#8212; read and weight</p>
+            <p class="ph-subtitle ph-is-knn">Nearest Neighbor &#8212; read and weight</p>
+            <p class="ph-subtitle ph-is-snn">Scaled Nearest Neighbor 1/6 &#8212; find the 5 closest</p>
+            <p class="ph-subtitle ph-is-snn">Scaled Nearest Neighbor 2/6 &#8212; scale the columns</p>
+            <p class="ph-subtitle ph-is-snn">Scaled Nearest Neighbor 3/6 &#8212; read the scaled rows</p>
+            <p class="ph-subtitle ph-is-snn">Scaled Nearest Neighbor 4/6 &#8212; move the wash to scaled</p>
+            <p class="ph-subtitle ph-is-snn">Scaled Nearest Neighbor 5/6 &#8212; pick the 5 scaled</p>
+            <p class="ph-subtitle ph-is-snn">Scaled Nearest Neighbor 6/6 &#8212; read and weight</p>
             <p class="ph-subtitle ph-is-sum">Summary: similar homes win</p>
           </div>
         </header>
@@ -2975,6 +2989,16 @@
                 <text class="v h-nn" x="1066" y="342">3</text>
                 <text class="v" x="1148" y="342">4</text>
               </g>
+              <!-- Pending-conversion dots: one per scaled cell, centred h and v
+                   in the cell the value will occupy. Lit only at frag 10, while
+                   the raw rows read white and the scaled values are not yet
+                   placed. -->
+              <g class="ar-dots" fill="var(--ph-ink-muted)" opacity="0">
+                <circle cx="68" cy="285" r="2.5" /><circle cx="114" cy="285" r="2.5" /><circle cx="156" cy="285" r="2.5" /><circle cx="241" cy="285" r="2.5" /><circle cx="297" cy="285" r="2.5" /><circle cx="353" cy="285" r="2.5" /><circle cx="551" cy="285" r="2.5" /><circle cx="619" cy="285" r="2.5" /><circle cx="687" cy="285" r="2.5" /><circle cx="984" cy="285" r="2.5" /><circle cx="1066" cy="285" r="2.5" /><circle cx="1148" cy="285" r="2.5" />
+                <circle cx="68" cy="337" r="2.5" /><circle cx="114" cy="337" r="2.5" /><circle cx="156" cy="337" r="2.5" /><circle cx="241" cy="337" r="2.5" /><circle cx="297" cy="337" r="2.5" /><circle cx="353" cy="337" r="2.5" /><circle cx="551" cy="337" r="2.5" /><circle cx="619" cy="337" r="2.5" /><circle cx="687" cy="337" r="2.5" /><circle cx="984" cy="337" r="2.5" /><circle cx="1066" cy="337" r="2.5" /><circle cx="1148" cy="337" r="2.5" />
+                <circle cx="68" cy="389" r="2.5" /><circle cx="114" cy="389" r="2.5" /><circle cx="156" cy="389" r="2.5" /><circle cx="241" cy="389" r="2.5" /><circle cx="297" cy="389" r="2.5" /><circle cx="353" cy="389" r="2.5" /><circle cx="551" cy="389" r="2.5" /><circle cx="619" cy="389" r="2.5" /><circle cx="687" cy="389" r="2.5" /><circle cx="984" cy="389" r="2.5" /><circle cx="1066" cy="389" r="2.5" /><circle cx="1148" cy="389" r="2.5" />
+                <circle cx="68" cy="441" r="2.5" /><circle cx="114" cy="441" r="2.5" /><circle cx="156" cy="441" r="2.5" /><circle cx="241" cy="441" r="2.5" /><circle cx="297" cy="441" r="2.5" /><circle cx="353" cy="441" r="2.5" /><circle cx="551" cy="441" r="2.5" /><circle cx="619" cy="441" r="2.5" /><circle cx="687" cy="441" r="2.5" /><circle cx="984" cy="441" r="2.5" /><circle cx="1066" cy="441" r="2.5" /><circle cx="1148" cy="441" r="2.5" />
+              </g>
               <g class="ar-row ar-scaled ar-sliv" font-size="15" fill="#BCCCD4" text-anchor="middle">
                 <text class="v" x="68" y="290">0</text>
                 <text class="v" x="114" y="290">.024</text>
@@ -3019,7 +3043,6 @@
                 <text class="v h-nn" x="687" y="394">.750</text>
                 <text class="v h-nn" x="984" y="394">.750</text>
                 <text class="v h-nn" x="1066" y="394">.750</text>
-                <text class="v" x="1148" y="394">1</text>
               </g>
               <g class="ar-row ar-scaled ar-sbath" font-size="15" fill="#BCCCD4" text-anchor="middle">
                 <text class="v" x="68" y="446">0</text>
