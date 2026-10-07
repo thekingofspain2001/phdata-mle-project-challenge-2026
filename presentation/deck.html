@@ -2917,11 +2917,19 @@
       #s4:has(.ph-step:nth-of-type(10).visible):not(
           :has(.ph-step:nth-of-type(11).visible)
         )
-        .bx-compare,
+        #bx-snn-liv,
       #s4:has(.ph-step:nth-of-type(10).visible):not(
           :has(.ph-step:nth-of-type(11).visible)
         )
-        #bx-snn-liv,
+        #bx-snn-lot,
+      #s4:has(.ph-step:nth-of-type(10).visible):not(
+          :has(.ph-step:nth-of-type(11).visible)
+        )
+        #bx-snn-bed,
+      #s4:has(.ph-step:nth-of-type(10).visible):not(
+          :has(.ph-step:nth-of-type(11).visible)
+        )
+        #bx-snn-bath,
       #s4:has(.ph-step:nth-of-type(11).visible):not(
           :has(.ph-step:nth-of-type(12).visible)
         )
@@ -3125,10 +3133,86 @@
         fill: var(--tint-knn);
       }
 
+      /* SNN washes on drivers 10-14: same reason as the med fill below -
+         `.houses-svg .bx { fill: none }` beats the markup fill attribute, so
+         the stage rule paints them. Raw on 10-12, scaled on 13-14 (sliv drops
+         off at 14: its pick lands at 15, so only slot/sbed/sbath carry over). */
       #s4:has(.ph-step:nth-of-type(10).visible):not(
           :has(.ph-step:nth-of-type(11).visible)
         )
-        .bx-compare {
+        #bx-snn-liv,
+      #s4:has(.ph-step:nth-of-type(10).visible):not(
+          :has(.ph-step:nth-of-type(11).visible)
+        )
+        #bx-snn-lot,
+      #s4:has(.ph-step:nth-of-type(10).visible):not(
+          :has(.ph-step:nth-of-type(11).visible)
+        )
+        #bx-snn-bed,
+      #s4:has(.ph-step:nth-of-type(10).visible):not(
+          :has(.ph-step:nth-of-type(11).visible)
+        )
+        #bx-snn-bath,
+      #s4:has(.ph-step:nth-of-type(11).visible):not(
+          :has(.ph-step:nth-of-type(12).visible)
+        )
+        #bx-snn-liv,
+      #s4:has(.ph-step:nth-of-type(11).visible):not(
+          :has(.ph-step:nth-of-type(12).visible)
+        )
+        #bx-snn-lot,
+      #s4:has(.ph-step:nth-of-type(11).visible):not(
+          :has(.ph-step:nth-of-type(12).visible)
+        )
+        #bx-snn-bed,
+      #s4:has(.ph-step:nth-of-type(11).visible):not(
+          :has(.ph-step:nth-of-type(12).visible)
+        )
+        #bx-snn-bath,
+      #s4:has(.ph-step:nth-of-type(12).visible):not(
+          :has(.ph-step:nth-of-type(13).visible)
+        )
+        #bx-snn-liv,
+      #s4:has(.ph-step:nth-of-type(12).visible):not(
+          :has(.ph-step:nth-of-type(13).visible)
+        )
+        #bx-snn-lot,
+      #s4:has(.ph-step:nth-of-type(12).visible):not(
+          :has(.ph-step:nth-of-type(13).visible)
+        )
+        #bx-snn-bed,
+      #s4:has(.ph-step:nth-of-type(12).visible):not(
+          :has(.ph-step:nth-of-type(13).visible)
+        )
+        #bx-snn-bath,
+      #s4:has(.ph-step:nth-of-type(13).visible):not(
+          :has(.ph-step:nth-of-type(14).visible)
+        )
+        #bx-snn-sliv,
+      #s4:has(.ph-step:nth-of-type(13).visible):not(
+          :has(.ph-step:nth-of-type(14).visible)
+        )
+        #bx-snn-slot,
+      #s4:has(.ph-step:nth-of-type(13).visible):not(
+          :has(.ph-step:nth-of-type(14).visible)
+        )
+        #bx-snn-sbed,
+      #s4:has(.ph-step:nth-of-type(13).visible):not(
+          :has(.ph-step:nth-of-type(14).visible)
+        )
+        #bx-snn-sbath,
+      #s4:has(.ph-step:nth-of-type(14).visible):not(
+          :has(.ph-step:nth-of-type(15).visible)
+        )
+        #bx-snn-slot,
+      #s4:has(.ph-step:nth-of-type(14).visible):not(
+          :has(.ph-step:nth-of-type(15).visible)
+        )
+        #bx-snn-sbed,
+      #s4:has(.ph-step:nth-of-type(14).visible):not(
+          :has(.ph-step:nth-of-type(15).visible)
+        )
+        #bx-snn-sbath {
         fill: var(--tint-snn);
       }
 
