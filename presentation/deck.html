@@ -1563,7 +1563,7 @@
          D7 KNN Frag1: 7; D8 KNN Frag2: 8; D9 KNN Frag3: 9;
          D10 SNN Frag1: 10; D11 SNN Frag2: 11; D12 SNN Frag3: 12;
          D13 SNN Frag4: 13; D14 SNN Frag5: 14; D15 SNN Frag6: 15;
-         D16 SNN Frag7: 16; D17 SNN Frag8: 17; D18 Summary Frag1: 18. */
+         D16 SNN Frag8: 16; D17 Summary Frag1: 17. */
       /* S4 staged subs: grid stack reserves one line; drivers are native
          fragments, CSS reacts to reveal's .visible — no JS staging. */
       .ph-subs {
@@ -1607,8 +1607,8 @@
 
       /* Reveal only ever ADDS .visible, so at stage N drivers 1..N are all visible.
        The :not() guard is what makes each rule match at exactly one stage; drop it
-       and every earlier stage's rules fire at once. Stage 18 is the one bare
-       :has() rule, unique because driver 18 exists nowhere else. */
+       and every earlier stage's rules fire at once. Stage 17 is the one bare
+       :has() rule, unique because driver 17 exists nowhere else. */
       #s4:has(.ph-step:nth-of-type(1).visible):not(
           :has(.ph-step:nth-of-type(2).visible)
         )
@@ -1689,12 +1689,7 @@
         )
         .ph-subs
         > *:nth-of-type(16),
-      #s4:has(.ph-step:nth-of-type(17).visible):not(
-          :has(.ph-step:nth-of-type(18).visible)
-        )
-        .ph-subs
-        > *:nth-of-type(17),
-      #s4:has(.ph-step:nth-of-type(18).visible) .ph-subs > *:nth-of-type(18) {
+      #s4:has(.ph-step:nth-of-type(17).visible) .ph-subs > *:nth-of-type(17) {
         opacity: 1;
       }
 
@@ -1807,7 +1802,7 @@
         stroke-dasharray: 8 5;
       }
       .houses-svg .mk-eq {
-        font-size: 13px;
+        font-size: 20px;
       }
       #houses-svg {
         color: var(--ph-mist);
@@ -1825,8 +1820,8 @@
           transform var(--ph-t-slide) var(--ph-ease);
       }
 
-      /* 8/8 marker state: the dashed box + unscaled value show on driver 16
-         only; driver 15 keeps the bare 0.8113S. */
+      /* 8/8 marker state (driver 16): top line is the scaled value in the
+         dashed box (0.8113S), second line the SNN value (3470). */
       #s4:has(.ph-step:nth-of-type(16).visible):not(
           :has(.ph-step:nth-of-type(17).visible)
         )
@@ -1838,6 +1833,32 @@
         #mk-snn
         .mk-eq {
         opacity: 1;
+      }
+      /* Summary marker state (driver 17): only the unscaled SNN value, set
+         like the other floaters, arrow starting at the shared y=44. */
+      #s4:has(.ph-step:nth-of-type(17).visible)
+        #mk-snn
+        .mk-real,
+      #s4:has(.ph-step:nth-of-type(17).visible)
+        #mk-snn
+        .mk-val {
+        opacity: 0;
+      }
+      #s4:has(.ph-step:nth-of-type(17).visible)
+        #mk-snn
+        .mk-eq {
+        opacity: 1;
+        font-size: 16px;
+        transform: translateY(-28px);
+      }
+      /* y1/y2 are NOT CSS properties in Blink - declarations drop. Stretch
+         the 72->122 line to 44->122 about its bottom end instead. */
+      #s4:has(.ph-step:nth-of-type(17).visible)
+        #mk-snn
+        line {
+        transform-box: fill-box;
+        transform-origin: 50% 100%;
+        transform: scaleY(1.56);
       }
 
       /* Attribute rows: the rest state is the whole data set in white, everything
@@ -2041,11 +2062,11 @@
           :has(.ph-step:nth-of-type(16).visible)
         )
         .al-lot ,
-#s4:has(.ph-step:nth-of-type(16).visible):not(
+      #s4:has(.ph-step:nth-of-type(16).visible):not(
           :has(.ph-step:nth-of-type(17).visible)
         )
         .ar-lot,
-#s4:has(.ph-step:nth-of-type(16).visible):not(
+      #s4:has(.ph-step:nth-of-type(16).visible):not(
           :has(.ph-step:nth-of-type(17).visible)
         )
         .al-lot{
@@ -2059,11 +2080,11 @@
           :has(.ph-step:nth-of-type(16).visible)
         )
         .al-bed ,
-#s4:has(.ph-step:nth-of-type(16).visible):not(
+      #s4:has(.ph-step:nth-of-type(16).visible):not(
           :has(.ph-step:nth-of-type(17).visible)
         )
         .ar-bed,
-#s4:has(.ph-step:nth-of-type(16).visible):not(
+      #s4:has(.ph-step:nth-of-type(16).visible):not(
           :has(.ph-step:nth-of-type(17).visible)
         )
         .al-bed{
@@ -2077,11 +2098,11 @@
           :has(.ph-step:nth-of-type(16).visible)
         )
         .al-bath ,
-#s4:has(.ph-step:nth-of-type(16).visible):not(
+      #s4:has(.ph-step:nth-of-type(16).visible):not(
           :has(.ph-step:nth-of-type(17).visible)
         )
         .ar-bath,
-#s4:has(.ph-step:nth-of-type(16).visible):not(
+      #s4:has(.ph-step:nth-of-type(16).visible):not(
           :has(.ph-step:nth-of-type(17).visible)
         )
         .al-bath{
@@ -2791,16 +2812,69 @@
         filter: drop-shadow(0 0 6px rgba(56, 189, 248, 0.9));
       }
 
-      /* Fragment 16 (8/8) only: sqft_living unstrikes - the scaled pick
-         unscales back to it, so it reads lit while lot/bed/bath stay dim. */
+      /* Fragment 16 (8/8): sqft_living reads white, houses 7-11 in the
+         eq (SNN calc) colour inside one dashed box. */
       #s4:has(.ph-step:nth-of-type(16).visible):not(
           :has(.ph-step:nth-of-type(17).visible)
         )
         .ar-living
+        .v.h-nn {
+        fill: var(--snn);
+        opacity: 1;
+        text-decoration: none;
+      }
+      #s4:has(.ph-step:nth-of-type(16).visible):not(
+          :has(.ph-step:nth-of-type(17).visible)
+        )
+        .ar-living
+        .v:not(.h-nn) {
+        fill: #ffffff;
+        opacity: 1;
+        text-decoration: none;
+      }
+
+
+      /* Fragment 16 (8/8): sqft_lot, beds, baths read muted+struck. */
+      #s4:has(.ph-step:nth-of-type(16).visible):not(
+          :has(.ph-step:nth-of-type(17).visible)
+        )
+        .ar-lot
+        .v,
+      #s4:has(.ph-step:nth-of-type(16).visible):not(
+          :has(.ph-step:nth-of-type(17).visible)
+        )
+        .ar-bed
+        .v,
+      #s4:has(.ph-step:nth-of-type(16).visible):not(
+          :has(.ph-step:nth-of-type(17).visible)
+        )
+        .ar-bath
+        .v {fill: #ffffff; opacity: 0.35; text-decoration: line-through;}
+      /* Fragment 16 (8/8): s_liv reads white, no strike; h7-11 carry the wash. */
+      #s4:has(.ph-step:nth-of-type(16).visible):not(
+          :has(.ph-step:nth-of-type(17).visible)
+        )
+        .ar-sliv
         .v {
         fill: #ffffff;
         opacity: 1;
+        text-decoration: none;
       }
+      #s4:has(.ph-step:nth-of-type(16).visible):not(
+          :has(.ph-step:nth-of-type(17).visible)
+        )
+        .ar-slot
+        .v,
+      #s4:has(.ph-step:nth-of-type(16).visible):not(
+          :has(.ph-step:nth-of-type(17).visible)
+        )
+        .ar-sbed
+        .v,
+      #s4:has(.ph-step:nth-of-type(16).visible):not(
+          :has(.ph-step:nth-of-type(17).visible)
+        )
+        .ar-sbath
+        .v {fill: #ffffff; opacity: 0.35; text-decoration: line-through;}
 
       /* Fragment 15+16 - SNN 7/8+8/8: the sliv wash fades off as the dashed pick box
        slides in around the 5 closest; sliv whites mute, the 5 in the box tint
@@ -2843,97 +2917,41 @@
           :has(.ph-step:nth-of-type(17).visible)
         )
         .al-sliv,
-#s4:has(.ph-step:nth-of-type(16).visible):not(
+      #s4:has(.ph-step:nth-of-type(16).visible):not(
           :has(.ph-step:nth-of-type(17).visible)
         )
         .al-slot,
-#s4:has(.ph-step:nth-of-type(16).visible):not(
+      #s4:has(.ph-step:nth-of-type(16).visible):not(
           :has(.ph-step:nth-of-type(17).visible)
         )
         .al-sbed,
-#s4:has(.ph-step:nth-of-type(16).visible):not(
+      #s4:has(.ph-step:nth-of-type(16).visible):not(
           :has(.ph-step:nth-of-type(17).visible)
         )
         .al-sbath,
-#s4:has(.ph-step:nth-of-type(16).visible):not(
+      #s4:has(.ph-step:nth-of-type(16).visible):not(
           :has(.ph-step:nth-of-type(17).visible)
         )
         .ar-sliv,
-#s4:has(.ph-step:nth-of-type(16).visible):not(
+      #s4:has(.ph-step:nth-of-type(16).visible):not(
           :has(.ph-step:nth-of-type(17).visible)
         )
         .ar-slot,
-#s4:has(.ph-step:nth-of-type(16).visible):not(
+      #s4:has(.ph-step:nth-of-type(16).visible):not(
           :has(.ph-step:nth-of-type(17).visible)
         )
         .ar-sbed,
-#s4:has(.ph-step:nth-of-type(16).visible):not(
+      #s4:has(.ph-step:nth-of-type(16).visible):not(
           :has(.ph-step:nth-of-type(17).visible)
         )
         .ar-sbath{
         opacity: 1;
       }
-      #s4:has(.ph-step:nth-of-type(15).visible):not(
-          :has(.ph-step:nth-of-type(16).visible)
-        )
-        .ar-slot
-        .v,
-      #s4:has(.ph-step:nth-of-type(15).visible):not(
-          :has(.ph-step:nth-of-type(16).visible)
-        )
-        .ar-sbed
-        .v,
-      #s4:has(.ph-step:nth-of-type(15).visible):not(
-          :has(.ph-step:nth-of-type(16).visible)
-        )
-        .ar-sbath
-        .v ,
-#s4:has(.ph-step:nth-of-type(16).visible):not(
-          :has(.ph-step:nth-of-type(17).visible)
-        )
-        .ar-slot
-        .v,
-#s4:has(.ph-step:nth-of-type(16).visible):not(
-          :has(.ph-step:nth-of-type(17).visible)
-        )
-        .ar-sbed
-        .v,
-#s4:has(.ph-step:nth-of-type(16).visible):not(
-          :has(.ph-step:nth-of-type(17).visible)
-        )
-        .ar-sbath
-        .v{
-        fill: #ffffff;
-        opacity: 1;
-      }
+      /* (8/8 slot/sbed/sbath/sliv lit rules removed: rows from sqft_lot
+         down read muted+struck on 8/8 - see the rule above.) */
 
-      #s4:has(.ph-step:nth-of-type(15).visible):not(
-          :has(.ph-step:nth-of-type(16).visible)
-        )
-        .ar-sliv
-        .v.h-nn,
-#s4:has(.ph-step:nth-of-type(16).visible):not(
-          :has(.ph-step:nth-of-type(17).visible)
-        )
-        .ar-sliv
-        .v.h-nn{
-        fill: var(--snn);
-        opacity: 1;
-      }
-
-      #s4:has(.ph-step:nth-of-type(15).visible):not(
-          :has(.ph-step:nth-of-type(16).visible)
-        )
-        .ar-sliv
-        .v:not(.h-nn),
-#s4:has(.ph-step:nth-of-type(16).visible):not(
-          :has(.ph-step:nth-of-type(17).visible)
-        )
-        .ar-sliv
-        .v:not(.h-nn){
-        fill: #ffffff;
-        opacity: 1;
-      }
+      /* Fragment 15 (7/8): sqft_living strikes - the read moves to the
+         scaled rows, raw living dims out (stays struck at 16, same as 7/8). */
       #s4:has(.ph-step:nth-of-type(15).visible):not(
           :has(.ph-step:nth-of-type(16).visible)
         )
@@ -2943,38 +2961,65 @@
         opacity: 0.35;
         text-decoration: line-through;
       }
-      #s4:has(.ph-step:nth-of-type(15).visible):not(
-          :has(.ph-step:nth-of-type(16).visible)
-        )
-        .ar-lot
-        .v,
-      #s4:has(.ph-step:nth-of-type(15).visible):not(
-          :has(.ph-step:nth-of-type(16).visible)
-        )
-        .ar-bed
-        .v,
-      #s4:has(.ph-step:nth-of-type(15).visible):not(
-          :has(.ph-step:nth-of-type(16).visible)
-        )
-        .ar-bath
-        .v ,
-#s4:has(.ph-step:nth-of-type(16).visible):not(
-          :has(.ph-step:nth-of-type(17).visible)
-        )
-        .ar-lot
-        .v,
-#s4:has(.ph-step:nth-of-type(16).visible):not(
-          :has(.ph-step:nth-of-type(17).visible)
-        )
-        .ar-bed
-        .v,
-#s4:has(.ph-step:nth-of-type(16).visible):not(
-          :has(.ph-step:nth-of-type(17).visible)
-        )
-        .ar-bath
-        .v{fill: #ffffff; opacity: 0.35; text-decoration: line-through;}
 
-      /* Stage 18 has no attribute rules at all: with every other stage guarded, no
+      /* Fragment 15 (7/8): slot/sbed/sbath values lit - the rows are
+         visible, so the values must be too (base .ar-scaled .v is opacity 0).
+         sliv keeps its picked/unpicked split below. */
+      #s4:has(.ph-step:nth-of-type(15).visible):not(
+          :has(.ph-step:nth-of-type(16).visible)
+        )
+        .ar-slot
+        .v,
+      #s4:has(.ph-step:nth-of-type(15).visible):not(
+          :has(.ph-step:nth-of-type(16).visible)
+        )
+        .ar-sbed
+        .v,
+      #s4:has(.ph-step:nth-of-type(15).visible):not(
+          :has(.ph-step:nth-of-type(16).visible)
+        )
+        .ar-sbath
+        .v {
+        fill: #ffffff;
+        opacity: 1;
+      }
+
+      #s4:has(.ph-step:nth-of-type(15).visible):not(
+          :has(.ph-step:nth-of-type(16).visible)
+        )
+        .ar-sliv
+        .v.h-nn {
+        fill: var(--snn);
+        opacity: 1;
+        text-decoration: none;
+      }
+      #s4:has(.ph-step:nth-of-type(15).visible):not(
+          :has(.ph-step:nth-of-type(16).visible)
+        )
+        .ar-sliv
+        .v:not(.h-nn) {
+        fill: #ffffff;
+        opacity: 1;
+        text-decoration: none;
+      }
+      #s4:has(.ph-step:nth-of-type(15).visible):not(
+          :has(.ph-step:nth-of-type(16).visible)
+        )
+        .ar-lot
+        .v,
+      #s4:has(.ph-step:nth-of-type(15).visible):not(
+          :has(.ph-step:nth-of-type(16).visible)
+        )
+        .ar-bed
+        .v,
+      #s4:has(.ph-step:nth-of-type(15).visible):not(
+          :has(.ph-step:nth-of-type(16).visible)
+        )
+        .ar-bath
+        .v {fill: #ffffff; opacity: 0.35; text-decoration: line-through;}
+
+
+      /* Stage 17 has no attribute rules at all: with every other stage guarded, no
        stage rule matches, all values read the white rest state, and
        all labels read lit accent with no glow. Scaled rows fall back to their
        hidden rest state with the markup empty of stage rules. */
@@ -3000,15 +3045,31 @@
           :has(.ph-step:nth-of-type(16).visible)
         )
         #mk-snn,
+      #s4:has(.ph-step:nth-of-type(17).visible):not(
+          :has(.ph-step:nth-of-type(16).visible)
+        )
+        #mk-snn,
+      #s4:has(.ph-step:nth-of-type(16).visible) #mk-avg,
+      #s4:has(.ph-step:nth-of-type(16).visible) #mk-med,
+      #s4:has(.ph-step:nth-of-type(16).visible) #mk-knn,
+      #s4:has(.ph-step:nth-of-type(16).visible) #mk-snn {
+        opacity: 1;
+      }
+
+      /* Fragment 16 (8/8): non-SNN markers out - only the SNN float stays. */
       #s4:has(.ph-step:nth-of-type(16).visible):not(
           :has(.ph-step:nth-of-type(17).visible)
         )
-        #mk-snn,
-      #s4:has(.ph-step:nth-of-type(18).visible) #mk-avg,
-      #s4:has(.ph-step:nth-of-type(18).visible) #mk-med,
-      #s4:has(.ph-step:nth-of-type(18).visible) #mk-knn,
-      #s4:has(.ph-step:nth-of-type(18).visible) #mk-snn {
-        opacity: 1;
+        #mk-avg,
+      #s4:has(.ph-step:nth-of-type(16).visible):not(
+          :has(.ph-step:nth-of-type(17).visible)
+        )
+        #mk-med,
+      #s4:has(.ph-step:nth-of-type(16).visible):not(
+          :has(.ph-step:nth-of-type(17).visible)
+        )
+        #mk-knn {
+        opacity: 0;
       }
 
       /* Box height is half the encoding: 122 stops between the sqft_living row and
@@ -3148,15 +3209,15 @@
       #s4:has(.ph-step:nth-of-type(15).visible):not(
           :has(.ph-step:nth-of-type(16).visible)
         )
-        #bx-snn-pick ,
+        #bx-snn-pick,
       #s4:has(.ph-step:nth-of-type(16).visible):not(
           :has(.ph-step:nth-of-type(17).visible)
         )
-        #bx-snn-sliv,
+        #bx-snn-pick {opacity: 1;}
       #s4:has(.ph-step:nth-of-type(16).visible):not(
           :has(.ph-step:nth-of-type(17).visible)
         )
-        #bx-snn-pick{opacity: 1;}
+        #bx-snn-pick-liv {opacity: 1;}
 
       /* SNN boxes ride their rows: the markup rests compact, the stage moves them.
        The pick box sits at the sliv rest y, so no ride is needed at frag 11 -
@@ -3237,8 +3298,8 @@
           :has(.ph-step:nth-of-type(16).visible)
         )
         #bx-snn-lot ,
-#s4:has(.ph-step:nth-of-type(16).visible):not(
-          :has(.ph-step:nth-of-type(17).visible)
+#s4:has(.ph-step:nth-of-type(17).visible):not(
+          :has(.ph-step:nth-of-type(16).visible)
         )
         #bx-snn-lot{
         transform: translateY(26px);
@@ -3247,8 +3308,8 @@
           :has(.ph-step:nth-of-type(16).visible)
         )
         #bx-snn-bed ,
-#s4:has(.ph-step:nth-of-type(16).visible):not(
-          :has(.ph-step:nth-of-type(17).visible)
+#s4:has(.ph-step:nth-of-type(17).visible):not(
+          :has(.ph-step:nth-of-type(16).visible)
         )
         #bx-snn-bed{
         transform: translateY(52px);
@@ -3257,8 +3318,8 @@
           :has(.ph-step:nth-of-type(16).visible)
         )
         #bx-snn-bath ,
-#s4:has(.ph-step:nth-of-type(16).visible):not(
-          :has(.ph-step:nth-of-type(17).visible)
+#s4:has(.ph-step:nth-of-type(17).visible):not(
+          :has(.ph-step:nth-of-type(16).visible)
         )
         #bx-snn-bath{
         transform: translateY(78px);
@@ -3370,11 +3431,14 @@
       #s4:has(.ph-step:nth-of-type(15).visible):not(
           :has(.ph-step:nth-of-type(16).visible)
         )
-        #bx-snn-pick-sbath ,
+        #bx-snn-pick-sbath,
       #s4:has(.ph-step:nth-of-type(16).visible):not(
           :has(.ph-step:nth-of-type(17).visible)
         )
-        #bx-snn-sliv{fill: var(--tint-snn); stroke: none;}
+        #bx-snn-pick {
+        fill: var(--tint-snn);
+        stroke: none;
+      }
 
       /* Medium wash on the med calc's last two fragments (drivers 4 and 5):
          same pattern as the compare fills above. Opacity gating already shows
@@ -3446,10 +3510,10 @@
         )
         .ph-panel.ph-is-knn,
       #s4:has(.ph-step:nth-of-type(9).visible):not(
-          :has(.ph-step:nth-of-type(18).visible)
+          :has(.ph-step:nth-of-type(16).visible)
         )
         .ph-panel.ph-is-snn,
-      #s4:has(.ph-step:nth-of-type(18).visible) .ph-panel.ph-is-sum {
+      #s4:has(.ph-step:nth-of-type(16).visible) .ph-panel.ph-is-sum {
         display: flex;
       }
 
@@ -4573,6 +4637,19 @@
                   height="21.8"
                   stroke="var(--snn)"
                 />
+                <!-- 8/8 living pick: houses 7-11 on the sqft_liv row, same
+                   x-geometry as the scaled pick boxes (row y 247.6). -->
+                <rect
+                  id="bx-snn-pick-liv"
+                  class="bx"
+                  x="523"
+                  y="247.6"
+                  width="570"
+                  height="21.8"
+                  stroke="var(--snn)"
+                />
+                <!-- 8/8 living pick: houses 7-11 on the s_liv row, same
+                   x-geometry as the other pick boxes. -->
                 <rect
                   id="bx-snn-pick-slot"
                   class="bx"
@@ -4682,11 +4759,11 @@
                   </g>
                   <text class="mk-name" x="940" y="-66">NN(5)w</text>
                   <text class="mk-val" x="940" y="30">0.8113S</text>
-                  <rect class="mk-real" x="905" y="14" width="70" height="40" />
-                  <text class="mk-eq" x="940" y="30">2802</text>
+                  <rect class="mk-real" x="905" y="14" width="70" height="24" />
+                  <text class="mk-eq" x="940" y="58">3470</text>
                   <line
                     x1="940"
-                    y1="62"
+                    y1="72"
                     x2="940"
                     y2="122"
                     marker-end="url(#arr-snn)"
@@ -5105,7 +5182,6 @@
               </div>
             </div>
             <div class="ph-steps" aria-hidden="true">
-              <span class="fragment ph-step"></span>
               <span class="fragment ph-step"></span>
               <span class="fragment ph-step"></span>
               <span class="fragment ph-step"></span>
