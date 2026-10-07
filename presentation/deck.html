@@ -89,6 +89,10 @@
       --ph-t-slide: 1.2s;
       --ph-t-fade: 0.18s;
       --ph-ease: cubic-bezier(0.26, 0.86, 0.44, 0.985);
+      /* S4 stages: every value fade runs the full stage duration, so the
+         longest move sets the pace for all of them. Sequencing between
+         stages 11-12 reads uses delay, not a shorter duration. */
+      --ph-t-stage: 1.5s;
       /* The zoom travels a long way (the From capture grows about four times),
          so it needs an ease that spends the whole duration moving instead of
          --ph-ease, which lands most of the move in its first fifth and reads
@@ -1653,17 +1657,17 @@
        halve every label and cap a lit label at half brightness. */
     .houses-svg .ar-row {
       transition:
-        opacity var(--ph-t-fade) var(--ph-ease),
-        transform var(--ph-t-slide) var(--ph-ease);
+        opacity var(--ph-t-stage) var(--ph-ease),
+        transform var(--ph-t-stage) var(--ph-ease);
     }
 
     .houses-svg .v,
     .houses-svg .al {
       transition:
-        opacity var(--ph-t-fade) var(--ph-ease),
-        fill var(--ph-t-fade) var(--ph-ease),
-        filter var(--ph-t-fade) var(--ph-ease),
-        transform var(--ph-t-slide) var(--ph-ease);
+        opacity var(--ph-t-stage) var(--ph-ease),
+        fill var(--ph-t-stage) var(--ph-ease),
+        filter var(--ph-t-stage) var(--ph-ease),
+        transform var(--ph-t-stage) var(--ph-ease);
     }
 
     .houses-svg .v {
@@ -1690,8 +1694,8 @@
     .houses-svg .ar-dots {
       opacity: 0;
       transition:
-        opacity var(--ph-t-fade) var(--ph-ease),
-        transform var(--ph-t-slide) var(--ph-ease);
+        opacity var(--ph-t-stage) var(--ph-ease),
+        transform var(--ph-t-stage) var(--ph-ease);
     }
 
     /* Scaled labels hide with their rows and wear the SNN calculation colour
@@ -1703,12 +1707,12 @@
     .houses-svg .al-sbath {
       fill: var(--snn);
       opacity: 0;
-      /* Fade runs the slide duration, so the names land with the numbers. */
+      /* Fade runs the stage duration, so the names land with the numbers. */
       transition:
-        opacity var(--ph-t-slide) var(--ph-ease),
-        fill var(--ph-t-fade) var(--ph-ease),
-        filter var(--ph-t-fade) var(--ph-ease),
-        transform var(--ph-t-slide) var(--ph-ease);
+        opacity var(--ph-t-stage) var(--ph-ease),
+        fill var(--ph-t-stage) var(--ph-ease),
+        filter var(--ph-t-stage) var(--ph-ease),
+        transform var(--ph-t-stage) var(--ph-ease);
     }
 
 
@@ -1936,8 +1940,8 @@
 
     #s4:has(.ph-step:nth-of-type(11).visible):not(:has(.ph-step:nth-of-type(12).visible)) .ar-dots {
       opacity: 1;
-      /* Waits out the s_x label fade, then fades in over the same duration. */
-      transition-delay: var(--ph-t-slide);
+      /* Starts at 80% of the label fade, overlapping its tail. */
+      transition-delay: calc(var(--ph-t-stage) * 0.8);
     }
 
     #s4:has(.ph-step:nth-of-type(11).visible):not(:has(.ph-step:nth-of-type(12).visible)) .al-living,
@@ -3068,6 +3072,7 @@
                 <text class="v h-nn" x="687" y="394">.750</text>
                 <text class="v h-nn" x="984" y="394">.750</text>
                 <text class="v h-nn" x="1066" y="394">.750</text>
+                <text class="v" x="1148" y="394">1</text>
               </g>
               <g class="ar-row ar-scaled ar-sbath" font-size="15" fill="#BCCCD4" text-anchor="middle">
                 <text class="v" x="68" y="446">0</text>

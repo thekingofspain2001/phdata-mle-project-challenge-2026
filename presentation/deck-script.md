@@ -117,11 +117,13 @@ its inner `a`. Placement is reveal's own default (`controlsLayout:"edges"`).
 --sp-xs:8px; --sp-sm:15px; --gap-sm:13px; --gap-md:25px;
 --ph-header-h:10vh; --ph-footer-h:8vh;
 --pad-x:60px; --pad-foot:72px;
-
 /* One motion language. */
 --ph-t-slide:1.2s; --ph-t-fade:.18s;
 --ph-ease:cubic-bezier(.26,.86,.44,.985);
 --ph-ease-soft:cubic-bezier(.4,0,.2,1);
+/* S4: every value fade runs --ph-t-stage (= --ph-t-slide, the longest move);
+   sequencing between reads uses transition-delay, not shorter durations. */
+--ph-t-stage:var(--ph-t-slide);
 
 /* Shape, line, logo. */
 --rad-card:12px; --rad-cell:10px; --line-sm:2px; --line-md:3px;
