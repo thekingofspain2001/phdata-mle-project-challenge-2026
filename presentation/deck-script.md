@@ -550,12 +550,12 @@ only at frag 15.
 | 5 | Nearest Neighbor — the table | `.bx-compare` (knn tint) | — | lot/bed/bath white, living dim |
 | 6 | Nearest Neighbor — find the 5 closest | `.bx-compare` + `bx-knn-2` | — | lot/bed/bath white, living dim |
 | 7 | Nearest Neighbor — read their size | `.bx-compare` | `mk-knn` | living NN `--knn`, rest dim |
-| 8 | Scaled Nearest Neighbor 1/6 — the table | `.bx-compare` (snn tint) | — | lot/bed/bath white, living dim |
-| 9 | Scaled Nearest Neighbor 2/6 — find the 5 closest | `.bx-compare` (snn tint) | — | lot/bed/bath white, living dim |
-| 10 | Scaled Nearest Neighbor 3/6 — scale the columns | `.bx-compare` + `bx-snn-liv` | — | all four rows white |
-| 11 | Scaled Nearest Neighbor 4/6 — read the scaled rows | `bx-snn-liv` + `bx-snn-pick` | — | raw rows white, scaled dotted muted |
-| 12 | Scaled Nearest Neighbor 5/6 — move the wash to scaled | raw + scaled washes | — | scaled white, raw struck |
-| 13 | Scaled Nearest Neighbor 6/6 — pick the 5 scaled | scaled washes | — | scaled white, raw struck |
+| 8 | Scaled Nearest Neighbor 1/6 — find the 5 closest | `.bx-compare` (snn tint) | — | lot/bed/bath white, living dim |
+| 9 | Scaled Nearest Neighbor 2/6 — scale the columns | `.bx-compare` + `bx-snn-liv` | — | all four rows white |
+| 10 | Scaled Nearest Neighbor 3/6 — read the scaled rows | `bx-snn-liv/lot/bed/bath` (raw washes) | — | raw rows white, scaled values hidden, dots lit |
+| 11 | Scaled Nearest Neighbor 4/6 — move the wash to scaled | raw + scaled washes | — | scaled white, raw struck |
+| 12 | Scaled Nearest Neighbor 5/6 — pick the 5 scaled | scaled washes | — | scaled white, raw struck |
+| 13 | Scaled Nearest Neighbor 6/6 — read and weight | scaled washes | — | scaled white, raw struck |
 | 14 | Scaled Nearest Neighbor — read and weight | scaled washes | — | scaled white, raw struck |
 | 15 | (same subtitle) | slot/sbed/sbath washes + `bx-snn-pick`, sliv wash off | `mk-snn` | sliv NN `--snn` in box, rest white |
 | 16 | Summary: similar homes win | — | all four | rest state |
