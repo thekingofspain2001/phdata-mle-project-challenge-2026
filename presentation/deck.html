@@ -1815,15 +1815,7 @@
           transform var(--ph-t-slide) var(--ph-ease);
       }
 
-      /* The marker's real-number box rides with its marker: visible exactly when
-       mk-snn is. */
-      #s4:has(.ph-step:nth-of-type(15).visible):not(
-          :has(.ph-step:nth-of-type(16).visible)
-        )
-        #mk-snn
-        .mk-real {
-        opacity: 1;
-      }
+      /* (mk-real retired: the floating house carries no dashed box.) */
 
       /* Attribute rows: the rest state is the whole data set in white, everything
        present and legible, nothing claimed. The per-stage rules tint the values
@@ -3009,15 +3001,15 @@
       #s4:has(.ph-step:nth-of-type(15).visible):not(
           :has(.ph-step:nth-of-type(16).visible)
         )
-        #bx-snn-slot,
+        #bx-snn-pick-slot,
       #s4:has(.ph-step:nth-of-type(15).visible):not(
           :has(.ph-step:nth-of-type(16).visible)
         )
-        #bx-snn-sbed,
+        #bx-snn-pick-sbed,
       #s4:has(.ph-step:nth-of-type(15).visible):not(
           :has(.ph-step:nth-of-type(16).visible)
         )
-        #bx-snn-sbath,
+        #bx-snn-pick-sbath,
       #s4:has(.ph-step:nth-of-type(15).visible):not(
           :has(.ph-step:nth-of-type(16).visible)
         )
@@ -3227,6 +3219,7 @@
         )
         #bx-snn-pick-sbath {
         fill: var(--tint-snn);
+        stroke: none;
       }
 
       /* Medium wash on the med calc's last two fragments (drivers 4 and 5):
@@ -4531,11 +4524,7 @@
                     <use href="#hs" />
                   </g>
                   <text class="mk-name" x="940" y="-66">NN(5)w</text>
-                  <text class="mk-val" x="940" y="30">3470</text>
-                  <rect class="mk-real" x="905" y="36" width="70" height="18" />
-                  <text class="mk-eq" x="940" y="52">
-                    0.8113 &#215; 2755 + 1235
-                  </text>
+                  <text class="mk-val" x="940" y="30">0.8113S</text>
                   <line
                     x1="940"
                     y1="62"
