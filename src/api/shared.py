@@ -15,6 +15,7 @@ from fastapi.openapi.models import Example
 from pydantic import BaseModel
 from sklearn.impute import KNNImputer
 
+from api.constants import REQUEST_COLUMNS, UNKNOWN_ZIP
 from paths import DEMOGRAPHICS_PATH, FEATURES_PATH, MODEL_PATH, SALES_PATH, UNSEEN_PATH
 
 if TYPE_CHECKING:
@@ -49,16 +50,6 @@ class ImputerProtocol(Protocol):
         ...
 
 
-REQUEST_COLUMNS = [
-    "bedrooms",
-    "bathrooms",
-    "sqft_living",
-    "sqft_lot",
-    "floors",
-    "sqft_above",
-    "sqft_basement",
-]
-UNKNOWN_ZIP = "98009"  # real Bellevue zipcode, deliberately absent from DEMOGRAPHICS_PATH
 ARTIFACT_MODEL = "model"
 ARTIFACT_MODEL_FEATURES = "model_features"
 ARTIFACT_DEMOGRAPHICS = "demographics"
