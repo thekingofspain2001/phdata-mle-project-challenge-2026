@@ -16,6 +16,8 @@ from pydantic import BaseModel
 from sklearn.impute import KNNImputer
 
 from api.constants import REQUEST_COLUMNS, UNKNOWN_ZIP
+from api.schemas_v2 import HomeFeaturesV2
+from api.types import ImputationResult, PredictionInput, PredictionResult
 from paths import DEMOGRAPHICS_PATH, FEATURES_PATH, MODEL_PATH, SALES_PATH, UNSEEN_PATH
 
 if TYPE_CHECKING:
@@ -241,10 +243,19 @@ def require_artifacts(request: Request) -> Artifacts:
     return artifacts
 
 
-def fill_missing(payload: dict[str, int | float | str | None], artifacts: Artifacts) -> tuple[dict[str, float], list[str]]:
+def fill_missing(home_features: HomeFeaturesV2, artifacts: Artifacts) -> ImputationResult:
     """Fill null request fields via the fitted KNN imputer; return values + filled names."""
-    missing = [c for c in REQUEST_COLUMNS if payload.get(c) is None]
-    row = pd.DataFrame([{c: payload.get(c) for c in REQUEST_COLUMNS}])
+    features = {
+        "bedrooms": home_features.bedrooms,
+        "bathrooms": home_features.bathrooms,
+        "sqft_living": home_features.sqft_living,
+        "sqft_lot": home_features.sqft_lot,
+        "floors": home_features.floors,
+        "sqft_above": home_features.sqft_above,
+        "sqft_basement": home_features.sqft_basement,
+    }
+    missing = [c for c in REQUEST_COLUMNS if features[c] is None]
+    row = pd.DataFrame([features], columns=REQUEST_COLUMNS)
     if row.isna().any().any():
         logger.info("imputing_null_features")
         filled = pd.DataFrame(
@@ -252,20 +263,46 @@ def fill_missing(payload: dict[str, int | float | str | None], artifacts: Artifa
             columns=REQUEST_COLUMNS,
         )
         row[REQUEST_COLUMNS] = filled
-    return {c: float(row.iloc[0][c]) for c in REQUEST_COLUMNS}, missing
+    values = {c: float(row.iloc[0][c]) for c in REQUEST_COLUMNS}
+    return ImputationResult(
+        features=PredictionInput(
+            bedrooms=int(values["bedrooms"]),
+            bathrooms=values["bathrooms"],
+            sqft_living=values["sqft_living"],
+            sqft_lot=values["sqft_lot"],
+            floors=values["floors"],
+            sqft_above=values["sqft_above"],
+            sqft_basement=values["sqft_basement"],
+            zipcode=home_features.zipcode,
+        ),
+        missing_fields=missing,
+    )
 
 
-def predict_price(payload: dict[str, int | float | str | None], artifacts: Artifacts) -> dict[str, float]:
-    """Run the shared load/join/predict pipeline over a raw feature payload."""
+def predict_price(features: PredictionInput, artifacts: PredictArtifacts) -> PredictionResult:
+    """Run the shared load/join/predict pipeline over typed prediction features."""
     model = artifacts.model
     model_features = artifacts.model_features
     demographics = artifacts.demographics
-    input_data: pd.DataFrame = pd.DataFrame([payload])
+    input_data: pd.DataFrame = pd.DataFrame(
+        [
+            {
+                "bedrooms": features.bedrooms,
+                "bathrooms": features.bathrooms,
+                "sqft_living": features.sqft_living,
+                "sqft_lot": features.sqft_lot,
+                "floors": features.floors,
+                "sqft_above": features.sqft_above,
+                "sqft_basement": features.sqft_basement,
+                "zipcode": features.zipcode,
+            },
+        ],
+    )
 
-    demographic_info = demographics[demographics["zipcode"] == payload["zipcode"]].drop(columns="zipcode").reset_index(drop=True)
+    demographic_info = demographics[demographics["zipcode"] == features.zipcode].drop(columns="zipcode").reset_index(drop=True)
     if demographic_info.empty:
-        logger.warning("unknown_zipcode", zipcode=payload["zipcode"])
-        raise HTTPException(status_code=404, detail=f"Unknown zipcode: {payload['zipcode']}")
+        logger.warning("unknown_zipcode", zipcode=features.zipcode)
+        raise HTTPException(status_code=404, detail=f"Unknown zipcode: {features.zipcode}")
 
     # Combine input data with demographic data
     input_data = pd.concat([input_data, demographic_info], axis=1)
@@ -277,4 +314,4 @@ def predict_price(payload: dict[str, int | float | str | None], artifacts: Artif
     prediction = model.predict(input_data)
     logger.info("prediction_complete", predicted_price=float(prediction[0]))
 
-    return {"predicted_price": float(prediction[0])}
+    return PredictionResult(predicted_price=float(prediction[0]))
