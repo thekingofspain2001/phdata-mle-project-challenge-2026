@@ -6,8 +6,9 @@ import pandas as pd
 import pytest
 from fastapi import HTTPException
 
+from api.artifacts import Artifacts, PredictArtifacts
 from api.schemas_v2 import HomeFeaturesV2
-from api.shared import Artifacts, PredictArtifacts, fill_missing, predict_price
+from api.shared import impute_home_features, predict_price
 from api.types import ImputationResult, PredictionInput, PredictionResult
 
 
@@ -21,6 +22,8 @@ class RecordingPredictor:
 
 
 class FixedImputer:
+    """Test double imputer that returns a fixed feature row."""
+
     def fit(self, _features: pd.DataFrame) -> FixedImputer:
         return self
 
@@ -67,7 +70,7 @@ def test_predict_price_returns_not_found_for_unknown_zipcode() -> None:
     assert exc_info.value.detail == "Unknown zipcode: 00000"
 
 
-def test_fill_missing_returns_typed_result_and_truncates_bedrooms() -> None:
+def test_impute_home_features_returns_typed_result_and_preserves_bedrooms() -> None:
     artifacts = Artifacts(
         model=RecordingPredictor(),
         model_features=["bedrooms"],
@@ -75,7 +78,7 @@ def test_fill_missing_returns_typed_result_and_truncates_bedrooms() -> None:
         imputer=FixedImputer(),
     )
 
-    result = fill_missing(
+    result = impute_home_features(
         HomeFeaturesV2(
             zipcode="98042",
             bedrooms=3,
@@ -92,4 +95,4 @@ def test_fill_missing_returns_typed_result_and_truncates_bedrooms() -> None:
     assert isinstance(result, ImputationResult)
     assert isinstance(result.features, PredictionInput)
     assert result.missing_fields == ["sqft_living"]
-    assert result.features.bedrooms == 3
+    assert result.features.bedrooms == 3.8

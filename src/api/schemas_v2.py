@@ -14,7 +14,7 @@ class PredictionResponse(BaseModel):
 class ImputeResponse(BaseModel):
     """KNN-imputed request fields; valid input for v1 /predict."""
 
-    bedrooms: int = Field(examples=[3])
+    bedrooms: float = Field(examples=[3])
     bathrooms: float = Field(examples=[2.25])
     sqft_living: float = Field(examples=[1840.0])
     sqft_lot: float = Field(examples=[11403.0])

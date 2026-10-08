@@ -11,7 +11,7 @@ from src.main import app
 if TYPE_CHECKING:
     from collections.abc import Iterator
 
-    from api.shared import PredictArtifacts
+    from api.artifacts import PredictArtifacts
     from api.types import PredictionInput, PredictionResult
 
 REQUEST_ID = "8f14e45f-ea0f-4b76-9c2a-1f3d5b7c9e01"

@@ -58,15 +58,19 @@ def test_v2_openapi_documents_request_and_imputation_contract(test_client: TestC
 
     assert v2_request["properties"]["zipcode"]["pattern"] == r"^\d{5}$"
     assert set(v2_request["required"]) == {"zipcode"}
-    bedroom_types = {
-        option["type"]
-        for option in v2_request["properties"]["bedrooms"]["anyOf"]
-    }
+    bedroom_types = {option["type"] for option in v2_request["properties"]["bedrooms"]["anyOf"]}
     assert bedroom_types == {"integer", "null"}
     impute: dict[str, Any] = paths["/impute"]["post"]["responses"]["200"]["content"]["application/json"]["schema"]
     assert impute["$ref"].endswith("ImputeResponse")
     assert {"404", "500"} <= set(paths["/impute"]["post"]["responses"])
     assert set(schemas["ImputeResponse"]["properties"]) == {
-        "bedrooms", "bathrooms", "sqft_living", "sqft_lot", "floors",
-        "sqft_above", "sqft_basement", "zipcode", "imputed",
+        "bedrooms",
+        "bathrooms",
+        "sqft_living",
+        "sqft_lot",
+        "floors",
+        "sqft_above",
+        "sqft_basement",
+        "zipcode",
+        "imputed",
     }

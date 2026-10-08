@@ -1,19 +1,17 @@
-"""API endpoints for home price prediction.
-
-Restored to the first-commit shape (e9ef514) on purpose: untyped, original
-imports, artifacts loaded from disk on every request. The one thing kept from
-the later work is the OpenAPI request examples, so /docs still shows sample
-bodies. File is excluded from lint in ruff.toml for the same reason.
-"""
+"""Legacy v1 API endpoints for home price prediction."""
 
 from typing import Annotated
 
 from fastapi import APIRouter, Body
 from pydantic import BaseModel
 
-from api.shared import (
+from api.artifacts import (
     PredictArtifacts,
-    listi' no
+    load_demographics,
+    load_model,
+    load_model_features,
+)
+from api.shared import listing_examples, predict_price
 from api.types import PredictionInput
 
 router = APIRouter()
@@ -31,7 +29,7 @@ class HomeFeatures(BaseModel):
 
 
 @router.get("/health")
-async def health_check():
+def health_check() -> dict[str, str]:
     """
     Health check endpoint for container orchestration.
     Returns 200 if API is ready to accept requests.
@@ -40,22 +38,18 @@ async def health_check():
 
 
 @router.post("/predict")
-async def predict(home_features: Annotated[HomeFeatures, Body(openapi_examples=listing_examples())]):
-    # Load the model and features
-    with MODEL_PATH.open("rb") as model_file:
-        model = pickle.load(model_file)
-
-    with FEATURES_PATH.open() as features_file:
-        model_features: list[str] = json.load(features_file)
-
-    # Load demographic data
+def predict(home_features: Annotated[HomeFeatures, Body(openapi_examples=listing_examples())]) -> dict[str, float]:
+    loaded_model = load_model()
+    loaded_model_features = load_model_features()
     demographics = load_demographics()
+
     artifacts = PredictArtifacts(
-        model=model,
-        model_features=model_features,
+        model=loaded_model,
+        model_features=loaded_model_features,
         demographics=demographics,
     )
-    features = PredictionInput(
+
+    prediction_input = PredictionInput(
         bedrooms=home_features.bedrooms,
         bathrooms=home_features.bathrooms,
         sqft_living=home_features.sqft_living,
@@ -65,6 +59,7 @@ async def predict(home_features: Annotated[HomeFeatures, Body(openapi_examples=l
         sqft_basement=home_features.sqft_basement,
         zipcode=home_features.zipcode,
     )
-    result = predict_price(features, artifacts)
 
-    return {"predicted_price": result.predicted_price}
+    prediction_result = predict_price(prediction_input, artifacts)
+
+    return {"predicted_price": prediction_result.predicted_price}

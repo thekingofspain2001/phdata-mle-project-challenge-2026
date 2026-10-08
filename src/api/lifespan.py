@@ -5,7 +5,7 @@ from __future__ import annotations
 from contextlib import asynccontextmanager
 from typing import TYPE_CHECKING
 
-from api.shared import ArtifactLoadError, load_artifacts
+from api.artifacts import ArtifactLoadError, load_artifacts
 from logger_config import setup_logging
 
 if TYPE_CHECKING:

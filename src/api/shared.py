@@ -1,61 +1,26 @@
-"""Shared prediction artifacts, paths, and pipeline helpers."""
+"""Shared home-price prediction pipeline helpers."""
 
 from __future__ import annotations
 
 import csv
-import hashlib
-import json
-import pickle
-from typing import TYPE_CHECKING, Protocol, cast, runtime_checkable
+from typing import TYPE_CHECKING
 
 import pandas as pd
 import structlog
-from fastapi import HTTPException, Request
+from fastapi import HTTPException
 from fastapi.openapi.models import Example
-from pydantic import BaseModel
-from sklearn.impute import KNNImputer
 
 from api.constants import REQUEST_COLUMNS, UNKNOWN_ZIP
-from api.schemas_v2 import HomeFeaturesV2
 from api.types import ImputationResult, PredictionInput, PredictionResult
-from paths import DEMOGRAPHICS_PATH, FEATURES_PATH, MODEL_PATH, SALES_PATH, UNSEEN_PATH
+from paths import UNSEEN_PATH
 
 if TYPE_CHECKING:
-    import pathlib
     from collections.abc import Iterator, Mapping
 
-    import numpy as np
-    import numpy.typing as npt
+    from api.artifacts import Artifacts, PredictArtifacts
+    from api.schemas_v2 import HomeFeaturesV2
 
 logger = structlog.get_logger(__name__)
-
-
-@runtime_checkable
-class Predictor(Protocol):
-    """Any regressor exposing sklearn-style predict over a DataFrame."""
-
-    def predict(self, features: pd.DataFrame) -> npt.NDArray[np.float64]:
-        """Predict targets for the given feature frame."""
-        ...
-
-
-@runtime_checkable
-class ImputerProtocol(Protocol):
-    """KNN-style imputer with fit/transform over DataFrames."""
-
-    def fit(self, features: pd.DataFrame) -> ImputerProtocol:
-        """Fit the imputer on the given feature frame."""
-        ...
-
-    def transform(self, features: pd.DataFrame) -> npt.NDArray[np.float64]:
-        """Fill missing values in the given feature frame."""
-        ...
-
-
-ARTIFACT_MODEL = "model"
-ARTIFACT_MODEL_FEATURES = "model_features"
-ARTIFACT_DEMOGRAPHICS = "demographics"
-ARTIFACT_IMPUTER = "imputer"
 
 
 def _unseen_rows() -> Iterator[Mapping[str, str]]:
@@ -63,6 +28,7 @@ def _unseen_rows() -> Iterator[Mapping[str, str]]:
     if not UNSEEN_PATH.is_file():
         msg = f"Unseen listings file not found: {UNSEEN_PATH}"
         raise FileNotFoundError(msg)
+
     with UNSEEN_PATH.open(newline="", encoding="utf-8") as handle:
         yield from csv.DictReader(handle)
 
@@ -72,6 +38,7 @@ def _listing_line(row: Mapping[str, str]) -> str:
     line = (
         f"{int(row['bedrooms'])} bed, {float(row['bathrooms']):g} bath, {float(row['sqft_living']):,.0f} sq ft, {float(row['floors']):g} fl, {row['zipcode']}"
     )
+
     if float(row["waterfront"]) != 0:
         line += ", waterfront"
     return line
@@ -103,149 +70,35 @@ def listing_examples() -> dict[str, Example]:
     rows = list(_unseen_rows())
     first = rows[0]
     unknown_line = _listing_line(first).replace(first["zipcode"], UNKNOWN_ZIP)
+
     examples: dict[str, Example] = {
         "example_0_unknown_zip": Example(
             summary=f"Example 0 - Unknown Zip - {unknown_line}, not in the demographics table",
             value=_listing_value(first) | {"zipcode": UNKNOWN_ZIP},
         ),
     }
+
     for index, row in enumerate(rows, start=1):
         line = _listing_line(row)
         value = _listing_value(row)
+
         examples[f"example_{index}_all"] = Example(
             summary=f"Example {index} - All - {line}",
             value=value,
         )
+
         missing = droppable[(index - 1) % len(droppable)]
         examples[f"example_{index}_no_{missing}"] = Example(
             summary=f"Example {index} - No {missing} - {line}",
             value={key: item for key, item in value.items() if key != missing},
         )
+
     return examples
 
 
-class PredictArtifacts(BaseModel):
-    """What /predict loads per request: model, ordered features, demographics."""
-
-    model_config = {"arbitrary_types_allowed": True}
-
-    model: Predictor
-    model_features: list[str]
-    demographics: pd.DataFrame
-
-
-class Artifacts(PredictArtifacts):
-    """Adds the fitted KNN imputer that /predict/v2 needs at startup."""
-
-    imputer: ImputerProtocol
-
-
-class ArtifactLoadError(RuntimeError):
-    """Raised when a startup artifact fails to load; message carries the artifact name."""
-
-
-def _digest(path: pathlib.Path) -> str:
-    """Short content digest of an artifact, for identifying it in the logs."""
-    return hashlib.sha256(path.read_bytes()).hexdigest()[:12]
-
-
-def load_model() -> Predictor:
-    """Load the trained regressor from its trusted build artifact."""
-    try:
-        with MODEL_PATH.open("rb") as model_file:
-            model = cast("Predictor", pickle.load(model_file))  # noqa: S301 - trusted build artifact from create_model.py
-    except Exception as exc:
-        logger.exception("artifact_load_failed", artifact=ARTIFACT_MODEL)
-        raise ArtifactLoadError(ARTIFACT_MODEL) from exc
-
-    # Identify which model.pkl this process is serving. The artifact gets
-    # retrained and re-committed, so a stale image layer and a fresh one are
-    # otherwise indistinguishable in the logs.
-    logger.info("artifact_loaded", artifact=ARTIFACT_MODEL, sha256=_digest(MODEL_PATH))
-    return model
-
-
-def _require_feature_list(raw: object) -> list[str]:
-    """Return raw as a feature list, or raise if it is not one.
-
-    json.load hands back Any, so without this the list[str] return type is an
-    unchecked assertion and a corrupt file only fails inside predict_price,
-    as an opaque 500 on the first request.
-    """
-    got = type(raw).__name__
-    if not isinstance(raw, list):
-        msg = f"{FEATURES_PATH.name} must be a non-empty list of strings, got {got}"
-        raise TypeError(msg)
-    features = cast("list[object]", raw)
-    if not features:
-        msg = f"{FEATURES_PATH.name} must be a non-empty list of strings, got empty list"
-        raise TypeError(msg)
-    if not all(isinstance(feature, str) for feature in features):
-        msg = f"{FEATURES_PATH.name} must be a non-empty list of strings, got list of {type(features[0]).__name__}"
-        raise TypeError(msg)
-    return cast("list[str]", features)
-
-
-def load_model_features() -> list[str]:
-    """Load the ordered model feature list."""
-    try:
-        with FEATURES_PATH.open() as features_file:
-            return _require_feature_list(json.load(features_file))
-    except Exception as exc:
-        logger.exception("artifact_load_failed", artifact=ARTIFACT_MODEL_FEATURES)
-        raise ArtifactLoadError(ARTIFACT_MODEL_FEATURES) from exc
-
-
-def load_demographics() -> pd.DataFrame:
-    """Load the zipcode demographics table."""
-    try:
-        demographics = pd.read_csv(DEMOGRAPHICS_PATH, dtype={"zipcode": str})
-    except Exception as exc:
-        logger.exception("artifact_load_failed", artifact=ARTIFACT_DEMOGRAPHICS)
-        raise ArtifactLoadError(ARTIFACT_DEMOGRAPHICS) from exc
-
-    # The lookup is what decides both the 404 boundary and 26 of the 33 model
-    # features, so a retrained model paired with a stale table is the case worth
-    # being able to spot.
-    logger.info("artifact_loaded", artifact=ARTIFACT_DEMOGRAPHICS, sha256=_digest(DEMOGRAPHICS_PATH), rows=len(demographics))
-    return demographics
-
-
-def load_imputer() -> ImputerProtocol:
-    """Fit the KNN imputer (k=5, distance) on training request columns."""
-    try:
-        sales = pd.read_csv(SALES_PATH, usecols=REQUEST_COLUMNS)
-        return cast(
-            "ImputerProtocol",
-            KNNImputer(n_neighbors=5, weights="distance").fit(sales[REQUEST_COLUMNS]),  # type: ignore[reportUnknownMemberType]
-        )
-    except Exception as exc:
-        logger.exception("artifact_load_failed", artifact=ARTIFACT_IMPUTER)
-        raise ArtifactLoadError(ARTIFACT_IMPUTER) from exc
-
-
-def load_artifacts() -> Artifacts:
-    """Load model, features, demographics, and fitted KNN imputer."""
-    return Artifacts(
-        model=load_model(),
-        model_features=load_model_features(),
-        demographics=load_demographics(),
-        imputer=load_imputer(),
-    )
-
-
-def require_artifacts(request: Request) -> Artifacts:
-    """Return lifespan artifacts or raise 500 when startup loading failed."""
-    artifacts = getattr(request.app.state, "artifacts", None)
-    if artifacts is None:
-        detail = "Prediction service unavailable"
-        raise HTTPException(status_code=500, detail=detail)
-    return artifacts
-
-
-def fill_missing(home_features: HomeFeaturesV2, artifacts: Artifacts) -> ImputationResult:
+def impute_home_features(home_features: HomeFeaturesV2, artifacts: Artifacts) -> ImputationResult:
     """Fill null request fields via the fitted KNN imputer; return values + filled names."""
-    features = {
+    request_values = {
         "bedrooms": home_features.bedrooms,
         "bathrooms": home_features.bathrooms,
         "sqft_living": home_features.sqft_living,
@@ -254,25 +107,28 @@ def fill_missing(home_features: HomeFeaturesV2, artifacts: Artifacts) -> Imputat
         "sqft_above": home_features.sqft_above,
         "sqft_basement": home_features.sqft_basement,
     }
-    missing = [c for c in REQUEST_COLUMNS if features[c] is None]
-    row = pd.DataFrame([features], columns=REQUEST_COLUMNS)
-    if row.isna().any().any():
+    missing = [c for c in REQUEST_COLUMNS if request_values[c] is None]
+    request_row = pd.DataFrame([request_values], columns=REQUEST_COLUMNS)
+
+    if request_row.isna().any().any():
         logger.info("imputing_null_features")
-        filled = pd.DataFrame(
-            artifacts.imputer.transform(row[REQUEST_COLUMNS]),
+        imputed_values = pd.DataFrame(
+            artifacts.imputer.transform(request_row[REQUEST_COLUMNS]),
             columns=REQUEST_COLUMNS,
         )
-        row[REQUEST_COLUMNS] = filled
-    values = {c: float(row.iloc[0][c]) for c in REQUEST_COLUMNS}
+        request_row[REQUEST_COLUMNS] = imputed_values
+
+    numeric_values = {c: float(request_row.iloc[0][c]) for c in REQUEST_COLUMNS}
+
     return ImputationResult(
         features=PredictionInput(
-            bedrooms=int(values["bedrooms"]),
-            bathrooms=values["bathrooms"],
-            sqft_living=values["sqft_living"],
-            sqft_lot=values["sqft_lot"],
-            floors=values["floors"],
-            sqft_above=values["sqft_above"],
-            sqft_basement=values["sqft_basement"],
+            bedrooms=numeric_values["bedrooms"],
+            bathrooms=numeric_values["bathrooms"],
+            sqft_living=numeric_values["sqft_living"],
+            sqft_lot=numeric_values["sqft_lot"],
+            floors=numeric_values["floors"],
+            sqft_above=numeric_values["sqft_above"],
+            sqft_basement=numeric_values["sqft_basement"],
             zipcode=home_features.zipcode,
         ),
         missing_fields=missing,
@@ -284,7 +140,8 @@ def predict_price(features: PredictionInput, artifacts: PredictArtifacts) -> Pre
     model = artifacts.model
     model_features = artifacts.model_features
     demographics = artifacts.demographics
-    input_data: pd.DataFrame = pd.DataFrame(
+
+    request_frame: pd.DataFrame = pd.DataFrame(
         [
             {
                 "bedrooms": features.bedrooms,
@@ -299,19 +156,20 @@ def predict_price(features: PredictionInput, artifacts: PredictArtifacts) -> Pre
         ],
     )
 
-    demographic_info = demographics[demographics["zipcode"] == features.zipcode].drop(columns="zipcode").reset_index(drop=True)
-    if demographic_info.empty:
+    matching_demographics = demographics[demographics["zipcode"] == features.zipcode].drop(columns="zipcode").reset_index(drop=True)
+
+    if matching_demographics.empty:
         logger.warning("unknown_zipcode", zipcode=features.zipcode)
         raise HTTPException(status_code=404, detail=f"Unknown zipcode: {features.zipcode}")
 
     # Combine input data with demographic data
-    input_data = pd.concat([input_data, demographic_info], axis=1)
-    logger.debug("joined_features", columns=len(input_data.columns))
+    request_frame = pd.concat([request_frame, matching_demographics], axis=1)
+    logger.debug("joined_features", columns=len(request_frame.columns))
 
     # Ensure the input data has the correct features
-    input_data = input_data[model_features]
+    request_frame = request_frame[model_features]
     # Make prediction
-    prediction = model.predict(input_data)
+    prediction = model.predict(request_frame)
     logger.info("prediction_complete", predicted_price=float(prediction[0]))
 
     return PredictionResult(predicted_price=float(prediction[0]))

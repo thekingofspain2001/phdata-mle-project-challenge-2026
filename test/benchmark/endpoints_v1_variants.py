@@ -29,7 +29,8 @@ import pandas as pd
 from fastapi import APIRouter, Request
 from pydantic import BaseModel
 
-from api.shared import DEMOGRAPHICS_PATH, FEATURES_PATH, MODEL_PATH, Predictor, require_artifacts
+from api.artifacts import Predictor, require_artifacts
+from paths import DEMOGRAPHICS_PATH, FEATURES_PATH, MODEL_PATH
 
 router_variants = APIRouter(tags=["bench"])
 

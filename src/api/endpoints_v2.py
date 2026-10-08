@@ -5,6 +5,7 @@ from typing import Annotated
 import structlog
 from fastapi import APIRouter, Body, HTTPException, Request
 
+from api.artifacts import Artifacts, require_artifacts
 from api.schemas_v2 import (
     ERROR_RESPONSES,
     ErrorDetail,
@@ -13,7 +14,7 @@ from api.schemas_v2 import (
     ImputeResponse,
     PredictionResponse,
 )
-from api.shared import Artifacts, fill_missing, listing_examples, predict_price, require_artifacts
+from api.shared import impute_home_features, listing_examples, predict_price
 
 router_v2 = APIRouter(tags=["v2"])
 
@@ -24,6 +25,7 @@ log = structlog.get_logger(__name__)
 def health_check_v2(request: Request) -> HealthResponse:
     """Check v2 API readiness (lifespan artifacts incl. imputer)."""
     require_artifacts(request)
+
     return HealthResponse(status="healthy")
 
 
@@ -39,13 +41,16 @@ def predict_v2(
     """Predict a home sale price, imputing null fields via KNN (k=5)."""
     try:
         artifacts: Artifacts = require_artifacts(request)
+
     except HTTPException as exc:
         # require_artifacts already answers 500 for this state; log before it propagates.
         log.warning("artifacts_unavailable", detail=str(exc.detail), status_code=exc.status_code)
         raise
-    imputation = fill_missing(home_features, artifacts)
-    result = predict_price(imputation.features, artifacts)
-    return PredictionResponse(predicted_price=result.predicted_price)
+
+    imputed_features = impute_home_features(home_features, artifacts)
+    prediction_result = predict_price(imputed_features.features, artifacts)
+
+    return PredictionResponse(predicted_price=prediction_result.predicted_price)
 
 
 @router_v2.post(
@@ -60,14 +65,15 @@ def impute(
     """Fill null fields via KNN (k=5); output feeds v1 /predict as-is."""
     try:
         artifacts: Artifacts = require_artifacts(request)
+
     except HTTPException as exc:
         log.warning("artifacts_unavailable", detail=str(exc.detail), status_code=exc.status_code)
         raise
 
-    result = fill_missing(home_features, artifacts)
+    result = impute_home_features(home_features, artifacts)
 
     return ImputeResponse(
-        bedrooms=int(result.features.bedrooms),
+        bedrooms=result.features.bedrooms,
         bathrooms=result.features.bathrooms,
         sqft_living=result.features.sqft_living,
         sqft_lot=result.features.sqft_lot,

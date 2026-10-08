@@ -11,7 +11,7 @@ from api.types import PredictionInput, PredictionResult
 if TYPE_CHECKING:
     from collections.abc import Mapping
 
-    from api.shared import PredictArtifacts
+    from api.artifacts import PredictArtifacts
 
 HTTP_STATUS_OK = 200
 HTTP_STATUS_NOT_FOUND = 404

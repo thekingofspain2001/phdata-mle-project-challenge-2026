@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 import pytest
 from fastapi.testclient import TestClient
 
-from api.shared import ArtifactLoadError
+from api.artifacts import ArtifactLoadError
 from src.main import app
 
 if TYPE_CHECKING:
