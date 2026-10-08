@@ -43,10 +43,9 @@ def predict_v2(
         # require_artifacts already answers 500 for this state; log before it propagates.
         log.warning("artifacts_unavailable", detail=str(exc.detail), status_code=exc.status_code)
         raise
-    payload = home_features.model_dump()
-    filled, _ = fill_missing(payload, artifacts)
-    payload |= filled
-    return PredictionResponse(**predict_price(payload, artifacts))
+    imputation = fill_missing(home_features, artifacts)
+    result = predict_price(imputation.features, artifacts)
+    return PredictionResponse(predicted_price=result.predicted_price)
 
 
 @router_v2.post(
@@ -65,17 +64,16 @@ def impute(
         log.warning("artifacts_unavailable", detail=str(exc.detail), status_code=exc.status_code)
         raise
 
-    request_payload = home_features.model_dump()
-    filled, missing = fill_missing(request_payload, artifacts)
+    result = fill_missing(home_features, artifacts)
 
     return ImputeResponse(
-        bedrooms=int(filled["bedrooms"]),
-        bathrooms=filled["bathrooms"],
-        sqft_living=filled["sqft_living"],
-        sqft_lot=filled["sqft_lot"],
-        floors=filled["floors"],
-        sqft_above=filled["sqft_above"],
-        sqft_basement=filled["sqft_basement"],
-        zipcode=home_features.zipcode,
-        imputed=missing,
+        bedrooms=int(result.features.bedrooms),
+        bathrooms=result.features.bathrooms,
+        sqft_living=result.features.sqft_living,
+        sqft_lot=result.features.sqft_lot,
+        floors=result.features.floors,
+        sqft_above=result.features.sqft_above,
+        sqft_basement=result.features.sqft_basement,
+        zipcode=result.features.zipcode,
+        imputed=result.missing_fields,
     )

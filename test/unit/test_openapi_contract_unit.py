@@ -24,7 +24,9 @@ def test_predict_v2_openapi_documents_prediction_response(test_client: TestClien
     ref: str = ok_schema.get("$ref", "")
     assert ref.endswith("PredictionResponse")
     schemas: dict[str, Any] = spec["components"]["schemas"]
-    price_prop: dict[str, Any] = schemas["PredictionResponse"]["properties"]["predicted_price"]
+    prediction_properties: dict[str, Any] = schemas["PredictionResponse"]["properties"]
+    assert set(prediction_properties) == {"predicted_price"}
+    price_prop: dict[str, Any] = prediction_properties["predicted_price"]
     assert price_prop["type"] == "number"
 
 

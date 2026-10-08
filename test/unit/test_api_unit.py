@@ -72,6 +72,17 @@ def test_predict_v2_endpoint_valid_input(
     assert_predict_v2_ok(test_client, sample_home_features)
 
 
+def test_predict_v2_endpoint_omitted_field_returns_only_prediction(
+    test_client: TestClient,
+    sample_home_features: FeaturePayload,
+) -> None:
+    """Test an omitted feature is imputed without changing the response shape."""
+    del sample_home_features["sqft_living"]
+    response = test_client.post("/predict/v2", json=sample_home_features)
+    assert response.status_code == HTTP_STATUS_OK
+    assert set(response.json()) == {"predicted_price"}
+
+
 def test_predict_v2_endpoint_unknown_zipcode_returns_not_found(
     test_client: TestClient,
     sample_home_features: dict[str, int | float | str],
@@ -114,3 +125,36 @@ def test_predict_v2_endpoint_zero_value_returns_ok(
     """Test the /predict/v2 endpoint passes a zero value through as real data."""
     sample_home_features[field] = 0
     assert_predict_v2_ok(test_client, sample_home_features)
+
+
+def test_impute_complete_input_returns_same_features_and_no_missing_fields(
+    test_client: TestClient,
+    sample_home_features: dict[str, int | float | str],
+) -> None:
+    response = test_client.post("/impute", json=sample_home_features)
+    assert response.status_code == HTTP_STATUS_OK
+    assert response.json()["zipcode"] == sample_home_features["zipcode"]
+    assert response.json()["bedrooms"] == sample_home_features["bedrooms"]
+    assert response.json()["imputed"] == []
+
+
+def test_impute_null_field_returns_value_and_names_it(
+    test_client: TestClient,
+    sample_home_features: dict[str, int | float | str],
+) -> None:
+    payload = sample_home_features | {"sqft_living": None}
+    response = test_client.post("/impute", json=payload)
+    assert response.status_code == HTTP_STATUS_OK
+    assert isinstance(response.json()["sqft_living"], float)
+    assert response.json()["imputed"] == ["sqft_living"]
+
+
+def test_impute_omitted_field_names_it(
+    test_client: TestClient,
+    sample_home_features: dict[str, int | float | str],
+) -> None:
+    payload = sample_home_features.copy()
+    del payload["sqft_living"]
+    response = test_client.post("/impute", json=payload)
+    assert response.status_code == HTTP_STATUS_OK
+    assert response.json()["imputed"] == ["sqft_living"]
