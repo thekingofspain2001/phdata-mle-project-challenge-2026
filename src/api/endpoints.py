@@ -1,18 +1,25 @@
-"""Legacy v1 API endpoints for home price prediction."""
+"""Legacy v1 API endpoints for home price prediction.
+
+Restored to the first-commit shape (e9ef514) on purpose: untyped, original
+imports, artifacts loaded from disk on every request. The two things kept
+from later work are the OpenAPI request examples (so /docs still shows
+sample bodies) and the 404 guard on unknown zipcodes (without it the model
+is handed NaN features and fails with an opaque 500). File is excluded
+from lint in ruff.toml for the same reason.
+"""
 
 from typing import Annotated
 
-from fastapi import APIRouter, Body
+from fastapi import APIRouter, Body, HTTPException
 from pydantic import BaseModel
 
-from api.artifacts import (
-    PredictArtifacts,
-    load_demographics,
-    load_model,
-    load_model_features,
-)
-from api.shared import listing_examples, predict_price
-from api.types import PredictionInput
+import json
+import pickle
+
+import pandas as pd
+
+from api.artifacts import DEMOGRAPHICS_PATH, FEATURES_PATH, MODEL_PATH
+from api.shared import listing_examples
 
 router = APIRouter()
 
@@ -29,7 +36,7 @@ class HomeFeatures(BaseModel):
 
 
 @router.get("/health")
-def health_check() -> dict[str, str]:
+async def health_check():
     """
     Health check endpoint for container orchestration.
     Returns 200 if API is ready to accept requests.
@@ -38,28 +45,33 @@ def health_check() -> dict[str, str]:
 
 
 @router.post("/predict")
-def predict(home_features: Annotated[HomeFeatures, Body(openapi_examples=listing_examples())]) -> dict[str, float]:
-    loaded_model = load_model()
-    loaded_model_features = load_model_features()
-    demographics = load_demographics()
+async def predict(home_features: Annotated[HomeFeatures, Body(openapi_examples=listing_examples())]):
+    # Load the model and features
+    with MODEL_PATH.open("rb") as model_file:
+        model = pickle.load(model_file)
 
-    artifacts = PredictArtifacts(
-        model=loaded_model,
-        model_features=loaded_model_features,
-        demographics=demographics,
-    )
+    with FEATURES_PATH.open() as features_file:
+        model_features: list[str] = json.load(features_file)
 
-    prediction_input = PredictionInput(
-        bedrooms=home_features.bedrooms,
-        bathrooms=home_features.bathrooms,
-        sqft_living=home_features.sqft_living,
-        sqft_lot=home_features.sqft_lot,
-        floors=home_features.floors,
-        sqft_above=home_features.sqft_above,
-        sqft_basement=home_features.sqft_basement,
-        zipcode=home_features.zipcode,
-    )
+    input_data: pd.DataFrame = pd.DataFrame([home_features.model_dump()])
 
-    prediction_result = predict_price(prediction_input, artifacts)
+    # Load demographic data
+    demographics = pd.read_csv(DEMOGRAPHICS_PATH, dtype={"zipcode": str})
+    demographic_info = demographics[demographics["zipcode"] == home_features.zipcode].drop(columns="zipcode").reset_index(drop=True)
 
-    return {"predicted_price": prediction_result.predicted_price}
+    # A zipcode with no demographics row joins to nothing; without this guard the
+    # model is handed NaN features and fails with an opaque 500.
+    if demographic_info.empty:
+        raise HTTPException(status_code=404, detail=f"Unknown zipcode: {home_features.zipcode}")
+
+    # Combine input data with demographic data
+    input_data = pd.concat([input_data, demographic_info], axis=1)
+    print(input_data)
+
+    # Ensure the input data has the correct features
+    selected: pd.DataFrame = input_data[model_features]
+
+    # Make prediction
+    prediction = model.predict(selected)
+
+    return {"predicted_price": prediction[0]}
