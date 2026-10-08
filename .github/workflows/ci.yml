@@ -17,7 +17,7 @@ jobs:
       - run: uvx ruff@0.16.10 check .
       - run: uv run --group test pyright
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         if: always()
         with:
           name: coverage-report
