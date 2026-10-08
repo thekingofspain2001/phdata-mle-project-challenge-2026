@@ -5,8 +5,13 @@ from typing import TYPE_CHECKING
 import pytest
 from fastapi.testclient import TestClient
 
+from api import endpoints
+from api.types import PredictionInput, PredictionResult
+
 if TYPE_CHECKING:
     from collections.abc import Mapping
+
+    from api.shared import PredictArtifacts
 
 HTTP_STATUS_OK = 200
 HTTP_STATUS_NOT_FOUND = 404
@@ -52,6 +57,39 @@ def test_predict_endpoint_valid_input(
     response_data = response.json()
     assert "predicted_price" in response_data
     assert isinstance(response_data["predicted_price"], float)
+
+
+def test_predict_endpoint_uses_shared_prediction_path(
+    test_client: TestClient,
+    sample_home_features: dict[str, int | float | str],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Pass v1's typed features and locally loaded artifacts to shared prediction."""
+    received: list[tuple[PredictionInput, PredictArtifacts]] = []
+
+    def predict_price(features: PredictionInput, artifacts: PredictArtifacts) -> PredictionResult:
+        received.append((features, artifacts))
+        return PredictionResult(predicted_price=123.0)
+
+    monkeypatch.setattr(endpoints, "predict_price", predict_price)
+
+    response = test_client.post("/predict", json=sample_home_features)
+
+    assert response.status_code == HTTP_STATUS_OK
+    assert response.json() == {"predicted_price": 123.0}
+    assert len(received) == 1
+    features, artifacts = received[0]
+    assert features.bedrooms == sample_home_features["bedrooms"]
+    assert features.bathrooms == sample_home_features["bathrooms"]
+    assert features.sqft_living == sample_home_features["sqft_living"]
+    assert features.sqft_lot == sample_home_features["sqft_lot"]
+    assert features.floors == sample_home_features["floors"]
+    assert features.sqft_above == sample_home_features["sqft_above"]
+    assert features.sqft_basement == sample_home_features["sqft_basement"]
+    assert features.zipcode == sample_home_features["zipcode"]
+    assert artifacts.model is not None
+    assert artifacts.model_features
+    assert "98042" in artifacts.demographics["zipcode"].values
 
 
 def test_predict_endpoint_unknown_zipcode_returns_not_found(

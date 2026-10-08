@@ -11,6 +11,9 @@ from src.main import app
 if TYPE_CHECKING:
     from collections.abc import Iterator
 
+    from api.shared import PredictArtifacts
+    from api.types import PredictionInput, PredictionResult
+
 REQUEST_ID = "8f14e45f-ea0f-4b76-9c2a-1f3d5b7c9e01"
 INTERNAL_SERVER_ERROR = 500
 UUID_LENGTH = 36
@@ -25,7 +28,7 @@ def client() -> Iterator[TestClient]:
         yield test_client
 
 
-def explode(_payload: dict[str, object], _artifacts: object) -> dict[str, float]:
+def explode(_features: PredictionInput, _artifacts: PredictArtifacts) -> PredictionResult:
     """Stand in for the prediction pipeline: always fails."""
     raise RuntimeError(BOOM_MESSAGE)
 

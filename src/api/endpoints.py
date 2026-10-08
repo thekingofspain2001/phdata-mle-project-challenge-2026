@@ -8,15 +8,13 @@ bodies. File is excluded from lint in ruff.toml for the same reason.
 
 from typing import Annotated
 
-from fastapi import APIRouter, Body, HTTPException
+from fastapi import APIRouter, Body
 from pydantic import BaseModel
 
-import json
-import pickle
-
-import pandas as pd
-
-from api.shared import DEMOGRAPHICS_PATH, FEATURES_PATH, MODEL_PATH, listing_examples
+from api.shared import (
+    PredictArtifacts,
+    listi' no
+from api.types import PredictionInput
 
 router = APIRouter()
 
@@ -50,27 +48,23 @@ async def predict(home_features: Annotated[HomeFeatures, Body(openapi_examples=l
     with FEATURES_PATH.open() as features_file:
         model_features: list[str] = json.load(features_file)
 
-    input_data: pd.DataFrame = pd.DataFrame([home_features.model_dump()])
-
     # Load demographic data
-    demographics = pd.read_csv(DEMOGRAPHICS_PATH, dtype={"zipcode": str})
-    demographic_info = demographics[
-        demographics["zipcode"] == home_features.zipcode
-    ].drop(columns="zipcode").reset_index(drop=True)
+    demographics = load_demographics()
+    artifacts = PredictArtifacts(
+        model=model,
+        model_features=model_features,
+        demographics=demographics,
+    )
+    features = PredictionInput(
+        bedrooms=home_features.bedrooms,
+        bathrooms=home_features.bathrooms,
+        sqft_living=home_features.sqft_living,
+        sqft_lot=home_features.sqft_lot,
+        floors=home_features.floors,
+        sqft_above=home_features.sqft_above,
+        sqft_basement=home_features.sqft_basement,
+        zipcode=home_features.zipcode,
+    )
+    result = predict_price(features, artifacts)
 
-    # A zipcode with no demographics row joins to nothing; without this guard the
-    # model is handed NaN features and fails with an opaque 500.
-    if demographic_info.empty:
-        raise HTTPException(status_code=404, detail=f"Unknown zipcode: {home_features.zipcode}")
-
-    # Combine input data with demographic data
-    input_data = pd.concat([input_data, demographic_info], axis=1)
-    print(input_data)
-
-    # Ensure the input data has the correct features
-    selected: pd.DataFrame = input_data[model_features]
-
-    # Make prediction
-    prediction = model.predict(selected)
-
-    return {"predicted_price": prediction[0]}
+    return {"predicted_price": result.predicted_price}
